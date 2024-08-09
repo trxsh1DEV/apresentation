@@ -1,6 +1,7 @@
+import { BASE_URL } from "@/utils/request";
 import { FC, useEffect, useId, useState } from "react";
 
-interface CustomInputProps {
+interface TypePropsSearchInput {
   type?: string;
   placeholder?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -8,19 +9,36 @@ interface CustomInputProps {
   label?: string;
   className?: string;
   defaultValue?: string;
-  typeData: "test" | "cpuData";
 }
 
-const CustomInput: FC<CustomInputProps> = ({
+interface ValidTypeData {
+  typeData: "test" | "cpuData" | "gpuData";
+  url?: string;
+}
+
+interface InvalidTypeData {
+  typeData: null;
+  url: string;
+}
+
+type CustomInputProps = TypePropsSearchInput &
+  (ValidTypeData | InvalidTypeData);
+
+const SearchInput: FC<CustomInputProps> = ({
   type = "text",
   placeholder,
   label = "\u00A0",
   typeData,
+  url,
   // onChange,
   style,
   defaultValue,
   className,
 }) => {
+  if (typeData === null && url === undefined) {
+    throw new Error("url is required when typeData is null");
+  }
+
   const inputId = useId();
 
   const [data, setData] = useState<string[]>([]);
@@ -28,13 +46,12 @@ const CustomInput: FC<CustomInputProps> = ({
   const [query, setQuery] = useState<string>("");
 
   useEffect(() => {
-    fetch(`../../../${typeData}.json`)
+    const req = (typeData && `../../../${typeData}.json`) || url;
+    fetch(`${BASE_URL}/${req}`)
       .then((response) => response.json())
       .then((data) => setData(data))
       .catch((error) => console.error("Error fetching data:", error));
-  }, []);
 
-  useEffect(() => {
     if (query) {
       const regexExact = new RegExp(`^${query}$`, "i");
       const regexPartial = new RegExp(`${query}`, "i");
@@ -49,7 +66,7 @@ const CustomInput: FC<CustomInputProps> = ({
     } else {
       setResults([]);
     }
-  }, [query, data]);
+  }, [query, data, typeData]);
 
   // const handleResultClick = (result: string) => {
   //   onChange({ target: { value: result } } as any);
@@ -106,4 +123,4 @@ const CustomInput: FC<CustomInputProps> = ({
   );
 };
 
-export default CustomInput;
+export default SearchInput;

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import "./style.css";
 import { AgentType } from "../../utils/types/types";
@@ -85,6 +85,7 @@ const renderKeyValuePairs = (obj: any): JSX.Element[] => {
 
 const handleLabelClick = (inputId: string) => {
   const inputElement = document.getElementById(inputId) as HTMLInputElement;
+
   if (inputElement) {
     navigator.clipboard.writeText(inputElement.value);
   }
@@ -95,6 +96,40 @@ export default function Client() {
   const id = location.pathname.split("/")[2];
   const [agent, setAgent] = useState<AgentType | null>(null);
   const [activeTab, setActiveTab] = useState("Geral");
+  const formElement = useRef(null);
+
+  const handleEdit = async () => {
+    try {
+      if (!agent) return;
+      const updatedCustom: any = {};
+
+      const form =
+        formElement.current || document.getElementById("FormContainer");
+      if (!form) return;
+      const readOnlyElements = form.querySelectorAll("input:not([readonly])");
+
+      // Itera sobre os elementos encontrados
+      readOnlyElements.forEach((element) => {
+        const inputValue = (element as HTMLInputElement).value;
+        updatedCustom[element.id] = inputValue;
+      });
+
+      await request.patch(`/clients/${id}`, {
+        custom: {
+          ...updatedCustom,
+        },
+      });
+
+      setAgent((prevUserData: any) => ({
+        ...prevUserData,
+        custom: {
+          ...updatedCustom,
+        },
+      }));
+    } catch (err: any) {
+      console.log(err.message);
+    }
+  };
 
   const handleActiveTab = (name: string) => {
     return (
@@ -125,36 +160,6 @@ export default function Client() {
     fetchData();
   }, []);
 
-  const handleEdit = async () => {
-    try {
-      if (!agent) return;
-      const updatedCustom: any = {};
-
-      const form = document.getElementById("FormContainer") || document;
-      const readOnlyElements = form.querySelectorAll("input:not([readonly])");
-
-      // Itera sobre os elementos encontrados
-      readOnlyElements.forEach((element) => {
-        const inputValue = (element as HTMLInputElement).value;
-        updatedCustom[element.id] = inputValue;
-      });
-
-      await request.patch(`/clients/${id}`, {
-        custom: {
-          ...updatedCustom,
-        },
-      });
-
-      setAgent((prevUserData: any) => ({
-        ...prevUserData,
-        custom: {
-          ...updatedCustom,
-        },
-      }));
-    } catch (err: any) {
-      console.log(err.message);
-    }
-  };
   console.log(agent);
 
   return (
@@ -163,18 +168,27 @@ export default function Client() {
         {handleActiveTab("Geral")}
         {handleActiveTab("Rede")}
         {handleActiveTab("Software")}
+        {handleActiveTab("Hardware")}
+        {handleActiveTab("Sistema")}
         {handleActiveTab("Monitoramento")}
+        {handleActiveTab("Periféricos")}
         {handleActiveTab("Detalhes")}
       </div>
       {!agent ? (
         <div>Loading...</div>
       ) : (
         <>
-          <section className="FormContainer" id="FormContainer">
+          <section
+            className="FormContainer"
+            id="FormContainer"
+            ref={formElement}
+          >
             {/* Renderizar conteúdo conforme a aba ativa */}
             {activeTab === "Geral" && (
               <div className="ContentWrapper">
-                <div className="SectionTitle">Informações Gerais</div>
+                <div className="text-center col-span-full text-4xl font-bold mb-10">
+                  Informações Gerais
+                </div>
 
                 <div className="Content">
                   <label htmlFor="sys-so">SO</label>
@@ -229,7 +243,7 @@ export default function Client() {
                 </div>
 
                 <div className="Content">
-                  <label htmlFor="cpu-arch">Me. RAM</label>
+                  <label htmlFor="cpu-arch">Memória RAM</label>
                   <input
                     id="cpu-arch"
                     value={agent.inventory.memory.total + " GB"}
@@ -240,7 +254,7 @@ export default function Client() {
                 </div>
 
                 <div className="Content">
-                  <label htmlFor="storage-total">Disco T.</label>
+                  <label htmlFor="storage-total">Disco Total</label>
                   <input
                     id="storage-total"
                     value={agent.inventory.storage.total + " GB"}
@@ -251,7 +265,7 @@ export default function Client() {
                 </div>
 
                 <div className="Content">
-                  <label htmlFor="storage-used">D. usado</label>
+                  <label htmlFor="storage-used">Disco usado</label>
                   <input
                     id="storage-used"
                     value={agent.inventory.storage.used + " GB"}

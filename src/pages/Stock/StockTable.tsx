@@ -1,4 +1,4 @@
-import { useMemo, useState, FC } from "react";
+import { useMemo, useState } from "react";
 import { IconButton, Tooltip } from "@mui/material";
 import {
   MRT_ActionMenuItem,
@@ -9,30 +9,19 @@ import {
   useMaterialReactTable,
   type MRT_ColumnDef,
 } from "material-react-table";
-import { TypePeripherical } from "../../utils/types/types";
+import { TypeStockAutomatic } from "../../utils/types/types";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { formatDateString } from "../../utils/utils";
-import { download, generateCsv, mkConfig } from "export-to-csv";
 import { request } from "../../utils/request";
-// import { ArrowsClockwise, Pen, Trash } from "phosphor-react";
-import TablePeriphericals from "./Periphericals";
 import { Pen, RefreshCcw, Trash } from "lucide-react";
-// import { useDispatch } from "react-redux";
 
 type UserApiResponse = {
-  data: Array<TypePeripherical>;
+  data: Array<TypeStockAutomatic>;
   meta: {
     totalRowCount: number;
   };
 };
 
-const csvConfig = mkConfig({
-  fieldSeparator: ",",
-  decimalSeparator: ".",
-  useKeysAsHeaders: true,
-});
-
-const Peripherical: FC = () => {
+const StockAutomatic = () => {
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>(
     []
   );
@@ -66,7 +55,7 @@ const Peripherical: FC = () => {
       params.append("sorting", JSON.stringify(sorting ?? []));
 
       try {
-        const response = await request.get("/peripherical", { params });
+        const response = await request.get("/stock", { params });
         return response.data;
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -76,37 +65,41 @@ const Peripherical: FC = () => {
     placeholderData: keepPreviousData,
   });
 
-  const handleExportData = () => {
-    if (!data || data.length <= 0) return;
-    data.map((asd) => console.log({ ...asd }));
-    const periphericals = data.map((client) => ({ ...client }));
-    // const csv = generateCsv(csvConfig)(periphericals);
-    // download(csvConfig)(csv);
-  };
-
-  const columns = useMemo<MRT_ColumnDef<TypePeripherical>[]>(
+  const columns = useMemo<MRT_ColumnDef<any>[]>(
     () => [
-      { accessorKey: "status", header: "Situação" },
-      { accessorKey: "host", header: "Host" },
-      { accessorKey: "class", header: "Classe" },
-      { accessorKey: "sample", header: "Modelo/Versão" },
-      { accessorKey: "manufacturer", header: "Fabricante" },
-      { accessorKey: "department", header: "Departamento" },
-      { accessorKey: "person", header: "Pessoa" },
-      { accessorKey: "category", header: "Categoria" },
+      // {
+      //   accessorKey: "host_ref",
+      //   header: "Host",
+      // },
       {
-        accessorKey: "createdAt",
-        header: "Data",
-        Cell: ({ cell }: any) => formatDateString(cell.getValue()),
+        accessorKey: "hostname",
+        header: "Hostname",
+      },
+      {
+        accessorKey: "device_id",
+        header: "Identificador",
+      },
+      {
+        accessorKey: "device_type",
+        header: "Tipo de Periférico",
+        Cell: ({ renderedCellValue }) => (
+          <span style={{ textTransform: "capitalize" }}>
+            {renderedCellValue}
+          </span>
+        ),
       },
     ],
     []
+    //end
   );
 
   const table = useMaterialReactTable({
     columns,
     data,
-    enableRowActions: true,
+    enableExpanding: true,
+    // filterFromLeafRows: false, //apply filtering to all rows instead of just parent rows
+    getSubRows: (row) => row.devices, //default
+    // paginateExpandedRows: true, //When rows are expanded, do not count sub-rows as number of rows on the page towards pagination
     renderRowActionMenuItems: ({ table }) => [
       <MRT_ActionMenuItem
         icon={<Pen />}
@@ -130,23 +123,14 @@ const Peripherical: FC = () => {
             <RefreshCcw />
           </IconButton>
         </Tooltip>
-        <button onClick={handleExportData}>Exportar Dados</button>
+        <button>Exportar Dados</button>
         {/* <button onClick={() => handleModal()}>Adicionar novo</button> */}
       </>
     ),
-
     rowCount: meta?.totalRowCount ?? 0,
-    initialState: { showColumnFilters: true },
-    state: {
-      columnFilters,
-      isLoading,
-      pagination,
-      showAlertBanner: isError,
-      showSkeletons: isRefetching,
-      sorting,
-    },
+    initialState: { showColumnFilters: false },
     manualFiltering: true,
-    manualPagination: true,
+    manualPagination: true, // problema para exibir as subRows de devices, junto com a prop paginateExpandedRows
     manualSorting: true,
     enableGlobalFilter: false,
     enableDensityToggle: false,
@@ -166,15 +150,17 @@ const Peripherical: FC = () => {
     onColumnFiltersChange: setColumnFilters,
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
+    state: {
+      columnFilters,
+      isLoading,
+      pagination,
+      showAlertBanner: isError,
+      showSkeletons: isRefetching,
+      sorting,
+    },
   });
 
-  return (
-    <>
-      <h1>Equipamentos</h1>
-      <MaterialReactTable table={table} />
-      <TablePeriphericals />
-    </>
-  );
+  return <MaterialReactTable table={table} />;
 };
 
-export default Peripherical;
+export default StockAutomatic;

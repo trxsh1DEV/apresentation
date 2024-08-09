@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { request } from "../../utils/request";
 import "./style.css";
-import CustomInput from "../../components/InputCommom";
+import SearchInput from "../../components/InputCommom";
 
 export default function CompareHardware() {
   const [icons, setIcons] = useState<any>({});
@@ -63,7 +63,7 @@ export default function CompareHardware() {
         <form>
           <h3>Hardware PC-8152</h3>
           <div className="Wrapper">
-            <CustomInput
+            <SearchInput
               typeData="cpuData"
               placeholder="i5-9400F"
               label="CPU"
@@ -89,7 +89,7 @@ export default function CompareHardware() {
             />
           </div>
           <div className="Wrapper">
-            <CustomInput
+            <SearchInput
               typeData="test"
               placeholder="GeForce GTX 1060"
               label="GPU"

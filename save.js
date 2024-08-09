@@ -34,16 +34,39 @@ import axios from "axios";
 
 const apiUrl = "http://localhost:3000/triggers";
 const myData = [
-  {
-    display_name: "Alerta Memória RAM",
-    name: "",
-    isActive: false,
-  },
-  {
-    display_name: "Alerta Disco Rigído",
-    name: "",
-    isActive: false,
-  },
+  { display_name: "Alerta de cerca virtual" },
+  { display_name: "Alteração de hardware" },
+  { display_name: "Alteração de software" },
+  { display_name: "Atraso de manutenção" },
+  { display_name: "Atraso de devolução" },
+  { display_name: "BitLocker desativado" },
+  { display_name: "Checagem de antivírus" },
+  { display_name: "Consumo de CPU" },
+  { display_name: "Consumo de RAM" },
+  { display_name: "Contrato a vencer" },
+  { display_name: "Equipamentos com garantia a vencer" },
+  { display_name: "Equipamentos desativados" },
+  { display_name: "Equipamentos com garantia vencida Alerta" },
+  { display_name: "Equipamentos não localizados" },
+  { display_name: "Estoque abaixo do mínimo" },
+  { display_name: "HD com saúde critica" },
+  { display_name: "HD sobrecarregado" },
+  { display_name: "Inventário em estoque" },
+  { display_name: "Logon simultâneo" },
+  { display_name: "Manutenção preventiva a vencer" },
+  { display_name: "Manutenção preventiva vencida" },
+  { display_name: "Mudança de hostname" },
+  { display_name: "Mudança de logon" },
+  { display_name: "Mudança de SIM Card" },
+  { display_name: "Número de série coincidente" },
+  { display_name: "Pacotes com licença a vencer" },
+  { display_name: "Pacotes com licença vencida" },
+  { display_name: "Pacotes com suporte vencido" },
+  { display_name: "Secure boot desativado" },
+  { display_name: "Softwares desatualizados" },
+  { display_name: "Softwares proibidos" },
+  { display_name: "Softwares sem licença" },
+  { display_name: "Possui Antivirus" },
 ];
 
 const formatName = (displayName) => {
@@ -60,11 +83,10 @@ async function postData(data) {
   try {
     const resultRefine = {
       display_name: data.display_name,
-      isActive: data.isActive,
+      isActive: false,
       name: formatName(data.display_name),
     };
     console.log(resultRefine);
-    console.log(apiUrl, data);
     const response = await axios.post(apiUrl, resultRefine);
     console.log(response.data);
   } catch (error) {

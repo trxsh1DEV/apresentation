@@ -348,13 +348,17 @@ const Clients: React.FC = () => {
     <>
       <h1>Connected Clients</h1>
       {!clients && <div>Nenhum dado disponível</div>}
-      {clients && clients.length > 0 && (
-        <ThemeProvider theme={tableTheme}>
-          <MaterialReactTable table={table} />
-        </ThemeProvider>
-      )}
+      {clients && clients.length > 0 && <MaterialReactTable table={table} />}
     </>
   );
 };
 
-export default Clients;
+export const TableInventoryDevices = () => {
+  return (
+    <ThemeProvider theme={tableTheme()}>
+      <Clients />
+    </ThemeProvider>
+  );
+};
+
+export default TableInventoryDevices;

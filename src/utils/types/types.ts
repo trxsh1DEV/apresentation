@@ -81,3 +81,15 @@ export type TypePeripherical = {
   updatedAt?: string;
   _id?: string;
 };
+
+type TypeDeviceStockAutomatic = {
+  device_type: "keyboard" | "mouse" | "monitor";
+  device_id: string;
+};
+
+// Tipo para a estrutura completa do estoque
+export type TypeStockAutomatic = {
+  host_ref: string;
+  hostname: string;
+  devices: TypeDeviceStockAutomatic[]; // Array de dispositivos
+};

@@ -2,9 +2,9 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Toggle } from "@/components/ui/toggle";
 import { Filter } from "lucide-react";
 import { BASE_URL, request } from "@/utils/request";
+import { H1Custom } from "@/components/customerComponents/Customercomponents";
 
 interface Alert {
-  _id: string;
   display_name: string;
   name: string;
   isActive: boolean;
@@ -42,7 +42,6 @@ const AlertTrigger: React.FC = () => {
 
   const addNewAlert = (displayName: string) => {
     const newAlert: Alert = {
-      _id: String(alerts.length + 1),
       display_name: displayName,
       name: formatName(displayName),
       isActive: true,
@@ -50,20 +49,18 @@ const AlertTrigger: React.FC = () => {
     setAlerts((prevAlerts) => [...prevAlerts, newAlert]);
   };
 
-  const toggleAlert = async (id: string) => {
+  const toggleAlert = async (name: string) => {
     setAlerts((prevAlerts) => {
       const updatedAlerts = prevAlerts.map((alert) =>
-        alert._id === id ? { ...alert, isActive: !alert.isActive } : alert
+        alert.name === name ? { ...alert, isActive: !alert.isActive } : alert
       );
 
       // Encontre o alerta atualizado
-      const updatedAlert = updatedAlerts.find((alert) => alert._id === id);
-      console.log("new", updatedAlert);
-
+      const updatedAlert = updatedAlerts.find((alert) => alert.name === name);
       if (updatedAlert) {
         // Faça a requisição PUT para a API
         request
-          .patch(`${BASE_URL}/triggers/${id}`, {
+          .patch(`${BASE_URL}/triggers/${name}`, {
             isActive: updatedAlert.isActive,
           })
           .then((response) => {
@@ -79,26 +76,29 @@ const AlertTrigger: React.FC = () => {
   };
 
   return (
-    <div className="p-4 bg-gray-900 text-white">
-      <h1 className="text-2xl font-bold mb-4">Configuração de Alertas</h1>
+    <div className="p-4 bg-gray-900 text-white mx-auto min-w-max max-w-5xl">
+      <H1Custom>Configuração de Alertas</H1Custom>
       <div className="space-y-2">
         {alerts.map((alert) => (
           <div
-            key={alert._id}
+            key={alert.name}
             className="flex items-center justify-between bg-gray-800 p-3 rounded"
           >
-            <span>{alert.display_name}</span>
+            <span className="text-2xl">{alert.display_name}</span>
             <div className="flex items-center space-x-2">
-              <span>{alert.isActive ? "Ativado" : "Desativado"}</span>
+              <span className="text-xl ml-4">
+                {alert.isActive ? "Ativado" : "Desativado"}
+              </span>
               <Toggle
                 variant="outline"
                 pressed={alert.isActive}
-                onPressedChange={() => toggleAlert(alert._id)}
+                onPressedChange={() => toggleAlert(alert.name)}
                 aria-label={`Toggle ${alert.display_name}`}
+                size={"lg"}
               >
                 <Filter
-                  className={`h-4 w-4 transition text-gray-500 ${alert.isActive && "text-gray-100"}`}
-                  size={20}
+                  className={`transition ${alert.isActive ? "text-green-500" : "text-red-500"}`}
+                  size={28}
                 />
               </Toggle>
             </div>

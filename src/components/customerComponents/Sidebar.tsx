@@ -1,5 +1,16 @@
 import { NavLink as ReactRouterNavLink } from "react-router-dom";
-import { Home, LayoutDashboardIcon, UserCircle, LogOut } from "lucide-react";
+import {
+  Home,
+  LayoutDashboardIcon,
+  UserCircle,
+  LogOut,
+  LucideLayers,
+  MessageCircle,
+  Siren,
+  MonitorSmartphone,
+  LocateFixed,
+  Code,
+} from "lucide-react";
 
 const Sidebar = () => {
   return (
@@ -16,6 +27,48 @@ const Sidebar = () => {
           <div className="flex items-center font-medium gap-2.5 p-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:bg-gray-700 hover:text-indigo-400">
             <LayoutDashboardIcon size={32} />
             <span className="ml-2">Dashboards</span>
+          </div>
+        </ReactRouterNavLink>
+
+        <ReactRouterNavLink to="/" className="text-azure block w-52 p-2.5">
+          <div className="flex items-center font-medium gap-2.5 p-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:bg-gray-700 hover:text-indigo-400">
+            <LucideLayers size={32} />
+            <span className="ml-2">Inventário</span>
+          </div>
+        </ReactRouterNavLink>
+
+        <ReactRouterNavLink to="/" className="text-azure block w-52 p-2.5">
+          <div className="flex items-center font-medium gap-2.5 p-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:bg-gray-700 hover:text-indigo-400">
+            <Siren size={32} />
+            <span className="ml-2">Alertas</span>
+          </div>
+        </ReactRouterNavLink>
+
+        <ReactRouterNavLink to="/" className="text-azure block w-52 p-2.5">
+          <div className="flex items-center font-medium gap-2.5 p-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:bg-gray-700 hover:text-indigo-400">
+            <MonitorSmartphone size={32} />
+            <span className="ml-2">Equipamentos</span>
+          </div>
+        </ReactRouterNavLink>
+
+        <ReactRouterNavLink to="/" className="text-azure block w-52 p-2.5">
+          <div className="flex items-center font-medium gap-2.5 p-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:bg-gray-700 hover:text-indigo-400">
+            <LocateFixed size={32} />
+            <span className="ml-2">Geolocalização</span>
+          </div>
+        </ReactRouterNavLink>
+
+        <ReactRouterNavLink to="/" className="text-azure block w-52 p-2.5">
+          <div className="flex items-center font-medium gap-2.5 p-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:bg-gray-700 hover:text-indigo-400">
+            <Code size={32} />
+            <span className="ml-2">API</span>
+          </div>
+        </ReactRouterNavLink>
+
+        <ReactRouterNavLink to="/" className="text-azure block w-52 p-2.5">
+          <div className="flex items-center font-medium gap-2.5 p-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:bg-gray-700 hover:text-indigo-400">
+            <MessageCircle size={32} />
+            <span className="ml-2">Suporte</span>
           </div>
         </ReactRouterNavLink>
 

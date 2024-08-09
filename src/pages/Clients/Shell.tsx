@@ -37,7 +37,7 @@ const Shell = ({
         input.scrollIntoView({ behavior: "smooth" });
       }
     }
-  }, [output]);
+  }, [output, input]);
 
   const handleCommandSubmit = async (command: string) => {
     setIsLoading(true);
@@ -65,7 +65,7 @@ const Shell = ({
           handleCommandSubmit(command);
           break;
       }
-      setCommand("");
+      // setCommand("");
     }
   };
 
