@@ -1,12 +1,15 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import Chart from "chart.js/auto";
 import { Line } from "react-chartjs-2";
 import GaugeChart from "react-gauge-chart";
 import { data, historyData } from "./mock";
 
 const Charts: React.FC = () => {
+  const cpuRamBarsRef = useRef<Chart | null>(null);
+  const diskSpacePieRef = useRef<any>(null);
+
   // Labels para o eixo X
-  const labels = historyData.map((values, _) => `${values.day}`);
+  const labels = historyData.map((values) => `${values.day}`);
 
   // Dados para os gráficos
   const historyCPUUsage = historyData.map((data) => data.cpu_usage);
@@ -17,28 +20,24 @@ const Charts: React.FC = () => {
   );
 
   useEffect(() => {
-    // Definindo as cores com base nos dados
     const getColor = (value: number) => {
-      let red, green, blue, alpha;
+      let red, green, blue;
 
       if (value < 50) {
         red = 0;
         green = 255 * (value / 50);
         blue = 0;
       } else if (value <= 80) {
-        // Amarelo para Vermelho
         red = 255 * ((value - 50) / 30);
         green = 255;
         blue = 0;
       } else {
-        // Vermelho
         red = 255;
         green = 255 - 255 * ((value - 80) / 20);
         blue = 0;
       }
 
-      alpha = Math.min(1, value / 20); // Limite máximo de opacidade em 1
-      console.log(green);
+      const alpha = Math.min(1, value / 20); // Limite máximo de opacidade em 1
 
       return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
     };
@@ -47,7 +46,10 @@ const Charts: React.FC = () => {
     const cpuRamBarsCtx = document.getElementById(
       "cpuRamBars"
     ) as HTMLCanvasElement;
-    new Chart(cpuRamBarsCtx, {
+    if (cpuRamBarsRef.current) {
+      cpuRamBarsRef.current.destroy();
+    }
+    cpuRamBarsRef.current = new Chart(cpuRamBarsCtx, {
       type: "bar",
       data: {
         labels: labels,
@@ -56,14 +58,14 @@ const Charts: React.FC = () => {
             label: "CPU Usage (%)",
             data: historyCPUUsage,
             backgroundColor: historyCPUUsage.map((value) => getColor(value)),
-            borderColor: historyCPUUsage.map((_) => "transparent"),
+            borderColor: historyCPUUsage.map(() => "transparent"),
             borderWidth: 1,
           },
           {
             label: "RAM Usage (%)",
             data: historyRAMUsage,
             backgroundColor: historyRAMUsage.map((value) => getColor(value)),
-            borderColor: historyRAMUsage.map((_) => "transparent"),
+            borderColor: historyRAMUsage.map(() => "transparent"),
             borderWidth: 1,
           },
         ],
@@ -81,7 +83,10 @@ const Charts: React.FC = () => {
     const diskSpacePieCtx = document.getElementById(
       "diskSpacePie"
     ) as HTMLCanvasElement;
-    new Chart(diskSpacePieCtx, {
+    if (diskSpacePieRef.current) {
+      diskSpacePieRef.current.destroy();
+    }
+    diskSpacePieRef.current = new Chart(diskSpacePieCtx, {
       type: "pie",
       data: {
         labels: ["Free Space", "Used Space"],
@@ -102,86 +107,75 @@ const Charts: React.FC = () => {
       },
       options: {},
     });
-  }, []);
 
-  // Gauge
+    // Cleanup function to destroy charts when component unmounts
+    return () => {
+      if (cpuRamBarsRef.current) {
+        cpuRamBarsRef.current.destroy();
+      }
+      if (diskSpacePieRef.current) {
+        diskSpacePieRef.current.destroy();
+      }
+    };
+  }, [labels, historyCPUUsage, historyRAMUsage]);
+
+  // Gauge options
   const gaugeOptions = {
     minValue: 0,
     maxValue: 100,
-    nrOfLevels: 30,
+    // arcPadding: 0.08,
+    // cornerRadius: 3,
+    // arcsLength: [0.3, 0.5, 0.2],
+    nrOfLevels: 20,
     colors: ["#FF5F6D", "#7DDA58"],
     arcWidth: 0.3,
-    // label: { text: "CPU Temperature", color: "#000000" },
   };
 
-  const cpuTemperatureGauge = (
-    <GaugeChart
-      id="cpuTemperatureGauge"
-      percent={data.cpu_temperature / 100}
-      {...gaugeOptions}
-    />
-  );
-  const memGabage = (
-    <GaugeChart
-      id="memGabage"
-      percent={data.ram_usage / 100}
-      {...gaugeOptions}
-    />
-  );
-  const cpuUsage = (
-    <GaugeChart
-      id="cpuUsage"
-      percent={data.cpu_usage / 100}
-      {...gaugeOptions}
-    />
-  );
-  const diskUsage = (
-    <GaugeChart
-      id="diskUsage"
-      percent={data.free_disk_space / data.total_disk_space}
-      {...gaugeOptions}
-    />
-  );
-
   return (
-    <div style={{ textAlign: "center" }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-around",
-          marginBottom: "20px",
-        }}
-      >
+    <div className="text-center max-w-screen-xl mx-auto">
+      <div className="flex flex-wrap justify-between mb-6 ">
         <div>
-          <p>CPU</p>
-          {cpuTemperatureGauge}
+          <p className="font-bold text-2xl">Temperatura CPU</p>
+          <GaugeChart
+            style={{ width: 285 }}
+            id="cpuTemperatureGauge"
+            percent={data.cpu_temperature / 100}
+            {...gaugeOptions}
+          />
         </div>
         <div>
-          <p>Memory</p>
-          {memGabage}
+          <p className="font-bold text-2xl">Uso de Memória</p>
+          <GaugeChart
+            style={{ width: 285 }}
+            id="memGabage"
+            percent={data.ram_usage / 100}
+            {...gaugeOptions}
+          />
         </div>
         <div>
-          <p>CPU Usage</p>
-          {cpuUsage}
+          <p className="font-bold text-2xl">Uso de CPU</p>
+          <GaugeChart
+            style={{ width: 285 }}
+            id="cpuUsage"
+            percent={data.cpu_usage / 100}
+            {...gaugeOptions}
+          />
         </div>
         <div>
-          <p>Disk Usage</p>
-          {diskUsage}
+          <p className="font-bold text-2xl">Uso de Disco</p>
+          <GaugeChart
+            style={{ width: 285 }}
+            id="diskUsage"
+            percent={data.free_disk_space / data.total_disk_space}
+            {...gaugeOptions}
+          />
         </div>
       </div>
-      <div
-        style={{
-          width: "100%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "400px",
-        }}
-      >
-        <canvas id="cpuRamBars"></canvas>
-        <canvas id="diskSpacePie"></canvas>
+      <div className="flex flex-col md:flex-row items-center justify-between h-96 mb-6 ">
+        <canvas id="cpuRamBars" className="w-full md:w-1/2"></canvas>
+        <canvas id="diskSpacePie" className="w-full md:w-1/2"></canvas>
       </div>
-      <div>
+      <div className="w-full h-fit">
         <Line
           data={{
             labels: labels,
@@ -215,10 +209,20 @@ const Charts: React.FC = () => {
           options={{
             scales: {
               y: {
-                beginAtZero: true,
+                // beginAtZero: true,
+              },
+            },
+            plugins: {
+              title: {
+                display: false,
+                text: "Users Gained between 2016-2020",
+              },
+              legend: {
+                display: true,
               },
             },
           }}
+          className="h-[1200px]"
         />
       </div>
     </div>

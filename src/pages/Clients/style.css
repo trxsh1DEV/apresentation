@@ -3,10 +3,10 @@
     margin: 0 auto;
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: 1200px;
-    min-height: calc(100vh - 6.7rem);
     height: fit-content;
+    /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
+    /* min-height: calc(100vh - 6.7rem); */
     
 }
 
@@ -21,11 +21,9 @@
 .ContentWrapper {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    
     gap: 15px 40px;
     margin-bottom: 10px;
     align-items: center;
-    /* background-color: red; */
     padding: 15px;
 }
 
@@ -73,9 +71,9 @@
     display: flex;
     justify-content: space-between;
     font-size: 1.4rem;
+    position: relative;
     /* background-color: yellow; */
     /* gap: 10px; */
-    position: relative;
     /* width: fit-content; */
 }
 
@@ -88,14 +86,13 @@
     margin: 0;
 }
 
-.ProfileInput {
+/* .ProfileInput {
     padding: 10px;
     border: 1px solid #ccc;
     font-size: 1rem;
     border-radius: 6px;
     box-sizing: border-box;
     width: fit-content;
-    /* height: fit-content; */
     min-height: 40px;
     max-height: 400px;
     overflow: auto;
@@ -106,4 +103,4 @@
 .ProfileInput:read-only {
     background-color: #222;
     cursor: default;
-}
+} */

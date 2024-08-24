@@ -1,66 +1,83 @@
+import { InterfaceSoftwareItem } from "@/pages/Software/Software";
+
 export type AgentType = {
   hwid: string;
   uid: string;
   online: boolean;
   // clientUid: Types.ObjectId;
   inventory: {
-    motherboard: {
-      manufacturer: string;
-      model_extend: string;
-      model: string;
+    inventoryHardware: {
+      motherboard: {
+        manufacturer: string;
+        model_extend: string;
+        model: string;
+      };
+      cpu: {
+        model: string;
+        architecture: string;
+        cpu_freq: number;
+        physical_cores: number;
+        logic_cores: number;
+      };
+      memory: {
+        total: number;
+        available: number;
+        used: number;
+        percentage: number;
+      };
+      system: {
+        so: string;
+        version: string;
+        architecture: string;
+        domain: string;
+        type_machine: string;
+        hostname: string;
+        user_logged: string;
+        last_update: string;
+      };
+      storage: {
+        total: number;
+        used: number;
+        available: number;
+        percentage: number;
+      };
+      network: {
+        mac: string;
+        ip_public: string;
+        ipv4: string;
+        network: string;
+      };
     };
-    cpu: {
-      model: string;
-      architecture: string;
-      cpu_freq: number;
-      physical_cores: number;
-      logic_cores: number;
+    software: {
+      software: InterfaceSoftwareItem[];
     };
-    memory: {
-      total: number;
-      available: number;
-      used: number;
-      percentage: number;
+
+    processes: Processes;
+
+    periphericals: {
+      keyboard: string;
+      mouse: string;
+      monitors: string[];
     };
-    system: {
-      so: string;
-      version: string;
-      architecture: string;
-      domain: string;
-      type_machine: string;
-      hostname: string;
-      user_logged: string;
-      last_update: string;
-    };
-    storage: {
-      total: number;
-      used: number;
-      available: number;
-      percentage: number;
-    };
-    network: {
-      mac: string;
-      ipv4: string;
-      network: string;
-    };
-    software: string[];
   };
-  custom?: {
-    department: string[];
-    collaborator: string[];
-    bond: ["Operador", "Proprietario"];
-    patrimony: string;
-    date_warranty: string;
-    nfe: string;
-    purchase_price: number;
-    local: string[];
-  };
-  periphericals: {
-    keyboard: string;
-    mouse: string;
-    monitors: string[];
-  };
+  custom?: TypeCustom;
 };
+
+export type AgentInventoryType = Pick<
+  AgentType["inventory"],
+  "inventoryHardware" | "periphericals"
+>;
+
+export interface ProcessesFields {
+  pid: number;
+  name: string;
+  exe: string;
+}
+
+export interface Processes {
+  apps: ProcessesFields[];
+  system: ProcessesFields[];
+}
 
 export type TypePeripherical = {
   status: "Normal" | "Critico";
@@ -80,6 +97,17 @@ export type TypePeripherical = {
   createdAt?: string;
   updatedAt?: string;
   _id?: string;
+};
+
+type TypeCustom = {
+  department: string;
+  collaborator: string;
+  bond: "Operador" | "Proprietario";
+  patrimony: string;
+  date_warranty: string;
+  nfe: string;
+  purchase_price: number;
+  local: string;
 };
 
 type TypeDeviceStockAutomatic = {

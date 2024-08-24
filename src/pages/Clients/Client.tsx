@@ -1,8 +1,27 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
-import "./style.css";
+// import "./style.css";
 import { AgentType } from "../../utils/types/types";
-import { request } from "../../utils/request";
+import SearchInput from "@/components/InputCommom";
+import InputComponent from "@/components/InputComponent";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import TableSoftwares from "../Software/Software";
+import { H1Custom } from "@/components/customerComponents/Customercomponents";
+import Charts from "../Charts/Charts";
+import { requestWithToken } from "@/utils/request";
+import TableProcesses from "@/components/Tables/ProcessTable";
+import AgentInfo, {
+  mockAgentData,
+} from "@/components/customerComponents/AgentInfo";
 
 const renderKeyValuePair = (
   key: string,
@@ -53,21 +72,21 @@ const renderKeyValuePair = (
   // const keyNew = key;
 
   return (
-    <div key={key} className="Content">
+    <div key={key} className="flex justify-between text-[1.4rem] relative">
       {!isArray && <label htmlFor={key}>{key}</label>}
       {typeof displayValue === "string" || typeof displayValue === "number" ? (
         <input
           id={key}
           value={displayValue}
           readOnly={readOnly}
-          className={"ProfileInput"}
-          onClick={() => handleLabelClick(key)}
+          className={"text-gray-900 px-3"}
+          onClick={() => handleCopyContent(key)}
         />
       ) : (
         <div
           id={key}
-          className={"ProfileInput"}
-          onClick={() => handleLabelClick(key)}
+          className={"text-gray-900"}
+          onClick={() => handleCopyContent(key)}
         >
           {displayValue}
         </div>
@@ -83,7 +102,7 @@ const renderKeyValuePairs = (obj: any): JSX.Element[] => {
   );
 };
 
-const handleLabelClick = (inputId: string) => {
+const handleCopyContent = (inputId: string) => {
   const inputElement = document.getElementById(inputId) as HTMLInputElement;
 
   if (inputElement) {
@@ -106,17 +125,25 @@ export default function Client() {
       const form =
         formElement.current || document.getElementById("FormContainer");
       if (!form) return;
-      const readOnlyElements = form.querySelectorAll("input:not([readonly])");
+      // console.log(form.querySelector("#department > span")?.textContent);
+      const readOnlyElements = form.querySelectorAll(
+        "input:not([readonly]), [data-select-type='edit-field']"
+      );
 
       // Itera sobre os elementos encontrados
       readOnlyElements.forEach((element) => {
-        const inputValue = (element as HTMLInputElement).value;
+        console.log("el", element);
+        const inputValue =
+          element instanceof HTMLInputElement
+            ? element.value
+            : element.textContent;
         updatedCustom[element.id] = inputValue;
       });
 
-      await request.patch(`/clients/${id}`, {
+      await requestWithToken.patch(`/clients/${id}`, {
         custom: {
           ...updatedCustom,
+          // id,
         },
       });
 
@@ -131,305 +158,403 @@ export default function Client() {
     }
   };
 
-  const handleActiveTab = (name: string) => {
-    return (
-      <div
-        className={`Tab ${activeTab === name ? "ActiveTab" : ""}`}
-        onClick={() => handleTabClick(name)}
-      >
-        {name}
-      </div>
-    );
+  const handleChange = (field: string, value: string) => {
+    setAgent((prevState: any): any => ({
+      ...prevState,
+      custom: {
+        ...prevState.custom,
+        [field]: value,
+      },
+    }));
   };
 
   const handleTabClick = (tabName: string) => {
     setActiveTab(tabName);
   };
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
-      const result = await request.get(`/clients/${id}`);
-      if (!result) return setAgent(null);
-      setAgent(result.data);
+      const [resultInventory, resultSoftware] = await Promise.all([
+        requestWithToken.get(`/clients/full/${id}`),
+        requestWithToken.get(`/softwares/${id}`),
+      ]);
+
+      if (!resultInventory) return setAgent(null);
+      console.log(resultInventory.data.inventory);
+      // console.log(resultSoftware.data.software);
+
+      // Unificar os resultados em um único objeto
+      const unifiedData = {
+        ...resultInventory.data,
+        softwares: resultSoftware.data.software,
+      };
+
+      setAgent(unifiedData);
     } catch (error) {
-      console.error("Error fetching agent:", error);
+      console.error("Erro ao buscar os dados do agente:", error);
+      setAgent(null);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     fetchData();
   }, []);
 
-  console.log(agent);
+  // console.log(agent?.inventory.inventoryHardware.software[0])
+  // console.log(agent?.inventory.software);
 
   return (
     <main className="ProfileContainer">
-      <div className="TabsContainer">
-        {handleActiveTab("Geral")}
-        {handleActiveTab("Rede")}
-        {handleActiveTab("Software")}
-        {handleActiveTab("Hardware")}
-        {handleActiveTab("Sistema")}
-        {handleActiveTab("Monitoramento")}
-        {handleActiveTab("Periféricos")}
-        {handleActiveTab("Detalhes")}
+      <div className="flex justify-center space-x-1 mb-5">
+        {[
+          "Geral",
+          "Software",
+          "Geolocalização",
+          "Histórico de Ocorrências",
+          "Monitoramento",
+          "Processos",
+          "Detalhes",
+        ].map((tab) => (
+          <button
+            key={tab}
+            className={`px-4 bg py-2 rounded text-xl font-semibold transition-all duration-300 hover:opacity-80 ${
+              activeTab === tab
+                ? "dark:bg-purple-700 bg-green-500 text-white"
+                : ""
+            }`}
+            onClick={() => handleTabClick(tab)}
+          >
+            {tab}
+          </button>
+        ))}
       </div>
       {!agent ? (
         <div>Loading...</div>
       ) : (
         <>
           <section
-            className="FormContainer"
+            className="max-w-[1400px] w-[1200px] h-max mx-auto my-0 px-5 rounded-lg"
             id="FormContainer"
             ref={formElement}
           >
             {/* Renderizar conteúdo conforme a aba ativa */}
             {activeTab === "Geral" && (
-              <div className="ContentWrapper">
-                <div className="text-center col-span-full text-4xl font-bold mb-10">
+              <div className="grid grid-cols-[repeat(2,1fr)] gap-[15px_40px] items-center mb-0 p-[15px]">
+                <div className="text-center col-span-full text-4xl font-bold mb-5">
                   Informações Gerais
                 </div>
 
-                <div className="Content">
-                  <label htmlFor="sys-so">SO</label>
-                  <input
-                    id="sys-so"
-                    value={agent.inventory.system.so}
-                    readOnly
-                    className={"ProfileInput"}
-                    onClick={() => handleLabelClick("sys-so")}
-                  />
-                </div>
-                <div className="Content">
-                  <label htmlFor="sys-host">Hostname</label>
-                  <input
-                    id="sys-host"
-                    value={agent.inventory.system.hostname}
-                    readOnly
-                    className={"ProfileInput"}
-                    onClick={() => handleLabelClick("sys-host")}
-                  />
-                </div>
-                <div className="Content">
-                  <label htmlFor="sys-domain">Domínio</label>
-                  <input
-                    id="sys-domain"
-                    value={agent.inventory.system.domain}
-                    readOnly
-                    className={"ProfileInput"}
-                    onClick={() => handleLabelClick("sys-domain")}
-                  />
-                </div>
-                <div className="Content">
-                  <label htmlFor="sys-user">Usuário</label>
-                  <input
-                    id="sys-user"
-                    value={agent.inventory.system.user_logged}
-                    readOnly
-                    className={"ProfileInput"}
-                    onClick={() => handleLabelClick("sys-user")}
-                  />
-                </div>
+                <InputComponent
+                  label="SO"
+                  id="sys-so"
+                  readOnly
+                  value={agent.inventory.inventoryHardware.system.so}
+                  onClick={() => handleCopyContent("sys-so")}
+                />
+                <InputComponent
+                  label="Hostname"
+                  id="sys-host"
+                  value={agent.inventory.inventoryHardware.system.hostname}
+                  readOnly
+                  onClick={() => handleCopyContent("sys-host")}
+                />
+                <InputComponent
+                  label="Domínio"
+                  id="sys-domain"
+                  value={agent.inventory.inventoryHardware.system.domain}
+                  readOnly
+                  onClick={() => handleCopyContent("sys-domain")}
+                />
+                <InputComponent
+                  label="Usuário"
+                  id="sys-user"
+                  value={agent.inventory.inventoryHardware.system.user_logged}
+                  readOnly
+                  onClick={() => handleCopyContent("sys-user")}
+                />
+                <InputComponent
+                  label="CPU"
+                  id="cpu-model"
+                  value={agent.inventory.inventoryHardware.cpu.model}
+                  readOnly
+                  onClick={() => handleCopyContent("cpu-model")}
+                />
+                <InputComponent
+                  label="Memória RAM"
+                  id="cpu-arch"
+                  value={agent.inventory.inventoryHardware.memory.total + " GB"}
+                  readOnly
+                  onClick={() => handleCopyContent("cpu-arch")}
+                />
+                <InputComponent
+                  label="Disco Total"
+                  id="storage-total"
+                  value={
+                    agent.inventory.inventoryHardware.storage.total + " GB"
+                  }
+                  readOnly
+                  onClick={() => handleCopyContent("storage-total")}
+                />
+                <InputComponent
+                  label="Disco usado"
+                  id="storage-used"
+                  value={agent.inventory.inventoryHardware.storage.used + " GB"}
+                  readOnly
+                  onClick={() => handleCopyContent("storage-used")}
+                />
+                <InputComponent
+                  label="IP"
+                  id="net-ip"
+                  value={agent.inventory.inventoryHardware.network.ipv4}
+                  readOnly
+                  onClick={() => handleCopyContent("net-ip")}
+                />
+                <InputComponent
+                  label="Mac"
+                  id="net-mac"
+                  value={agent.inventory.inventoryHardware.network.mac}
+                  readOnly
+                  onClick={() => handleCopyContent("net-mac")}
+                />
+                <InputComponent
+                  label="Rede Conec."
+                  id="net-name"
+                  value={agent.inventory.inventoryHardware.network.network}
+                  readOnly
+                  onClick={() => handleCopyContent("net-name")}
+                />
+                <InputComponent
+                  label="Fabricante"
+                  id="sys-manufact"
+                  value={
+                    agent.inventory.inventoryHardware.motherboard.manufacturer
+                  }
+                  readOnly
+                  onClick={() => handleCopyContent("sys-manufact")}
+                />
+                <InputComponent
+                  label="Placa mãe"
+                  id="manufacturer"
+                  value={
+                    agent.inventory.inventoryHardware.motherboard.model_extend
+                  }
+                  readOnly
+                  onClick={() => handleCopyContent("manufacturer")}
+                />
+                <InputComponent
+                  label="Modelo"
+                  id="motherboard"
+                  value={agent.inventory.inventoryHardware.motherboard.model}
+                  readOnly
+                  onClick={() => handleCopyContent("motherboard")}
+                />
 
-                <div className="Content">
-                  <label htmlFor="cpu-model">CPU</label>
-                  <input
-                    id="cpu-model"
-                    value={agent.inventory.cpu.model}
-                    readOnly
-                    className={"ProfileInput"}
-                    onClick={() => handleLabelClick("cpu-model")}
-                  />
-                </div>
+                {/* TODO testando esse componente para ser editavel */}
+                <InputComponent
+                  label="Patrimônio"
+                  id="patrimony"
+                  onChange={(e: any) =>
+                    handleChange("patrimony", e.target.value)
+                  }
+                  placeholder="Ex: PC-0001"
+                  value={agent.custom?.patrimony}
+                  readOnly={false}
+                  onClick={() => handleCopyContent("patrimony")}
+                />
 
-                <div className="Content">
-                  <label htmlFor="cpu-arch">Memória RAM</label>
-                  <input
-                    id="cpu-arch"
-                    value={agent.inventory.memory.total + " GB"}
-                    readOnly
-                    className={"ProfileInput"}
-                    onClick={() => handleLabelClick("cpu-arch")}
-                  />
-                </div>
-
-                <div className="Content">
-                  <label htmlFor="storage-total">Disco Total</label>
-                  <input
-                    id="storage-total"
-                    value={agent.inventory.storage.total + " GB"}
-                    readOnly
-                    className={"ProfileInput"}
-                    onClick={() => handleLabelClick("storage-total")}
-                  />
-                </div>
-
-                <div className="Content">
-                  <label htmlFor="storage-used">Disco usado</label>
-                  <input
-                    id="storage-used"
-                    value={agent.inventory.storage.used + " GB"}
-                    readOnly
-                    className={"ProfileInput"}
-                    onClick={() => handleLabelClick("storage-used")}
-                  />
-                </div>
-
-                <div className="Content">
-                  <label htmlFor="net-ip">IP</label>
-                  <input
-                    id="net-ip"
-                    value={agent.inventory.network.ipv4}
-                    readOnly
-                    className={"ProfileInput"}
-                    onClick={() => handleLabelClick("net-ip")}
-                  />
-                </div>
-
-                <div className="Content">
-                  <label htmlFor="net-mac">Mac</label>
-                  <input
-                    id="net-mac"
-                    value={agent.inventory.network.mac}
-                    readOnly
-                    className={"ProfileInput"}
-                    onClick={() => handleLabelClick("net-mac")}
-                  />
-                </div>
-
-                <div className="Content">
-                  <label htmlFor="net-name">Rede Conec.</label>
-                  <input
-                    id="net-name"
-                    value={agent.inventory.network.network}
-                    readOnly
-                    className={"ProfileInput"}
-                    onClick={() => handleLabelClick("net-name")}
-                  />
-                </div>
-
-                <div className="Content">
-                  <label htmlFor="sys-manufact">Fabricante</label>
-                  <input
-                    id="sys-manufact"
-                    value={agent.inventory.motherboard.manufacturer}
-                    readOnly
-                    className={"ProfileInput"}
-                    onClick={() => handleLabelClick("sys-manufact")}
-                  />
-                </div>
-
-                <div className="Content">
-                  <label htmlFor="manufacturer">Placa mãe</label>
-                  <input
-                    id="manufacturer"
-                    value={agent.inventory.motherboard.model_extend}
-                    readOnly
-                    className={"ProfileInput"}
-                    onClick={() => handleLabelClick("manufacturer")}
-                  />
-                </div>
-
-                <div className="Content">
-                  <label htmlFor="motherboard">Modelo</label>
-                  <input
-                    id="motherboard"
-                    value={agent.inventory.motherboard.model}
-                    readOnly
-                    className={"ProfileInput"}
-                    onClick={() => handleLabelClick("motherboard")}
-                  />
-                </div>
-
-                <div className="Content">
-                  <label htmlFor="patrimony">Patrimônio</label>
-                  <input
-                    id="patrimony"
-                    value={agent.custom?.patrimony}
-                    className={"ProfileInput"}
-                    onClick={() => handleLabelClick("patrimony")}
-                  />
-                </div>
-
-                <div className="Content">
-                  <label htmlFor="collaborator">Colaborador</label>
-                  <input
+                <div className="flex justify-between text-[1.4rem] relative">
+                  <SearchInput
+                    typeData={null}
                     id="collaborator"
-                    value={agent.custom?.collaborator}
-                    className={"ProfileInput"}
-                    onClick={() => handleLabelClick("collaborator")}
+                    url={`stock/search?query=`}
+                    placeholder="Ex: Joao Silva"
+                    defaultValue={agent.custom?.collaborator}
+                    label="Colabrador"
                   />
                 </div>
 
-                <div className="Content">
-                  <label htmlFor="date_warranty">Compra</label>
-                  <input
-                    id="date_warranty"
-                    value={agent.custom?.date_warranty}
-                    className={"ProfileInput"}
-                    onClick={() => handleLabelClick("date_warranty")}
-                  />
+                <InputComponent
+                  label="Data Compra"
+                  id="date_warranty"
+                  value={agent.custom?.date_warranty}
+                  placeholder="01/01/1970"
+                  onClick={() => handleCopyContent("date_warranty")}
+                  onChange={(e: any) =>
+                    handleChange("date_warranty", e.target.value)
+                  }
+                  readOnly={false}
+                />
+
+                <div className="flex justify-between items-center text-[1.4rem] relative">
+                  <Label
+                    htmlFor="department_ref"
+                    className="text-2xl font-medium text-gray-700 dark:text-gray-300 "
+                  >
+                    Departamento
+                  </Label>
+
+                  <Select defaultValue={agent.custom?.department}>
+                    <SelectTrigger
+                      id="department_ref"
+                      // className="w-[252px] bg-slate-800 ring-1 ring-ring px-3 py-2 text-lg ring-offset-background placeholder:text-muted-foreground"
+                      className="w-[252px] dark:bg-slate-800 px-3 py-2 text-xl ring-ring focus:outline-none focus:ring-4 focus:ring-ring focus:ring-offset-2"
+                    >
+                      <SelectValue
+                        id="department"
+                        data-select-type="edit-field"
+                        placeholder="Selecione um DP"
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Departamentos</SelectLabel>
+                        <SelectItem value="RH">RH</SelectItem>
+                        <SelectItem value="Marketing">Marketing</SelectItem>
+                        <SelectItem value="Financeiro">Financeiro</SelectItem>
+                        <SelectItem value="TI">TI</SelectItem>
+                        <SelectItem value="Operação">Operação</SelectItem>
+                        <SelectItem value="Diretoria">Diretoria</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                <div className="Content">
-                  <label htmlFor="department">Departamento</label>
-                  <input
-                    id="department"
-                    value={agent.custom?.department}
-                    className={"ProfileInput"}
-                    onClick={() => handleLabelClick("department")}
-                  />
+                <div className="flex justify-between items-center text-[1.4rem] relative">
+                  <Label
+                    htmlFor="local_ref"
+                    className="text-2xl font-medium text-gray-700 dark:text-gray-300"
+                  >
+                    Local
+                  </Label>
+
+                  <Select defaultValue={agent.custom?.local}>
+                    <SelectTrigger
+                      id="local_ref"
+                      className="w-[252px] dark:bg-slate-800 px-3 py-2 text-xl ring-ring focus:outline-none focus:ring-4 focus:ring-ring focus:ring-offset-2"
+                    >
+                      <SelectValue
+                        data-select-type="edit-field"
+                        id="local"
+                        placeholder="Localizado no(a)"
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {/* <SelectLabel>Pertence ao</SelectLabel> */}
+                        <SelectItem value="Estoque">Estoque</SelectItem>
+                      </SelectGroup>
+                      <SelectItem value="Sala 1">Sala 1</SelectItem>
+                      <SelectItem value="Sala do TI">Sala do TI</SelectItem>
+                      <SelectItem value="12°">12°</SelectItem>
+                      <SelectItem value="21° Expedição">
+                        21° Expedição
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                <div className="Content">
-                  <label htmlFor="bond">Vínculo</label>
-                  <input
-                    id="bond"
-                    value={agent.custom?.bond}
-                    className={"ProfileInput"}
-                    onClick={() => handleLabelClick("bond")}
-                  />
-                </div>
+                <div className="flex justify-between items-center text-[1.4rem] relative">
+                  <Label
+                    htmlFor="bond_ref"
+                    className="text-2xl font-medium text-gray-700 dark:text-gray-300"
+                  >
+                    Vinculo
+                  </Label>
 
-                <div className="Content">
-                  <label htmlFor="local">Local</label>
-                  <input
-                    id="local"
-                    value={agent.custom?.local}
-                    className={"ProfileInput"}
-                    onClick={() => handleLabelClick("local")}
-                  />
+                  <Select defaultValue={agent.custom?.bond}>
+                    <SelectTrigger
+                      id="bond_ref"
+                      className="w-[252px] dark:bg-slate-800 px-3 py-2 text-xl ring-ring focus:outline-none focus:ring-4 focus:ring-ring focus:ring-offset-2"
+                    >
+                      <SelectValue
+                        data-select-type="edit-field"
+                        id="bond"
+                        placeholder="Pertence ao"
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {/* <SelectLabel>Pertence ao</SelectLabel> */}
+                        <SelectItem value="Proprietario">
+                          Proprietario
+                        </SelectItem>
+                        <SelectItem value="Operador">Operador</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                 </div>
-              </div>
-            )}
-            {activeTab === "Rede" && (
-              <div className="ContentWrapper">
-                <div className="SectionTitle">Rede</div>
-                {renderKeyValuePairs(agent.inventory.system)}
+                <button onClick={handleEdit}>Salvar</button>
               </div>
             )}
             {activeTab === "Software" && (
-              <div className="ContentWrapper">
-                <div className="SectionTitle">Software</div>
-                {renderKeyValuePairs(agent.inventory.software)}
+              <div className="grid grid-cols-[repeat(2,1fr)] gap-[15px_40px] items-center mb-0 p-[15px]">
+                <div className="text-center col-span-full text-5xl font-bold mb-5">
+                  Softwares
+                </div>
+                {/* {renderKeyValuePairs(agent.inventory.inventoryHardware.software)} */}
+                <TableSoftwares data={agent.inventory.software.software} />
+              </div>
+            )}
+            {activeTab === "Geolocalização" && (
+              <div className="grid grid-cols-[repeat(2,1fr)] gap-[15px_40px] items-center mb-0 p-[15px] ">
+                <div className="text-center col-span-full text-5xl font-bold mb-5">
+                  Geolocalização
+                </div>
+                <div className="col-span-full text-3xl font-bold">
+                  <H1Custom className="text-left">
+                    {agent.inventory.inventoryHardware.system.hostname},{" "}
+                    {agent.inventory.inventoryHardware.system.last_update}
+                  </H1Custom>
+                </div>
+                <div className="col-span-full h-full w-full">
+                  <iframe
+                    className="w-full min-h-fit min-w-fit"
+                    height={"600px"}
+                    loading="lazy"
+                    allowFullScreen
+                    referrerPolicy="no-referrer-when-downgrade"
+                    src="https://www.google.com/maps?q=-23.6039,-46.9192&hl=es;z=14&output=embed"
+                  ></iframe>
+                </div>
+              </div>
+            )}
+            {activeTab === "Histórico de Ocorrências" && (
+              <div className="grid grid-cols-[repeat(2,1fr)] gap-[15px_40px] items-center mb-0 p-[15px]">
+                <div className="text-center col-span-full text-5xl font-bold mb-5">
+                  Histórico de Ocorrências
+                </div>
+              </div>
+            )}
+            {activeTab === "Processos" && (
+              <div className="grid grid-cols-[repeat(2,1fr)] gap-[15px_40px] items-center mb-0 p-[15px]">
+                <div className="text-center col-span-full text-5xl font-bold mb-5">
+                  <div className="mb-5">Processos</div>
+                  <TableProcesses data={agent.inventory.processes.apps} />
+                </div>
               </div>
             )}
             {activeTab === "Monitoramento" && (
-              <div className="ContentWrapper">
-                <div className="SectionTitle">Monitoramento</div>
-                {renderKeyValuePairs(agent.inventory.storage)}
+              <div className="grid grid-cols-[repeat(2,1fr)] gap-[15px_40px] items-center mb-0 p-[15px]">
+                <div className="text-center col-span-full text-5xl font-bold mb-5">
+                  Monitoramento
+                </div>
+                <Charts />
               </div>
             )}
             {activeTab === "Detalhes" && (
-              <div className="ContentWrapper">
-                <div className="SectionTitle">Mais Detalhes</div>
-                {renderKeyValuePairs({
+              <div className="grid grid-cols-[repeat(2,1fr)] gap-[15px_40px] items-center mb-0 p-[15px]">
+                <div className="text-center col-span-full font-bold mb-5">
+                  <div className="text-5xl">Detalhes da coleta</div>
+                  <div>
+                    <AgentInfo agent={mockAgentData} />
+                  </div>
+                </div>
+                {/* {renderKeyValuePairs({
                   ...agent.inventory,
-                  ...agent.periphericals,
-                })}
+                  ...agent.inventory.periphericals,
+                })} */}
               </div>
             )}
-            <button onClick={handleEdit}>Salvar</button>
           </section>
         </>
       )}

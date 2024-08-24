@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   MaterialReactTable,
   useMaterialReactTable,
@@ -10,7 +16,7 @@ import { formatDateString } from "../../utils/utils";
 import { AgentType } from "../../utils/types/types";
 import { Link } from "react-router-dom";
 import { mkConfig, generateCsv, download } from "export-to-csv";
-import { request } from "../../utils/request";
+import { requestWithToken } from "../../utils/request";
 import BlackScreen from "./Shell";
 import { openModalAtom } from "../../Context/ModalContext";
 import { Code, Eraser, Eye, Package, ShieldCheck } from "lucide-react";
@@ -25,7 +31,7 @@ const csvConfig = mkConfig({
 const Clients: React.FC = () => {
   const [clients, setClients] = useState<AgentType[] | null>([]);
   const fileInputRef = useRef<any>();
-  console.log("oi");
+
   const openModal = useSetAtom(openModalAtom);
 
   const handleExportData = () => {
@@ -49,11 +55,11 @@ const Clients: React.FC = () => {
   const columns = useMemo<MRT_ColumnDef<AgentType>[]>(
     () => [
       {
-        accessorKey: "inventory.system.hostname",
+        accessorKey: "inventory.inventoryHardware.system.hostname",
         header: "Hostname",
       },
       {
-        accessorKey: "inventory.system.so",
+        accessorKey: "inventory.inventoryHardware.system.so",
         header: "SO",
       },
       // {
@@ -61,17 +67,17 @@ const Clients: React.FC = () => {
       //   header: "UID",
       // },
       {
-        accessorKey: "inventory.system.type_machine",
+        accessorKey: "inventory.inventoryHardware.system.type_machine",
         header: "Categoria",
       },
       {
-        accessorKey: "inventory.system.user_logged",
+        accessorKey: "inventory.inventoryHardware.system.user_logged",
         header: "Usuário",
         grow: false, //don't allow this column to grow to fill in remaining space - new in v2.8
         size: 50, //small column
       },
       {
-        accessorKey: "inventory.storage.total",
+        accessorKey: "inventory.inventoryHardware.storage.total",
         header: "Armazenamento",
         Cell: ({ cell }: any) => cell.getValue() + " GB",
       },
@@ -86,7 +92,7 @@ const Clients: React.FC = () => {
         Cell: ({ cell }: any) => formatDateString(cell.getValue()),
       },
       {
-        accessorKey: "inventory.memory.total",
+        accessorKey: "inventory.inventoryHardware.memory.total",
         header: "RAM",
         Cell: ({ cell }: any) => cell.getValue() + " GB",
       },
@@ -94,28 +100,33 @@ const Clients: React.FC = () => {
     []
   );
 
-  useEffect(() => {
-    const fetchClients = async () => {
+  const fetchClients = useCallback(async () => {
+    {
       try {
-        const response = await request.get("/clients");
-        console.log(response.data);
+        const response = await requestWithToken.get("/clients");
+        // console.log(response.data);
         if (!response.data || response.data.length <= 0)
           return setClients(null);
         setClients(response.data);
       } catch (error: any) {
         console.error(
           "Error fetching clients:",
-          error?.response?.data.errors[0]
+          error?.response?.data.errors[0] || error.message
         );
       }
-    };
+    }
+  }, []);
 
+  useEffect(() => {
     fetchClients();
   }, []);
+  if (clients) {
+    console.log("hi", clients[0]);
+  }
 
   const sendCommand = async (clientId: string, command: string) => {
     try {
-      const result = await request.post("/sockets/send-command", {
+      const result = await requestWithToken.post("/sockets/send-command", {
         clientId,
         command,
       });
@@ -134,7 +145,7 @@ const Clients: React.FC = () => {
     formData.append("file", file);
 
     try {
-      await request.post("/sockets/send-file", formData, {
+      await requestWithToken.post("/sockets/send-file", formData, {
         headers: {
           "Content-Type": "multipart/form-data", // Define o cabeçalho correto para a requisição multipart/form-data
         },

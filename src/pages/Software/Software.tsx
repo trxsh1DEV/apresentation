@@ -4,135 +4,91 @@ import {
   useMaterialReactTable,
   type MRT_ColumnDef,
 } from "material-react-table";
+import { tableTheme } from "@/styles/theme";
+import { ThemeProvider } from "@mui/material";
+import { formatDateString } from "@/utils/utils";
 
 //example data type
-type Person = {
-  software: string;
-  categoria: string;
-  mapeado: boolean;
-  primeiro_inventario: string;
-  ultima_utilizacao: string;
-  licenciado: boolean;
-  expiracao_licenca: string | boolean;
+interface BaseSoftware {
+  name: string;
+  version?: string;
+  publisher: string;
+  install_path?: string;
+  first_inventory: Date;
+  category?: string;
+  have_license: boolean;
+  uninstall_path?: string;
+  createdAt: string;
+}
+
+interface LicensedSoftware extends BaseSoftware {
+  have_license: true;
+  license_key: string; // Obrigatório se have_license for true
+}
+
+interface UnlicensedSoftware extends BaseSoftware {
+  have_license: false;
+  license_key?: never; // Não deve existir se have_license for false
+}
+
+export type InterfaceSoftwareItem = LicensedSoftware | UnlicensedSoftware;
+
+export type InterfaceSoftware = {
+  host_ref: string;
+  software: InterfaceSoftwareItem;
 };
 
-//nested data is ok, see accessorKeys in ColumnDef below
-const data: Person[] = [
-  {
-    software: "Visual Studio",
-    categoria: "Desenvolvimento",
-    mapeado: false,
-    primeiro_inventario: "05/05/2024, 12:49:46",
-    ultima_utilizacao: "04/04/2022, 15:47:34",
-    licenciado: false,
-    expiracao_licenca: false,
-  },
-  {
-    software: "AutoCAD",
-    categoria: "Modelagem 3D",
-    mapeado: true,
-    primeiro_inventario: "04/08/2023, 06:15:27",
-    ultima_utilizacao: "18/03/2023, 22:56:13",
-    licenciado: true,
-    expiracao_licenca: "25/08/2027, 04:42:45",
-  },
-  {
-    software: "Chrome",
-    categoria: "Web",
-    mapeado: true,
-    primeiro_inventario: "09/11/2023, 21:06:15",
-    ultima_utilizacao: "17/11/2023, 02:32:44",
-    licenciado: false,
-    expiracao_licenca: false,
-  },
-  {
-    software: "Winrar",
-    categoria: "Arquivos",
-    mapeado: false,
-    primeiro_inventario: "07/03/2023, 17:50:19",
-    ultima_utilizacao: "20/03/2024, 19:45:51",
-    licenciado: false,
-    expiracao_licenca: false,
-  },
-  {
-    software: "Photoshop",
-    categoria: "Design",
-    mapeado: true,
-    primeiro_inventario: "07/10/2023, 21:07:59",
-    ultima_utilizacao: "27/11/2023, 10:21:22",
-    licenciado: true,
-    expiracao_licenca: "19/01/2025, 02:16:45",
-  },
-  {
-    software: "Office",
-    categoria: "Suíte Escritório",
-    mapeado: true,
-    primeiro_inventario: "04/04/2024, 00:30:52",
-    ultima_utilizacao: "27/10/2023, 02:04:42",
-    licenciado: true,
-    expiracao_licenca: "27/12/2027, 04:40:42",
-  },
-  {
-    software: "Firefox",
-    categoria: "Web",
-    mapeado: false,
-    primeiro_inventario: "29/10/2022, 14:06:16",
-    ultima_utilizacao: "24/01/2024, 23:12:19",
-    licenciado: false,
-    expiracao_licenca: false,
-  },
-  {
-    software: "Discord",
-    categoria: "Comunicação",
-    mapeado: true,
-    primeiro_inventario: "30/01/2022, 10:10:27",
-    ultima_utilizacao: "21/04/2023, 23:40:57",
-    licenciado: true,
-    expiracao_licenca: false,
-  },
-];
+const Softwares = ({ data }: { data: InterfaceSoftwareItem[] }) => {
+  // console.log("soft", data);
 
-const Example = () => {
-  //should be memoized or stable
-  const columns = useMemo<MRT_ColumnDef<Person>[]>(
+  const columns = useMemo<MRT_ColumnDef<InterfaceSoftwareItem>[]>(
     () => [
       {
-        accessorKey: "software",
-        header: "Software",
+        accessorKey: "name",
+        header: "Nome",
         size: 150,
+        Cell: ({ cell }: any) => {
+          const value = cell.getValue();
+          return value.length > 24 ? value.slice(0, 24) + "..." : value;
+        },
       },
       {
-        accessorKey: "categoria",
-        header: "Categoria",
-        size: 150,
-      },
-      {
-        accessorKey: "ultima_utilizacao",
-        header: "Última Utilização",
-        size: 200,
-      },
-      {
-        accessorKey: "licenciado",
-        header: "Licenciado",
+        accessorKey: "version",
+        header: "Versão",
         size: 50,
+        enableColumnFilter: false,
+        enableSorting: false,
+      },
+      {
+        accessorKey: "category",
+        header: "Categoria",
+        enableSorting: false,
+        size: 100,
+      },
+      {
+        accessorKey: "publisher",
+        header: "Desenvolvedor",
+        size: 100,
+        // enableSorting: false,
+      },
+      {
+        accessorKey: "have_license",
+        header: "Possui licença",
         Cell: ({ cell }: any) => (cell.getValue() ? "Sim" : "Não"),
+        size: 50,
       },
       {
-        accessorKey: "expiracao_licenca",
-        header: "Expiração licença",
-        Cell: ({ cell }: any) => (cell.getValue() ? cell.getValue() : "N/A"),
-        size: 200,
+        accessorKey: "createdAt",
+        header: "Primeiro inventário",
+        size: 100,
+        Cell: ({ cell }: any) => formatDateString(cell.getValue()),
       },
       {
-        accessorKey: "mapeado",
-        header: "Mapeado",
-        Cell: ({ cell }: any) => (cell.getValue() ? "Sim" : "Não"),
-        size: 80,
-      },
-      {
-        accessorKey: "primeiro_inventario",
-        header: "Primeiro Inventário",
-        size: 200,
+        accessorKey: "license_key",
+        header: "Chave da licença",
+        size: 100,
+        enableColumnFilter: false,
+        enableSorting: false,
       },
     ],
     []
@@ -140,9 +96,10 @@ const Example = () => {
 
   const table = useMaterialReactTable({
     columns,
-    data, //data must be memoized or stable (useState, useMemo, defined outside of this component, etc.)
+    data,
     enableDensityToggle: false,
     enableColumnActions: false,
+    // initialState: { density: "compact" },
     columnFilterDisplayMode: "popover",
     muiPaginationProps: {
       shape: "rounded",
@@ -152,12 +109,18 @@ const Example = () => {
     paginationDisplayMode: "pages",
   });
 
+  return <MaterialReactTable table={table} />;
+};
+
+export const TableSoftwares = ({ data }: { data: InterfaceSoftwareItem[] }) => {
+  console.log("tst", data);
   return (
-    <>
-      <h1 style={{ marginRight: "200px" }}>Softwares</h1>
-      <MaterialReactTable table={table} />
-    </>
+    <ThemeProvider theme={tableTheme()}>
+      <main className="w-full">
+        <Softwares data={data} />
+      </main>
+    </ThemeProvider>
   );
 };
 
-export default Example;
+export default TableSoftwares;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Toggle } from "@/components/ui/toggle";
 import { Filter } from "lucide-react";
-import { BASE_URL, request } from "@/utils/request";
+import { BASE_URL, requestWithToken } from "@/utils/request";
 import { H1Custom } from "@/components/customerComponents/Customercomponents";
 
 interface Alert {
@@ -24,11 +24,11 @@ const AlertTrigger: React.FC = () => {
 
   const fetchAlerts = useCallback(async () => {
     try {
-      const response = await fetch(`${BASE_URL}/triggers/all`);
-      if (!response.ok) {
+      const response = await requestWithToken.get(`${BASE_URL}/triggers/all`);
+      if (!response?.data) {
         throw new Error("Falha ao buscar alertas da API");
       }
-      const data = await response.json();
+      const data = await response.data;
       console.log(data);
       setAlerts(data);
     } catch (err) {
@@ -59,7 +59,7 @@ const AlertTrigger: React.FC = () => {
       const updatedAlert = updatedAlerts.find((alert) => alert.name === name);
       if (updatedAlert) {
         // Faça a requisição PUT para a API
-        request
+        requestWithToken
           .patch(`${BASE_URL}/triggers/${name}`, {
             isActive: updatedAlert.isActive,
           })
@@ -77,7 +77,7 @@ const AlertTrigger: React.FC = () => {
 
   return (
     <div className="p-4 bg-gray-900 text-white mx-auto min-w-max max-w-5xl">
-      <H1Custom>Configuração de Alertas</H1Custom>
+      <H1Custom className="text-center">Configuração de Alertas</H1Custom>
       <div className="space-y-2">
         {alerts.map((alert) => (
           <div

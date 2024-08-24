@@ -11,7 +11,7 @@ import {
 } from "material-react-table";
 import { TypeStockAutomatic } from "../../utils/types/types";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { request } from "../../utils/request";
+import { requestWithToken } from "../../utils/request";
 import { Pen, RefreshCcw, Trash } from "lucide-react";
 
 type UserApiResponse = {
@@ -55,7 +55,7 @@ const StockAutomatic = () => {
       params.append("sorting", JSON.stringify(sorting ?? []));
 
       try {
-        const response = await request.get("/stock", { params });
+        const response = await requestWithToken.get("/stock", { params });
         return response.data;
       } catch (error) {
         console.error("Error fetching data:", error);

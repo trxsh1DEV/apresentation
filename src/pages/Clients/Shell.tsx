@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 // import { XCircle } from "phosphor-react";
-import { request } from "../../utils/request";
+import { requestWithToken } from "../../utils/request";
 import { useSetAtom } from "jotai";
 import { closeModalAtom } from "../../Context/ModalContext";
 import { XCircle } from "lucide-react";
@@ -42,7 +42,7 @@ const Shell = ({
   const handleCommandSubmit = async (command: string) => {
     setIsLoading(true);
     try {
-      const result = await request.post("/sockets/send-command", {
+      const result = await requestWithToken.post("/sockets/send-command", {
         clientId,
         command,
       });
@@ -65,7 +65,7 @@ const Shell = ({
           handleCommandSubmit(command);
           break;
       }
-      // setCommand("");
+      setCommand("");
     }
   };
 

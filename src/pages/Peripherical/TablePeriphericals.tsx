@@ -1,5 +1,5 @@
 import { useMemo, useState, FC } from "react";
-import { IconButton, Tooltip } from "@mui/material";
+import { IconButton, ThemeProvider, Tooltip } from "@mui/material";
 import {
   MRT_ActionMenuItem,
   MRT_ColumnFiltersState,
@@ -13,10 +13,12 @@ import { TypePeripherical } from "../../utils/types/types";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { formatDateString } from "../../utils/utils";
 import { download, generateCsv, mkConfig } from "export-to-csv";
-import { request } from "../../utils/request";
+import { requestWithToken } from "../../utils/request";
 // import { ArrowsClockwise, Pen, Trash } from "phosphor-react";
 import TablePeriphericals from "./Periphericals";
 import { Pen, RefreshCcw, Trash } from "lucide-react";
+import { tableTheme } from "@/styles/theme";
+import { InterfaceSoftwareItem } from "../Software/Software";
 // import { useDispatch } from "react-redux";
 
 type UserApiResponse = {
@@ -66,7 +68,9 @@ const Peripherical: FC = () => {
       params.append("sorting", JSON.stringify(sorting ?? []));
 
       try {
-        const response = await request.get("/peripherical", { params });
+        const response = await requestWithToken.get("/equipament", {
+          params,
+        });
         return response.data;
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -177,4 +181,13 @@ const Peripherical: FC = () => {
   );
 };
 
-export default Peripherical;
+export const TablePeripherals = () => {
+  return (
+    <ThemeProvider theme={tableTheme()}>
+      <main className="w-full">
+        <Peripherical />
+      </main>
+    </ThemeProvider>
+  );
+};
+export default TablePeripherals;

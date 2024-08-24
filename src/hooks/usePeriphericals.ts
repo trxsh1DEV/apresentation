@@ -1,5 +1,5 @@
-import { request } from "../utils/request";
+import { requestWithToken } from "../utils/request";
 
 export const createPeripherical = async (data: any) => {
-  return await request.post("/peripherical", data);
+  return await requestWithToken.post("/peripherical", data);
 };

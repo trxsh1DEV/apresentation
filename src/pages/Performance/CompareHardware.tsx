@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { request } from "../../utils/request";
+import { requestWithToken } from "../../utils/request";
 import "./style.css";
 import SearchInput from "../../components/InputCommom";
 
@@ -25,8 +25,14 @@ export default function CompareHardware() {
 
     if (cpuValues.length > 0) {
       try {
-        const promiseCpu = request.post("/hardware/cpu/compare", cpuValues);
-        const promiseGpu = request.post("/hardware/gpu/compare", gpuValues);
+        const promiseCpu = requestWithToken.post(
+          "/hardware/cpu/compare",
+          cpuValues
+        );
+        const promiseGpu = requestWithToken.post(
+          "/hardware/gpu/compare",
+          gpuValues
+        );
 
         const [resCpu, resGpu] = await Promise.all([promiseCpu, promiseGpu]);
 

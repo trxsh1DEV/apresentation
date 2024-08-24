@@ -5,15 +5,15 @@ interface TypePropsSearchInput {
   type?: string;
   placeholder?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  style?: React.CSSProperties;
   label?: string;
+  id?: string;
   className?: string;
   defaultValue?: string;
 }
 
 interface ValidTypeData {
   typeData: "test" | "cpuData" | "gpuData";
-  url?: string;
+  url?: never;
 }
 
 interface InvalidTypeData {
@@ -30,34 +30,59 @@ const SearchInput: FC<CustomInputProps> = ({
   label = "\u00A0",
   typeData,
   url,
-  // onChange,
-  style,
+  id,
   defaultValue,
   className,
 }) => {
-  if (typeData === null && url === undefined) {
+  if (typeData === null && !url) {
     throw new Error("url is required when typeData is null");
   }
 
   const inputId = useId();
-
-  const [data, setData] = useState<string[]>([]);
+  const [data, setData] = useState<any[]>([]);
   const [results, setResults] = useState<string[]>([]);
-  const [query, setQuery] = useState<string>("");
+  const [query, setQuery] = useState<string>(defaultValue || "");
 
   useEffect(() => {
-    const req = (typeData && `../../../${typeData}.json`) || url;
-    fetch(`${BASE_URL}/${req}`)
-      .then((response) => response.json())
-      .then((data) => setData(data))
-      .catch((error) => console.error("Error fetching data:", error));
+    const fetchData = async () => {
+      try {
+        let response;
+        if (query.length < 2) return;
 
-    if (query) {
+        if (typeData) {
+          response = await fetch(`../../../${typeData}.json`);
+        } else if (url) {
+          const apiUrl = `${BASE_URL}/${url}${encodeURIComponent(query)}`;
+          response = await fetch(apiUrl);
+        }
+
+        if (response && !response.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        const fetchedData = await response?.json();
+        if (Array.isArray(fetchedData)) {
+          const hostnames = fetchedData.map(
+            (item: { owner: string }) => item.owner
+          );
+          setData(hostnames);
+        } else {
+          console.error("Unexpected data format");
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, [typeData, url, query]);
+
+  useEffect(() => {
+    if (query !== "" && query.length >= 2) {
       const regexExact = new RegExp(`^${query}$`, "i");
       const regexPartial = new RegExp(`${query}`, "i");
 
       const exactMatch = data.find((item) => regexExact.test(item));
-
       const partialMatches = data.filter(
         (item) => !exactMatch && regexPartial.test(item)
       );
@@ -66,53 +91,35 @@ const SearchInput: FC<CustomInputProps> = ({
     } else {
       setResults([]);
     }
-  }, [query, data, typeData]);
-
-  // const handleResultClick = (result: string) => {
-  //   onChange({ target: { value: result } } as any);
-  // };
+  }, [query, data]);
 
   return (
     <>
-      <label htmlFor={inputId}>{label}</label>
+      <label
+        htmlFor={id || inputId}
+        className="block text-2xl font-medium text-gray-700 dark:text-gray-300"
+      >
+        {label}
+      </label>
       <input
+        id={id || inputId}
         type={type}
-        value={query || undefined}
+        value={query}
         placeholder={placeholder}
-        onChange={(event: any) => setQuery(event?.target?.value)}
-        style={style}
-        className={className}
-        defaultValue={defaultValue}
+        // className={`block rounded-md border-gray-300 shadow-sm focus:border-indigo-300 px-3 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${className}`}
+        className="rounded-md border border-input bg-slate-0 dark:bg-slate-800 px-3 py-2 text-xl ring-offset-background placeholder:text-muted-foreground ring-2 ring-ring focus:outline-none focus:ring-4 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1"
+        onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+          setQuery(event.target.value)
+        }
       />
       {results.length > 0 &&
         !(results.length === 1 && results[0] === query) && (
-          <ul
-            style={{
-              position: "absolute",
-              top: "0",
-              left: "75%",
-              // right: 0,
-              width: "max-content",
-              border: "1px solid #ccc",
-              borderRadius: "4px",
-              backgroundColor: "#222",
-              listStyle: "none",
-              margin: 0,
-              padding: 0,
-              maxHeight: "150px",
-              overflowY: "auto",
-              zIndex: 3,
-            }}
-          >
+          <ul className="absolute left-3/4 w-max border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-background shadow-lg max-h-40 overflow-y-auto z-10">
             {results.map((result, index) => (
               <li
                 key={index}
                 onClick={() => setQuery(result)}
-                style={{
-                  padding: "8px",
-                  cursor: "pointer",
-                  borderBottom: "1px solid #ccc",
-                }}
+                className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer border-b border-gray-200 dark:border-gray-700 last:border-b-0"
               >
                 {result}
               </li>
