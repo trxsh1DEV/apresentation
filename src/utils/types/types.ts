@@ -54,18 +54,33 @@ export type AgentType = {
 
     processes: Processes;
 
-    periphericals: {
-      keyboard: string;
-      mouse: string;
-      monitors: string[];
-    };
+    peripherals: TypePeripheral;
   };
   custom?: TypeCustom;
 };
 
+type TypePeripheralFields = {
+  name: string;
+  description: string;
+  device_id: string;
+};
+
+type TypePeripheralMonitor = {
+  device_id: string;
+  resolution: string;
+  gpu: string;
+  gpu_id: string;
+};
+
+export type TypePeripheral = {
+  keyboard: TypePeripheralFields;
+  mouse: TypePeripheralFields;
+  monitors: TypePeripheralMonitor[];
+};
+
 export type AgentInventoryType = Pick<
   AgentType["inventory"],
-  "inventoryHardware" | "periphericals"
+  "inventoryHardware" | "peripherals"
 >;
 
 export interface ProcessesFields {

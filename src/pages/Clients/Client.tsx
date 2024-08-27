@@ -19,9 +19,7 @@ import { H1Custom } from "@/components/customerComponents/Customercomponents";
 import Charts from "../Charts/Charts";
 import { requestWithToken } from "@/utils/request";
 import TableProcesses from "@/components/Tables/ProcessTable";
-import AgentInfo, {
-  mockAgentData,
-} from "@/components/customerComponents/AgentInfo";
+import AgentInfo from "@/components/customerComponents/AgentInfo";
 
 const renderKeyValuePair = (
   key: string,
@@ -544,9 +542,12 @@ export default function Client() {
             {activeTab === "Detalhes" && (
               <div className="grid grid-cols-[repeat(2,1fr)] gap-[15px_40px] items-center mb-0 p-[15px]">
                 <div className="text-center col-span-full font-bold mb-5">
-                  <div className="text-5xl">Detalhes da coleta</div>
+                  <div className="text-5xl">Detalhes da Coleta</div>
                   <div>
-                    <AgentInfo agent={mockAgentData} />
+                    <AgentInfo
+                      inventoryHardware={agent.inventory.inventoryHardware}
+                      peripherals={agent.inventory.peripherals}
+                    />
                   </div>
                 </div>
                 {/* {renderKeyValuePairs({
