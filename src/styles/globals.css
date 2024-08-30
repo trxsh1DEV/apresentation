@@ -172,14 +172,14 @@
   gap: .5rem;
   margin: 1.5rem;
 
-  svg {
+  /* svg {
     color: fuchsia;
   }
 
   &--warning,
   &--warning svg {
     color: red;
-  }
+  } */
 }
 
 .tiptap p.is-editor-empty:first-child::before {
