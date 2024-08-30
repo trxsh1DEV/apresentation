@@ -20,7 +20,7 @@ export default function TablePeriphericals() {
   const openModal = useSetAtom(openModalAtom);
   const handleModal = () =>
     openModal({
-      title: "Dynamic Modal",
+      title: "Adicionar item ao estoque",
       content: (
         <FormPeripherical
           errors={errors}
@@ -29,8 +29,8 @@ export default function TablePeriphericals() {
           register={register}
         />
       ),
-      onConfirm: () => console.log("Confirmed!"),
-      onCancel: () => console.log("Cancelled!"),
+      // onConfirm: () => console.log("Confirmed!"),
+      // onCancel: () => console.log("Cancelled!"),
     });
 
   const {

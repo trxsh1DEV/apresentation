@@ -17,19 +17,12 @@ const Sidebar = () => {
   return (
     <nav className="fixed top-0 bottom-0 left-0 h-full w-16 bg-white dark:bg-slate-900 pt-5 mr-16 transition-all duration-300 ease-in-out overflow-hidden hover:w-52 z-20">
       <>
-        <NavLink to="/" className="text-azure block w-52 p-2.5">
+        {/* <NavLink to="/" className="text-azure block w-52 p-2.5">
           <div className="flex items-center font-medium gap-2.5 px-2.5  rounded transition-all duration-300 ease-in cursor-pointer  hover:text-white hover:bg-green-300  dark:hover:bg-slate-600 dark:hover:text-indigo-400">
             <Home size={32} />
             <span className="ml-2 py-2">Home</span>
           </div>
-        </NavLink>
-
-        <NavLink to="/" className="text-azure block w-52 p-2.5">
-          <div className="flex items-center font-medium gap-2.5 px-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:text-white hover:bg-green-300  dark:hover:bg-slate-600 dark:hover:text-indigo-400">
-            <LayoutDashboardIcon size={32} />
-            <span className="ml-2 py-2">Dashboards</span>
-          </div>
-        </NavLink>
+        </NavLink> */}
 
         <NavLink to="/" className="text-azure block w-52 p-2.5">
           <div className="flex items-center font-medium gap-2.5 px-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:text-white hover:bg-green-300  dark:hover:bg-slate-600 dark:hover:text-indigo-400">
@@ -40,12 +33,19 @@ const Sidebar = () => {
 
         <NavLink to="/" className="text-azure block w-52 p-2.5">
           <div className="flex items-center font-medium gap-2.5 px-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:text-white hover:bg-green-300  dark:hover:bg-slate-600 dark:hover:text-indigo-400">
+            <LayoutDashboardIcon size={32} />
+            <span className="ml-2 py-2">Dashboards</span>
+          </div>
+        </NavLink>
+
+        <NavLink to="/triggers" className="text-azure block w-52 p-2.5">
+          <div className="flex items-center font-medium gap-2.5 px-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:text-white hover:bg-green-300  dark:hover:bg-slate-600 dark:hover:text-indigo-400">
             <Siren size={32} />
             <span className="ml-2 py-2">Alertas</span>
           </div>
         </NavLink>
 
-        <NavLink to="/" className="text-azure block w-52 p-2.5">
+        <NavLink to="/stock" className="text-azure block w-52 p-2.5">
           <div className="flex items-center font-medium gap-2.5 px-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:text-white hover:bg-green-300  dark:hover:bg-slate-600 dark:hover:text-indigo-400">
             <MonitorSmartphone size={32} />
             <span className="ml-2 py-2">Equipamentos</span>

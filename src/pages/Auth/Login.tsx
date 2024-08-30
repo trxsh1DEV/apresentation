@@ -25,7 +25,6 @@ const LoginPage = () => {
 
   const onSubmit = async ({ email, password }: LoginFormValues) => {
     if (!email || !password) return;
-    console.log(email, password);
 
     try {
       const response = await fetch(`${BASE_URL}/auth/login`, {
@@ -41,16 +40,20 @@ const LoginPage = () => {
       }
 
       const data: { token: string; expireIn: string } = await response.json();
-      console.log(data.expireIn.slice(0, -1));
+      console.log(Number(data.expireIn.slice(0, -1)) / 24);
+      console.log(data.token);
 
       Cookies.set("token", data.token, {
-        expires: Number(data.expireIn.slice()),
+        expires: Number(data.expireIn.slice(0, -1)) / 24,
         // sameSite: "strict",
         // secure: true,
       });
+
+      // Redireciona para a página inicial após o login bem-sucedido
       navigate("/");
     } catch (error) {
       console.error("An error occurred:", error);
+      // Aqui você pode adicionar uma lógica para mostrar uma mensagem de erro ao usuário
     }
   };
 
