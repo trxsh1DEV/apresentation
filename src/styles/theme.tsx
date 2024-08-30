@@ -2,7 +2,10 @@ import { Theme, useTheme } from "@/components/ui/theme-provider";
 import { createTheme } from "@mui/material";
 
 // eslint-disable-next-line
-export const tableTheme = (mode: Theme = useTheme().theme || "dark") =>
+export const tableTheme = (mode: Theme = useTheme().theme || "dark") => {
+  if (mode === "system") {
+    mode = "dark";
+  }
   createTheme({
     palette: {
       mode: mode,
@@ -14,3 +17,4 @@ export const tableTheme = (mode: Theme = useTheme().theme || "dark") =>
       },
     },
   });
+};
