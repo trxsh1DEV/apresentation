@@ -1,16 +1,42 @@
 import { HTMLAttributes, forwardRef, useId } from "react";
 
-type inputProps = HTMLAttributes<HTMLInputElement> & {
+// Define um tipo específico para 'type' que inclui todos os tipos válidos de input
+type InputType = 
+  | "text"
+  | "password"
+  | "email"
+  | "number"
+  | "url"
+  | "tel"
+  | "date"
+  | "datetime-local"
+  | "month"
+  | "week"
+  | "time"
+  | "search"
+  | "color"
+  | "checkbox"
+  | "radio"
+  | "file"
+  | "hidden"
+  | "image"
+  | "reset"
+  | "submit"
+  | "button";
+
+type InputProps = HTMLAttributes<HTMLInputElement> & {
+  type?: InputType;  // Agora o 'type' é limitado aos tipos válidos
+  name?: string;     // 'name' continua sendo uma string opcional
   label?: string;
   helperText?: string;
-  hasError?: boolean; // Adicione a propriedade hasError
+  hasError?: boolean;
 };
 
-export const Input = forwardRef<HTMLInputElement, inputProps>(
+export const Input = forwardRef<HTMLInputElement, InputProps>(
   (
     {
-      type = "text",
-      name = "",
+      type = "text",  // 'type' padrão é 'text'
+      name = "",      // 'name' padrão é uma string vazia
       label = "\u00A0",
       helperText = "",
       hasError = false,
@@ -18,7 +44,6 @@ export const Input = forwardRef<HTMLInputElement, inputProps>(
     },
     ref
   ) => {
-    // console.log()
     const inputId = useId();
     hasError = helperText.length > 0;
 
@@ -31,8 +56,8 @@ export const Input = forwardRef<HTMLInputElement, inputProps>(
           id={inputId}
           type={type}
           name={name}
-          ref={ref as React.RefObject<HTMLInputElement>}
-          className={`InputStyle ${hasError ? "hasError" : ""}`} // Adicione a classe "hasError" se houver erro
+          ref={ref}
+          className={`InputStyle ${hasError ? "hasError" : ""}`}
           {...props}
         />
         {hasError && <p>{helperText}</p>}
@@ -40,3 +65,4 @@ export const Input = forwardRef<HTMLInputElement, inputProps>(
     );
   }
 );
+

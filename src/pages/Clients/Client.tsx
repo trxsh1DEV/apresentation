@@ -22,84 +22,84 @@ import TableProcesses from "@/components/Tables/ProcessTable";
 import AgentInfo from "@/components/customerComponents/AgentInfo";
 import HistoryAgent from "@/components/customerComponents/HistoryAgent";
 
-const renderKeyValuePair = (
-  key: string,
-  value: any,
-  // eslint-disable-next-line
-  isArray: boolean = false
-) => {
-  let displayValue: any;
-  let readOnly = true;
+// const renderKeyValuePair = (
+//   key: string,
+//   value: any,
+//   // eslint-disable-next-line
+//   isArray: boolean = false
+// ) => {
+//   let displayValue: any;
+//   let readOnly = true;
 
-  if (typeof value === "object") {
-    // Se for um array, tratar cada elemento
-    if (Array.isArray(value)) {
-      displayValue = value.map((item, index) => (
-        <div key={index}>
-          {/* Recursivamente chamar renderKeyValuePair para cada item do array */}
-          {renderKeyValuePair(index.toString(), item, true)}
-        </div>
-      ));
-    } else {
-      displayValue = Object.entries(value).map(([subKey, subValue]) => (
-        <div key={subKey}>
-          {/* Recursivamente chamar renderKeyValuePair para cada propriedade do objeto */}
-          {renderKeyValuePair(subKey, subValue)}
-        </div>
-      ));
-    }
-  } else {
-    // Se não for um objeto, apenas exibir o valor
-    displayValue = value;
-  }
+//   if (typeof value === "object") {
+//     // Se for um array, tratar cada elemento
+//     if (Array.isArray(value)) {
+//       displayValue = value.map((item, index) => (
+//         <div key={index}>
+//           {/* Recursivamente chamar renderKeyValuePair para cada item do array */}
+//           {renderKeyValuePair(index.toString(), item, true)}
+//         </div>
+//       ));
+//     } else {
+//       displayValue = Object.entries(value).map(([subKey, subValue]) => (
+//         <div key={subKey}>
+//           {/* Recursivamente chamar renderKeyValuePair para cada propriedade do objeto */}
+//           {renderKeyValuePair(subKey, subValue)}
+//         </div>
+//       ));
+//     }
+//   } else {
+//     // Se não for um objeto, apenas exibir o valor
+//     displayValue = value;
+//   }
 
-  const valuesForEdit = [
-    "bond",
-    "patrimony",
-    "date_warranty",
-    "nfe",
-    "purchase_price",
-    "department",
-    "collaborator",
-    "local",
-  ];
+//   const valuesForEdit = [
+//     "bond",
+//     "patrimony",
+//     "date_warranty",
+//     "nfe",
+//     "purchase_price",
+//     "department",
+//     "collaborator",
+//     "local",
+//   ];
 
-  if (valuesForEdit.includes(key)) {
-    readOnly = false;
-  }
+//   if (valuesForEdit.includes(key)) {
+//     readOnly = false;
+//   }
 
-  // const keyNew = key;
+//   // const keyNew = key;
 
-  return (
-    <div key={key} className="flex justify-between text-[1.4rem] relative">
-      {!isArray && <label htmlFor={key}>{key}</label>}
-      {typeof displayValue === "string" || typeof displayValue === "number" ? (
-        <input
-          id={key}
-          value={displayValue}
-          readOnly={readOnly}
-          className={"text-gray-900 px-3"}
-          onClick={() => handleCopyContent(key)}
-        />
-      ) : (
-        <div
-          id={key}
-          className={"text-gray-900"}
-          onClick={() => handleCopyContent(key)}
-        >
-          {displayValue}
-        </div>
-      )}
-    </div>
-  );
-};
+//   return (
+//     <div key={key} className="flex justify-between text-[1.4rem] relative">
+//       {!isArray && <label htmlFor={key}>{key}</label>}
+//       {typeof displayValue === "string" || typeof displayValue === "number" ? (
+//         <input
+//           id={key}
+//           value={displayValue}
+//           readOnly={readOnly}
+//           className={"text-gray-900 px-3"}
+//           onClick={() => handleCopyContent(key)}
+//         />
+//       ) : (
+//         <div
+//           id={key}
+//           className={"text-gray-900"}
+//           onClick={() => handleCopyContent(key)}
+//         >
+//           {displayValue}
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
 
-const renderKeyValuePairs = (obj: any): JSX.Element[] => {
-  // Object.entries(obj).map(([key, value]) => console.log(key, value));
-  return Object.entries(obj).map(([key, value]) =>
-    renderKeyValuePair(key, value)
-  );
-};
+// const renderKeyValuePairs = (obj: any): JSX.Element[] => {
+//   // Object.entries(obj).map(([key, value]) => console.log(key, value));
+//   return Object.entries(obj).map(([key, value]) =>
+//     renderKeyValuePair(key, value)
+//   );
+// };
 
 const handleCopyContent = (inputId: string) => {
   const inputElement = document.getElementById(inputId) as HTMLInputElement;
@@ -164,15 +164,15 @@ export default function Client() {
     }
   };
 
-  const handleChange = (field: string, value: string) => {
-    // setAgent((prevState: any): any => ({
-    //   ...prevState,
-    //   custom: {
-    //     ...prevState.custom,
-    //     [field]: value,
-    //   },
-    // }));
-  };
+  // const handleChange = (field: string, value: string) => {
+  //   setAgent((prevState: any): any => ({
+  //     ...prevState,
+  //     custom: {
+  //       ...prevState.custom,
+  //       [field]: value,
+  //     },
+  //   }));
+  // };
 
   const handleTabClick = (tabName: string) => {
     setActiveTab(tabName);
@@ -357,9 +357,9 @@ export default function Client() {
                 <InputComponent
                   label="Patrimônio"
                   id="patrimony"
-                  onChange={(e: any) =>
-                    handleChange("patrimony", e.target.value)
-                  }
+                  // onChange={(e: any) =>
+                  //   handleChange("patrimony", e.target.value)
+                  // }
                   placeholder="Ex: PC-0001"
                   value={agent.inventory.custom?.patrimony}
                   readOnly={false}
@@ -383,9 +383,9 @@ export default function Client() {
                   value={agent.inventory.custom?.date_warranty}
                   placeholder="01/01/1970"
                   onClick={() => handleCopyContent("date_warranty")}
-                  onChange={(e: any) =>
-                    handleChange("date_warranty", e.target.value)
-                  }
+                  // onChange={(e: any) =>
+                  //   handleChange("date_warranty", e.target.value)
+                  // }
                   readOnly={false}
                 />
 

@@ -10,14 +10,14 @@ interface Alert {
   isActive: boolean;
 }
 
-const formatName = (displayName: string): string => {
-  return displayName
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^\w\s]/gi, "")
-    .toLowerCase()
-    .replace(/\s+/g, "_");
-};
+// const formatName = (displayName: string): string => {
+//   return displayName
+//     .normalize("NFD")
+//     .replace(/[\u0300-\u036f]/g, "")
+//     .replace(/[^\w\s]/gi, "")
+//     .toLowerCase()
+//     .replace(/\s+/g, "_");
+// };
 
 const AlertTrigger: React.FC = () => {
   const [alerts, setAlerts] = useState<Alert[]>([]);
@@ -40,14 +40,14 @@ const AlertTrigger: React.FC = () => {
     fetchAlerts();
   }, [fetchAlerts]);
 
-  const addNewAlert = (displayName: string) => {
-    const newAlert: Alert = {
-      display_name: displayName,
-      name: formatName(displayName),
-      isActive: true,
-    };
-    setAlerts((prevAlerts) => [...prevAlerts, newAlert]);
-  };
+  // const addNewAlert = (displayName: string) => {
+  //   const newAlert: Alert = {
+  //     display_name: displayName,
+  //     name: formatName(displayName),
+  //     isActive: true,
+  //   };
+  //   setAlerts((prevAlerts) => [...prevAlerts, newAlert]);
+  // };
 
   const toggleAlert = async (name: string) => {
     setAlerts((prevAlerts) => {

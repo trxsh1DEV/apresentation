@@ -2,7 +2,7 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
-  useRef,
+  // useRef,
   useState,
 } from "react";
 import {
@@ -19,7 +19,7 @@ import { mkConfig, generateCsv, download } from "export-to-csv";
 import { requestWithToken } from "../../utils/request";
 import BlackScreen from "./Shell";
 import { openModalAtom } from "../../Context/ModalContext";
-import { Code, Eraser, Eye, Package, ShieldCheck, Upload } from "lucide-react";
+import { Code, Eraser, Eye, Package, ShieldCheck } from "lucide-react";
 import { tableTheme } from "@/styles/theme";
 
 type InventoryTypeEspecified = {
@@ -44,8 +44,7 @@ const csvConfig = mkConfig({
 
 const Clients: React.FC = () => {
   const [clients, setClients] = useState<InventoryTypeEspecified[] | null>([]);
-  const fileInputRef = useRef<any>();
-  console.log("oi");
+  // const fileInputRef = useRef<any>();
 
   const openModal = useSetAtom(openModalAtom);
 
@@ -138,11 +137,6 @@ const Clients: React.FC = () => {
     fetchClients();
   }, []);
 
-  console.log(
-    "oi",
-    clients?.map((item) => item.uid)
-  );
-
   const sendCommand = async (clientId: string, command: string) => {
     console.log("oi", clientId);
     try {
@@ -159,26 +153,26 @@ const Clients: React.FC = () => {
     }
   };
 
-  const uploadBatFile = async (clientId: string, file: any) => {
-    const formData = new FormData();
-    formData.append("clientId", clientId);
-    formData.append("file", file);
+  // const uploadBatFile = async (clientId: string, file: any) => {
+  //   const formData = new FormData();
+  //   formData.append("clientId", clientId);
+  //   formData.append("file", file);
 
-    try {
-      await requestWithToken.post("/sockets/send-file", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data", // Define o cabeçalho correto para a requisição multipart/form-data
-        },
-      });
-      alert("Upload do arquivo .bat concluído com sucesso!");
-    } catch (error: any) {
-      console.error("Erro ao fazer upload do arquivo .bat:", error);
-      alert(error.response.data.message);
-    } finally {
-      // Limpa o valor do elemento input
-      fileInputRef.current.value = "";
-    }
-  };
+  //   try {
+  //     await requestWithToken.post("/sockets/send-file", formData, {
+  //       headers: {
+  //         "Content-Type": "multipart/form-data", // Define o cabeçalho correto para a requisição multipart/form-data
+  //       },
+  //     });
+  //     alert("Upload do arquivo .bat concluído com sucesso!");
+  //   } catch (error: any) {
+  //     console.error("Erro ao fazer upload do arquivo .bat:", error);
+  //     alert(error.response.data.message);
+  //   } finally {
+  //     // Limpa o valor do elemento input
+  //     fileInputRef.current.value = "";
+  //   }
+  // };
 
   const handleTerminal = (clientId: string) => {
     console.log(clientId);

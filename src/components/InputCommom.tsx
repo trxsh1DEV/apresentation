@@ -32,7 +32,7 @@ const SearchInput: FC<CustomInputProps> = ({
   url,
   id,
   defaultValue,
-  className,
+  // className,
 }) => {
   if (typeData === null && !url) {
     throw new Error("url is required when typeData is null");

@@ -18,7 +18,6 @@ import { requestWithToken } from "../../utils/request";
 import TablePeriphericals from "./Periphericals";
 import { Pen, RefreshCcw, Trash } from "lucide-react";
 import { tableTheme } from "@/styles/theme";
-import { InterfaceSoftwareItem } from "../Software/Software";
 // import { useDispatch } from "react-redux";
 
 type UserApiResponse = {
@@ -83,9 +82,9 @@ const Peripherical: FC = () => {
   const handleExportData = () => {
     if (!data || data.length <= 0) return;
     data.map((asd) => console.log({ ...asd }));
-    const periphericals = data.map((client) => ({ ...client }));
-    // const csv = generateCsv(csvConfig)(periphericals);
-    // download(csvConfig)(csv);
+    const periphericals: any = data.map((client) => ({ ...client }));
+    const csv = generateCsv(csvConfig)(periphericals);
+    download(csvConfig)(csv);
   };
 
   const columns = useMemo<MRT_ColumnDef<TypePeripherical>[]>(

@@ -1,5 +1,4 @@
 import React, { useId, useState } from "react";
-import { Input } from "@/components/ui/input";
 
 interface TypePropsInput {
   type?: string;

@@ -18,10 +18,11 @@ export const modalAtom = atom<ModalState>({
   modalProps: null,
 });
 
-export const openModalAtom = atom(null, (get, set, modalProps: ModalProps) => {
+// get
+export const openModalAtom = atom(null, (_, set, modalProps: ModalProps) => {
   set(modalAtom, { isOpen: true, modalProps });
 });
 
-export const closeModalAtom = atom(null, (get, set) => {
+export const closeModalAtom = atom(null, (_, set) => {
   set(modalAtom, { isOpen: false, modalProps: null });
 });
