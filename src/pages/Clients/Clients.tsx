@@ -13,14 +13,28 @@ import {
 import { Box, IconButton, ThemeProvider, Tooltip } from "@mui/material";
 import { useSetAtom } from "jotai";
 import { formatDateString } from "../../utils/utils";
-import { AgentType } from "../../utils/types/types";
+import { TypePeripheral } from "../../utils/types/types";
 import { Link } from "react-router-dom";
 import { mkConfig, generateCsv, download } from "export-to-csv";
 import { requestWithToken } from "../../utils/request";
 import BlackScreen from "./Shell";
 import { openModalAtom } from "../../Context/ModalContext";
-import { Code, Eraser, Eye, Package, ShieldCheck } from "lucide-react";
+import { Code, Eraser, Eye, Package, ShieldCheck, Upload } from "lucide-react";
 import { tableTheme } from "@/styles/theme";
+
+type InventoryTypeEspecified = {
+  hostname: string;
+  so: string;
+  typeMachine: string;
+  userLogged: string;
+  memoryTotal: number;
+  diskTotal: number;
+  createdAt: string;
+  updatedAt: string;
+  peripherals: TypePeripheral;
+  online: boolean;
+  uid: string;
+};
 
 const csvConfig = mkConfig({
   fieldSeparator: ",",
@@ -29,8 +43,9 @@ const csvConfig = mkConfig({
 });
 
 const Clients: React.FC = () => {
-  const [clients, setClients] = useState<AgentType[] | null>([]);
+  const [clients, setClients] = useState<InventoryTypeEspecified[] | null>([]);
   const fileInputRef = useRef<any>();
+  console.log("oi");
 
   const openModal = useSetAtom(openModalAtom);
 
@@ -51,40 +66,42 @@ const Clients: React.FC = () => {
     const csv = generateCsv(csvConfig)(clientsData);
     download(csvConfig)(csv);
   };
+  if (clients) {
+    // console.log(clients[0].inventory);
+  }
 
-  const columns = useMemo<MRT_ColumnDef<AgentType>[]>(
+  const columns = useMemo<MRT_ColumnDef<InventoryTypeEspecified>[]>(
     () => [
       {
-        accessorKey: "inventory.inventoryHardware.system.hostname",
+        accessorKey: "hostname",
         header: "Hostname",
       },
       {
-        accessorKey: "inventory.inventoryHardware.system.so",
+        accessorKey: "so",
         header: "SO",
       },
-      // {
-      //   accessorKey: "uid",
-      //   header: "UID",
-      // },
       {
-        accessorKey: "inventory.inventoryHardware.system.type_machine",
+        accessorKey: "typeMachine",
         header: "Categoria",
       },
       {
-        accessorKey: "inventory.inventoryHardware.system.user_logged",
+        accessorKey: "userLogged",
         header: "Usuário",
         grow: false, //don't allow this column to grow to fill in remaining space - new in v2.8
         size: 50, //small column
       },
       {
-        accessorKey: "inventory.inventoryHardware.storage.total",
+        accessorFn: (row) => row.diskTotal,
         header: "Armazenamento",
         Cell: ({ cell }: any) => cell.getValue() + " GB",
       },
       // {
-      //   accessorKey: "custom.patrimony",
+      //   accessorKey: "inventory.custom.patrimony",
       //   header: "Patrimônio",
-      //   Cell: ({ cell }: any) => (cell.getValue() ? "N/A" : cell.getValue()),
+      //   Cell: ({ cell }: any) =>
+      //     cell.getValue() === undefined || !cell.getValue()
+      //       ? "N/A"
+      //       : cell.getValue(),
       // },
       {
         accessorKey: "createdAt",
@@ -92,7 +109,7 @@ const Clients: React.FC = () => {
         Cell: ({ cell }: any) => formatDateString(cell.getValue()),
       },
       {
-        accessorKey: "inventory.inventoryHardware.memory.total",
+        accessorKey: "memoryTotal",
         header: "RAM",
         Cell: ({ cell }: any) => cell.getValue() + " GB",
       },
@@ -111,7 +128,7 @@ const Clients: React.FC = () => {
       } catch (error: any) {
         console.error(
           "Error fetching clients:",
-          error?.response?.data.errors[0] || error.message
+          error?.response?.data?.errors?.[0] || error.message
         );
       }
     }
@@ -120,11 +137,14 @@ const Clients: React.FC = () => {
   useEffect(() => {
     fetchClients();
   }, []);
-  if (clients) {
-    console.log("hi", clients[0]);
-  }
+
+  console.log(
+    "oi",
+    clients?.map((item) => item.uid)
+  );
 
   const sendCommand = async (clientId: string, command: string) => {
+    console.log("oi", clientId);
     try {
       const result = await requestWithToken.post("/sockets/send-command", {
         clientId,
@@ -161,6 +181,7 @@ const Clients: React.FC = () => {
   };
 
   const handleTerminal = (clientId: string) => {
+    console.log(clientId);
     openModal({
       // title: "Dynamic Modal",
       content: <BlackScreen clientId={clientId} />,
@@ -168,6 +189,9 @@ const Clients: React.FC = () => {
       // onCancel: () => console.log("Cancelled!"),
     });
   };
+  // if (clients) {
+  //   console.log(clients[0].inventory.inventoryGeneral.storage[0].total);
+  // }
 
   const table = useMaterialReactTable({
     columns,
@@ -199,67 +223,6 @@ const Clients: React.FC = () => {
     },
     enableRowActions: true,
     getRowId: (row) => row.uid,
-    // renderRowActionMenuItems: ({ closeMenu, row, table }) => [
-    //   <MRT_ActionMenuItem
-    //     icon={<Package size={32} />}
-    //     key="get_inventory"
-    //     label={row.original.online ? "Obter Inventário" : "Agent Offline"}
-    //     onClick={() => sendCommand(row.id, "get_inventory")}
-    //     disabled={!row.original.online}
-    //     table={table}
-    //   />,
-    //   <MRT_ActionMenuItem
-    //     icon={<Code size={32} />}
-    //     key="custom_command"
-    //     label={row.original.online ? "Comando Personalizado" : "Agent Offline"}
-    //     onClick={() => {
-    //       openTerminal(row.id);
-    //       closeMenu();
-    //     }}
-    //     disabled={!row.original.online}
-    //     table={table}
-    //   />,
-    //   <MRT_ActionMenuItem
-    //     icon={<Eraser size={32} />}
-    //     key="format_device"
-    //     label={row.original.online ? "Formatar Dispositivo" : "Agent Offline"}
-    //     onClick={() => console.log(row.id)}
-    //     disabled={!row.original.online}
-    //     table={table}
-    //   />,
-    //   <MRT_ActionMenuItem
-    //     icon={<ShieldCheck size={32} />}
-    //     key="activate_bitlocker"
-    //     label={row.original.online ? "Ativar BitLocker" : "Agent Offline"}
-    //     onClick={() => console.log(row.id)}
-    //     disabled={!row.original.online}
-    //     table={table}
-    //   />,
-    //   <MRT_ActionMenuItem
-    //     icon={<UploadSimple size={32} />}
-    //     key="upload_script"
-    //     label={
-    //       row.original.online ? "Enviar Script (.bat | .ps1)" : "Agent Offline"
-    //     }
-    //     onClick={() => fileInputRef.current.click()}
-    //     disabled={!row.original.online}
-    //     table={table}
-    //   />,
-    //   <input
-    //     type="file"
-    //     accept=".bat"
-    //     ref={fileInputRef}
-    //     onChange={(e: any) => uploadBatFile(row.id, e?.target?.files[0])}
-    //     style={{ display: "none" }}
-    //   />,
-    //   <MRT_ActionMenuItem
-    //     icon={<Eye size={32} />}
-    //     key="details"
-    //     label="Mais detalhes"
-    //     onClick={() => navigate(`/agent/${row.id}`)}
-    //     table={table}
-    //   />,
-    // ],
 
     renderRowActions: ({ row }) => (
       <Box sx={{ display: "flex" }}>
@@ -292,6 +255,32 @@ const Clients: React.FC = () => {
             </IconButton>
           </span>
         </Tooltip>
+        {/* <Tooltip
+          title={
+            row.original.online
+              ? "Enviar Script (.bat | .ps1)"
+              : "Agent Offline"
+          }
+        >
+          <span>
+            <IconButton
+              color="primary"
+              onClick={() => fileInputRef.current.click()}
+              disabled={!row.original.online}
+            >
+              <input
+                type="file"
+                accept=".bat"
+                ref={fileInputRef}
+                onChange={(e: any) =>
+                  uploadBatFile(row.id, e?.target?.files[0])
+                }
+                style={{ display: "none" }}
+              />
+              <Upload size={32} />
+            </IconButton>
+          </span>
+        </Tooltip> */}
         <Tooltip
           title={row.original.online ? "Formatar Dispositivo" : "Agent Offline"}
         >
@@ -318,32 +307,7 @@ const Clients: React.FC = () => {
             </IconButton>
           </span>
         </Tooltip>
-        {/* <Tooltip
-          title={
-            row.original.online
-              ? "Enviar Script (.bat | .ps1)"
-              : "Agent Offline"
-          }
-        >
-          <span>
-            <IconButton
-              color="secondary"
-              onClick={() => fileInputRef.current.click()}
-              disabled={!row.original.online}
-            >
-              <input
-                type="file"
-                accept=".bat"
-                ref={fileInputRef}
-                onChange={(e: any) =>
-                  uploadBatFile(row.id, e?.target?.files[0])
-                }
-                style={{ display: "none" }}
-              />
-              <Upload size={32} />
-            </IconButton>
-          </span>
-        </Tooltip> */}
+
         <Tooltip title="Mais detalhes">
           <Link to={`/agent/${row.id}`}>
             <IconButton color="default">

@@ -1,4 +1,4 @@
-import React, { useId } from "react";
+import React, { useId, useState } from "react";
 import { Input } from "@/components/ui/input";
 
 interface TypePropsInput {
@@ -26,11 +26,12 @@ const InputComponent: React.FC<TypePropsInput> = ({
   onClick,
   onChange,
 }) => {
+  const [internalValue, setInternalValue] = useState(value || ""); // Estado interno
   const inputId = useId();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInternalValue(e.target.value); // Atualiza o valor interno
     if (onChange) {
-      // console.log("handle", e);
       onChange(e);
     }
   };
@@ -48,7 +49,7 @@ const InputComponent: React.FC<TypePropsInput> = ({
       <input
         id={id || inputId}
         type={type}
-        value={value}
+        value={internalValue}
         defaultValue={defaultValue}
         readOnly={readOnly}
         onClick={onClick}

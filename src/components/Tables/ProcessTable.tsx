@@ -63,6 +63,7 @@ const Processes = ({ data }: { data: ProcessItem[] }) => {
 };
 
 export const TableProcesses = ({ data }: { data: ProcessItem[] }) => {
+  console.log("oi", data);
   return (
     <ThemeProvider theme={tableTheme()}>
       <main className="w-full">

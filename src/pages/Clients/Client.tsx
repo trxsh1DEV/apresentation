@@ -20,6 +20,7 @@ import Charts from "../Charts/Charts";
 import { requestWithToken } from "@/utils/request";
 import TableProcesses from "@/components/Tables/ProcessTable";
 import AgentInfo from "@/components/customerComponents/AgentInfo";
+import HistoryAgent from "@/components/customerComponents/HistoryAgent";
 
 const renderKeyValuePair = (
   key: string,
@@ -130,15 +131,22 @@ export default function Client() {
 
       // Itera sobre os elementos encontrados
       readOnlyElements.forEach((element) => {
-        console.log("el", element);
         const inputValue =
           element instanceof HTMLInputElement
             ? element.value
             : element.textContent;
-        updatedCustom[element.id] = inputValue;
+        if (inputValue) {
+          updatedCustom[element.id] = [
+            "Selecione um DP",
+            "Localizado no(a)",
+            "Pertence ao",
+          ].includes(inputValue)
+            ? ""
+            : inputValue;
+        }
       });
 
-      await requestWithToken.patch(`/clients/${id}`, {
+      await requestWithToken.patch(`/inventory/custom/${id}`, {
         custom: {
           ...updatedCustom,
           // id,
@@ -157,13 +165,13 @@ export default function Client() {
   };
 
   const handleChange = (field: string, value: string) => {
-    setAgent((prevState: any): any => ({
-      ...prevState,
-      custom: {
-        ...prevState.custom,
-        [field]: value,
-      },
-    }));
+    // setAgent((prevState: any): any => ({
+    //   ...prevState,
+    //   custom: {
+    //     ...prevState.custom,
+    //     [field]: value,
+    //   },
+    // }));
   };
 
   const handleTabClick = (tabName: string) => {
@@ -172,22 +180,9 @@ export default function Client() {
 
   const fetchData = useCallback(async () => {
     try {
-      const [resultInventory, resultSoftware] = await Promise.all([
-        requestWithToken.get(`/clients/full/${id}`),
-        requestWithToken.get(`/softwares/${id}`),
-      ]);
-
-      if (!resultInventory) return setAgent(null);
-      console.log(resultInventory.data.inventory);
-      // console.log(resultSoftware.data.software);
-
-      // Unificar os resultados em um único objeto
-      const unifiedData = {
-        ...resultInventory.data,
-        softwares: resultSoftware.data.software,
-      };
-
-      setAgent(unifiedData);
+      const result = await requestWithToken.get(`/clients/full/${id}`);
+      if (!result.data) return;
+      setAgent(result.data);
     } catch (error) {
       console.error("Erro ao buscar os dados do agente:", error);
       setAgent(null);
@@ -198,11 +193,11 @@ export default function Client() {
     fetchData();
   }, []);
 
-  // console.log(agent?.inventory.inventoryHardware.software[0])
-  // console.log(agent?.inventory.software);
+  // console.log(agent?.inventory.inventoryGeneral.software[0])
+  // console.log(agent?.inventory.pro);
 
   return (
-    <main className="ProfileContainer">
+    <main className="w-full">
       <div className="flex justify-center space-x-1 mb-5">
         {[
           "Geral",
@@ -246,41 +241,41 @@ export default function Client() {
                   label="SO"
                   id="sys-so"
                   readOnly
-                  value={agent.inventory.inventoryHardware.system.so}
+                  value={agent.inventory.inventoryGeneral.system.so}
                   onClick={() => handleCopyContent("sys-so")}
                 />
                 <InputComponent
                   label="Hostname"
                   id="sys-host"
-                  value={agent.inventory.inventoryHardware.system.hostname}
+                  value={agent.inventory.inventoryGeneral.system.hostname}
                   readOnly
                   onClick={() => handleCopyContent("sys-host")}
                 />
                 <InputComponent
                   label="Domínio"
                   id="sys-domain"
-                  value={agent.inventory.inventoryHardware.system.domain}
+                  value={agent.inventory.inventoryGeneral.system.domain}
                   readOnly
                   onClick={() => handleCopyContent("sys-domain")}
                 />
                 <InputComponent
                   label="Usuário"
                   id="sys-user"
-                  value={agent.inventory.inventoryHardware.system.user_logged}
+                  value={agent.inventory.inventoryGeneral.system.user_logged}
                   readOnly
                   onClick={() => handleCopyContent("sys-user")}
                 />
                 <InputComponent
                   label="CPU"
                   id="cpu-model"
-                  value={agent.inventory.inventoryHardware.cpu.model}
+                  value={agent.inventory.inventoryGeneral.cpu.model}
                   readOnly
                   onClick={() => handleCopyContent("cpu-model")}
                 />
                 <InputComponent
                   label="Memória RAM"
                   id="cpu-arch"
-                  value={agent.inventory.inventoryHardware.memory.total + " GB"}
+                  value={agent.inventory.inventoryGeneral.memory.total + " GB"}
                   readOnly
                   onClick={() => handleCopyContent("cpu-arch")}
                 />
@@ -288,7 +283,7 @@ export default function Client() {
                   label="Disco Total"
                   id="storage-total"
                   value={
-                    agent.inventory.inventoryHardware.storage.total + " GB"
+                    agent.inventory.inventoryGeneral.storage[0].total + " GB"
                   }
                   readOnly
                   onClick={() => handleCopyContent("storage-total")}
@@ -296,28 +291,39 @@ export default function Client() {
                 <InputComponent
                   label="Disco usado"
                   id="storage-used"
-                  value={agent.inventory.inventoryHardware.storage.used + " GB"}
+                  value={
+                    agent.inventory.inventoryGeneral.storage[0].used + " GB"
+                  }
                   readOnly
                   onClick={() => handleCopyContent("storage-used")}
                 />
                 <InputComponent
                   label="IP"
                   id="net-ip"
-                  value={agent.inventory.inventoryHardware.network.ipv4}
+                  value={
+                    agent.inventory.inventoryGeneral.network.principal_interface
+                      ?.ipv4 || ""
+                  }
                   readOnly
                   onClick={() => handleCopyContent("net-ip")}
                 />
                 <InputComponent
                   label="Mac"
                   id="net-mac"
-                  value={agent.inventory.inventoryHardware.network.mac}
+                  value={
+                    agent.inventory.inventoryGeneral.network.principal_interface
+                      ?.mac || ""
+                  }
                   readOnly
                   onClick={() => handleCopyContent("net-mac")}
                 />
                 <InputComponent
                   label="Rede Conec."
                   id="net-name"
-                  value={agent.inventory.inventoryHardware.network.network}
+                  value={
+                    agent.inventory.inventoryGeneral.network.principal_interface
+                      .name
+                  }
                   readOnly
                   onClick={() => handleCopyContent("net-name")}
                 />
@@ -325,7 +331,7 @@ export default function Client() {
                   label="Fabricante"
                   id="sys-manufact"
                   value={
-                    agent.inventory.inventoryHardware.motherboard.manufacturer
+                    agent.inventory.inventoryGeneral.motherboard.manufacturer
                   }
                   readOnly
                   onClick={() => handleCopyContent("sys-manufact")}
@@ -334,7 +340,7 @@ export default function Client() {
                   label="Placa mãe"
                   id="manufacturer"
                   value={
-                    agent.inventory.inventoryHardware.motherboard.model_extend
+                    agent.inventory.inventoryGeneral.motherboard.model_extend
                   }
                   readOnly
                   onClick={() => handleCopyContent("manufacturer")}
@@ -342,7 +348,7 @@ export default function Client() {
                 <InputComponent
                   label="Modelo"
                   id="motherboard"
-                  value={agent.inventory.inventoryHardware.motherboard.model}
+                  value={agent.inventory.inventoryGeneral.motherboard.model}
                   readOnly
                   onClick={() => handleCopyContent("motherboard")}
                 />
@@ -355,7 +361,7 @@ export default function Client() {
                     handleChange("patrimony", e.target.value)
                   }
                   placeholder="Ex: PC-0001"
-                  value={agent.custom?.patrimony}
+                  value={agent.inventory.custom?.patrimony}
                   readOnly={false}
                   onClick={() => handleCopyContent("patrimony")}
                 />
@@ -366,15 +372,15 @@ export default function Client() {
                     id="collaborator"
                     url={`stock/search?query=`}
                     placeholder="Ex: Joao Silva"
-                    defaultValue={agent.custom?.collaborator}
-                    label="Colabrador"
+                    defaultValue={agent.inventory.custom?.collaborator}
+                    label="Colaborador"
                   />
                 </div>
 
                 <InputComponent
                   label="Data Compra"
                   id="date_warranty"
-                  value={agent.custom?.date_warranty}
+                  value={agent.inventory.custom?.date_warranty}
                   placeholder="01/01/1970"
                   onClick={() => handleCopyContent("date_warranty")}
                   onChange={(e: any) =>
@@ -391,7 +397,7 @@ export default function Client() {
                     Departamento
                   </Label>
 
-                  <Select defaultValue={agent.custom?.department}>
+                  <Select defaultValue={agent.inventory.custom?.department}>
                     <SelectTrigger
                       id="department_ref"
                       // className="w-[252px] bg-slate-800 ring-1 ring-ring px-3 py-2 text-lg ring-offset-background placeholder:text-muted-foreground"
@@ -425,7 +431,7 @@ export default function Client() {
                     Local
                   </Label>
 
-                  <Select defaultValue={agent.custom?.local}>
+                  <Select defaultValue={agent.inventory.custom?.local}>
                     <SelectTrigger
                       id="local_ref"
                       className="w-[252px] dark:bg-slate-800 px-3 py-2 text-xl ring-ring focus:outline-none focus:ring-4 focus:ring-ring focus:ring-offset-2"
@@ -459,7 +465,7 @@ export default function Client() {
                     Vinculo
                   </Label>
 
-                  <Select defaultValue={agent.custom?.bond}>
+                  <Select defaultValue={agent.inventory.custom?.bond}>
                     <SelectTrigger
                       id="bond_ref"
                       className="w-[252px] dark:bg-slate-800 px-3 py-2 text-xl ring-ring focus:outline-none focus:ring-4 focus:ring-ring focus:ring-offset-2"
@@ -489,7 +495,7 @@ export default function Client() {
                 <div className="text-center col-span-full text-5xl font-bold mb-5">
                   Softwares
                 </div>
-                {/* {renderKeyValuePairs(agent.inventory.inventoryHardware.software)} */}
+                {/* {renderKeyValuePairs(agent.inventory.inventoryGeneral.software)} */}
                 <TableSoftwares data={agent.inventory.software.software} />
               </div>
             )}
@@ -500,8 +506,8 @@ export default function Client() {
                 </div>
                 <div className="col-span-full text-3xl font-bold">
                   <H1Custom className="text-left">
-                    {agent.inventory.inventoryHardware.system.hostname},{" "}
-                    {agent.inventory.inventoryHardware.system.last_update}
+                    {agent.inventory.inventoryGeneral.system.hostname},{" "}
+                    {agent.inventory.inventoryGeneral.system.last_update}
                   </H1Custom>
                 </div>
                 <div className="col-span-full h-full w-full">
@@ -521,13 +527,16 @@ export default function Client() {
                 <div className="text-center col-span-full text-5xl font-bold mb-5">
                   Histórico de Ocorrências
                 </div>
+                <HistoryAgent id={id} />
               </div>
             )}
             {activeTab === "Processos" && (
               <div className="grid grid-cols-[repeat(2,1fr)] gap-[15px_40px] items-center mb-0 p-[15px]">
                 <div className="text-center col-span-full text-5xl font-bold mb-5">
                   <div className="mb-5">Processos</div>
-                  <TableProcesses data={agent.inventory.processes.apps} />
+                  <TableProcesses
+                    data={agent.inventory.processes.processes.apps}
+                  />
                 </div>
               </div>
             )}
@@ -543,12 +552,10 @@ export default function Client() {
               <div className="grid grid-cols-[repeat(2,1fr)] gap-[15px_40px] items-center mb-0 p-[15px]">
                 <div className="text-center col-span-full font-bold mb-5">
                   <div className="text-5xl">Detalhes da Coleta</div>
-                  <div>
-                    <AgentInfo
-                      inventoryHardware={agent.inventory.inventoryHardware}
-                      peripherals={agent.inventory.peripherals}
-                    />
-                  </div>
+                  <AgentInfo
+                    inventoryGeneral={agent.inventory.inventoryGeneral}
+                    peripherals={agent.inventory.peripherals}
+                  />
                 </div>
                 {/* {renderKeyValuePairs({
                   ...agent.inventory,

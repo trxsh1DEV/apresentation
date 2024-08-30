@@ -1,53 +1,11 @@
 import { InterfaceSoftwareItem } from "@/pages/Software/Software";
 
 export type AgentType = {
-  hwid: string;
   uid: string;
   online: boolean;
   // clientUid: Types.ObjectId;
   inventory: {
-    inventoryHardware: {
-      motherboard: {
-        manufacturer: string;
-        model_extend: string;
-        model: string;
-      };
-      cpu: {
-        model: string;
-        architecture: string;
-        cpu_freq: number;
-        physical_cores: number;
-        logic_cores: number;
-      };
-      memory: {
-        total: number;
-        available: number;
-        used: number;
-        percentage: number;
-      };
-      system: {
-        so: string;
-        version: string;
-        architecture: string;
-        domain: string;
-        type_machine: string;
-        hostname: string;
-        user_logged: string;
-        last_update: string;
-      };
-      storage: {
-        total: number;
-        used: number;
-        available: number;
-        percentage: number;
-      };
-      network: {
-        mac: string;
-        ip_public: string;
-        ipv4: string;
-        network: string;
-      };
-    };
+    inventoryGeneral: TypeInventoryGeneral;
     software: {
       software: InterfaceSoftwareItem[];
     };
@@ -55,8 +13,78 @@ export type AgentType = {
     processes: Processes;
 
     peripherals: TypePeripheral;
+    custom?: TypeCustom;
   };
-  custom?: TypeCustom;
+};
+
+type TypeInventoryGeneral = {
+  motherboard: {
+    manufacturer: string;
+    model_extend?: string; // Optional, as per MotherboardDto
+    model: string;
+    bios: string;
+    bios_release: string;
+  };
+  cpu: {
+    model: string;
+    architecture: string;
+    cpu_freq: number | null; // Can be null, as per CpuDto
+    physical_cores: number;
+    logic_cores: number;
+    cpu_temperature?: number; // Optional, as per CpuDto
+  };
+  memory: {
+    total: number;
+    available: number;
+    used: number;
+    percentage: number;
+  };
+  system: {
+    so: string;
+    version: string;
+    architecture: string;
+    domain: string;
+    type_machine: string;
+    hostname: string;
+    user_logged: string;
+    secure_boot: boolean;
+    windows_key: string | null; // Can be null, as per SystemDto
+    data_install_so: string;
+    last_update: string;
+  };
+  users: {
+    users_can_login: string[]; // Array of strings, as per SystemDto
+    users_already_logged: {
+      users: string[];
+      administrators: string[];
+    };
+  };
+  storage: {
+    letter?: string | null; // Optional and can be null, as per StorageItemDto
+    name: string;
+    total: number;
+    used: number;
+    available: number;
+    percentage: number;
+    bitlocker: boolean | null; // Can be null, as per StorageItemDto
+  }[];
+  network: {
+    principal_interface: {
+      name: string;
+      interface: string;
+      ipv4: string | null; // Can be null, as per NetworkInterfaceDto
+      mac: string | null; // Can be null, as per NetworkInterfaceDto
+      gateway: string | null; // Can be null, as per NetworkInterfaceDto
+    };
+    interfaces: {
+      interface: string;
+      ipv4: string | null; // Can be null, as per NetworkInterfaceDto
+      mac: string | null; // Can be null, as per NetworkInterfaceDto
+      gateway: string | null; // Can be null, as per NetworkInterfaceDto
+    }[];
+    public_ip: string;
+  };
+  printers: string[]; // Array of strings, as per InventoryGeneralDto
 };
 
 type TypePeripheralFields = {
@@ -80,7 +108,7 @@ export type TypePeripheral = {
 
 export type AgentInventoryType = Pick<
   AgentType["inventory"],
-  "inventoryHardware" | "peripherals"
+  "inventoryGeneral" | "peripherals"
 >;
 
 export interface ProcessesFields {
@@ -90,8 +118,10 @@ export interface ProcessesFields {
 }
 
 export interface Processes {
-  apps: ProcessesFields[];
-  system: ProcessesFields[];
+  processes: {
+    apps: ProcessesFields[];
+    system: ProcessesFields[];
+  };
 }
 
 export type TypePeripherical = {
@@ -114,7 +144,7 @@ export type TypePeripherical = {
   _id?: string;
 };
 
-type TypeCustom = {
+export type TypeCustom = {
   department: string;
   collaborator: string;
   bond: "Operador" | "Proprietario";
