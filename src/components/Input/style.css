@@ -19,6 +19,7 @@
 
 .InputStyle::placeholder {
     color: gray;
+    font-size: 21px;
 }
 
 /* Label */

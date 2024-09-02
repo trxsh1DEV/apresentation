@@ -1,7 +1,8 @@
 import { useMemo, useState, FC } from "react";
-import { IconButton, ThemeProvider, Tooltip } from "@mui/material";
+// import { IconButton, Tooltip } from "@mui/material";
 import {
   MRT_ActionMenuItem,
+  // MRT_ActionMenuItem,
   MRT_ColumnFiltersState,
   MRT_PaginationState,
   MRT_SortingState,
@@ -16,8 +17,8 @@ import { download, generateCsv, mkConfig } from "export-to-csv";
 import { requestWithToken } from "../../utils/request";
 // import { ArrowsClockwise, Pen, Trash } from "phosphor-react";
 import TablePeriphericals from "./Periphericals";
-import { Pen, RefreshCcw, Trash } from "lucide-react";
-import { tableTheme } from "@/styles/theme";
+import { Pen, Trash } from "lucide-react";
+// import { Pen, RefreshCcw, Trash } from "lucide-react";
 // import { useDispatch } from "react-redux";
 
 type UserApiResponse = {
@@ -50,7 +51,7 @@ const Peripherical: FC = () => {
     isError,
     isRefetching,
     isLoading,
-    refetch,
+    // refetch,
   } = useQuery<UserApiResponse>({
     queryKey: [
       "table-data",
@@ -86,6 +87,7 @@ const Peripherical: FC = () => {
     const csv = generateCsv(csvConfig)(periphericals);
     download(csvConfig)(csv);
   };
+  // console.log(handleExportData());
 
   const columns = useMemo<MRT_ColumnDef<TypePeripherical>[]>(
     () => [
@@ -126,18 +128,6 @@ const Peripherical: FC = () => {
         table={table}
       />,
     ],
-    renderTopToolbarCustomActions: () => (
-      <>
-        <Tooltip arrow title="Refresh Data">
-          <IconButton onClick={() => refetch()}>
-            <RefreshCcw />
-          </IconButton>
-        </Tooltip>
-        <button onClick={handleExportData}>Exportar Dados</button>
-        {/* <button onClick={() => handleModal()}>Adicionar novo</button> */}
-      </>
-    ),
-
     rowCount: meta?.totalRowCount ?? 0,
     initialState: { showColumnFilters: true },
     state: {
@@ -173,7 +163,7 @@ const Peripherical: FC = () => {
 
   return (
     <>
-      <h1>Equipamentos</h1>
+      <h1 onClick={() => handleExportData()}>Equipamentos</h1>
       <MaterialReactTable table={table} />
       <TablePeriphericals />
     </>
@@ -182,11 +172,9 @@ const Peripherical: FC = () => {
 
 export const TablePeripherals = () => {
   return (
-    <ThemeProvider theme={tableTheme()}>
-      <main className="w-full">
-        <Peripherical />
-      </main>
-    </ThemeProvider>
+    <main className="w-full">
+      <Peripherical />
+    </main>
   );
 };
 export default TablePeripherals;

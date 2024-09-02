@@ -4,8 +4,6 @@ import {
   useMaterialReactTable,
   type MRT_ColumnDef,
 } from "material-react-table";
-import { tableTheme } from "@/styles/theme";
-import { ThemeProvider } from "@mui/material";
 import { formatDateString } from "@/utils/utils";
 
 //example data type
@@ -115,11 +113,9 @@ const Softwares = ({ data }: { data: InterfaceSoftwareItem[] }) => {
 export const TableSoftwares = ({ data }: { data: InterfaceSoftwareItem[] }) => {
   console.log("tst", data);
   return (
-    <ThemeProvider theme={tableTheme()}>
-      <main className="w-full">
-        <Softwares data={data} />
-      </main>
-    </ThemeProvider>
+    <main className="w-full">
+      <Softwares data={data} />
+    </main>
   );
 };
 

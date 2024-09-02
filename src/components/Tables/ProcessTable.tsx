@@ -4,8 +4,6 @@ import {
   useMaterialReactTable,
   type MRT_ColumnDef,
 } from "material-react-table";
-import { tableTheme } from "@/styles/theme";
-import { ThemeProvider } from "@mui/material";
 
 // Dados dos processos
 interface ProcessItem {
@@ -63,13 +61,10 @@ const Processes = ({ data }: { data: ProcessItem[] }) => {
 };
 
 export const TableProcesses = ({ data }: { data: ProcessItem[] }) => {
-  console.log("oi", data);
   return (
-    <ThemeProvider theme={tableTheme()}>
-      <main className="w-full">
-        <Processes data={data} />
-      </main>
-    </ThemeProvider>
+    <main className="w-full">
+      <Processes data={data} />
+    </main>
   );
 };
 

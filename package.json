@@ -5,8 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "buildTS": "tsc && vite build --mode development",
-    "build": "vite build",
+    "build": "tsc && vite build",
     "predeploy": "npm run build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
@@ -35,7 +34,7 @@
     "react-dom": "^18.2.0",
     "react-gauge-chart": "^0.5.1",
     "react-hook-form": "^7.52.1",
-    "react-router-dom": "^6.25.1",
+    "react-router-dom": "^6.26.1",
     "tailwindcss-animate": "^1.0.6",
     "zod": "^3.23.8"
   },

@@ -3,7 +3,6 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BASE_URL } from "@/utils/request";
 import Cookies from "js-cookie";
-import { useNavigate } from "react-router-dom";
 
 const loginSchema = z.object({
   email: z.string().min(3, "email must be at least 3 characters"),
@@ -20,8 +19,6 @@ const LoginPage = () => {
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
   });
-
-  const navigate = useNavigate();
 
   const onSubmit = async ({ email, password }: LoginFormValues) => {
     if (!email || !password) return;
@@ -40,8 +37,6 @@ const LoginPage = () => {
       }
 
       const data: { token: string; expireIn: string } = await response.json();
-      console.log(Number(data.expireIn.slice(0, -1)) / 24);
-      console.log(data.token);
 
       Cookies.set("token", data.token, {
         expires: Number(data.expireIn.slice(0, -1)) / 24,
@@ -50,7 +45,7 @@ const LoginPage = () => {
       });
 
       // Redireciona para a página inicial após o login bem-sucedido
-      navigate("/");
+      window.location.href = "/";
     } catch (error) {
       console.error("An error occurred:", error);
       // Aqui você pode adicionar uma lógica para mostrar uma mensagem de erro ao usuário

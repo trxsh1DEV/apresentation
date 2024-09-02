@@ -1,37 +1,20 @@
-// import { useDispatch, useSelector } from "react-redux";
-// import { toggleModal } from "../../redux/modalSlice";
-// import Peripherical from "./TablePeriphericals";
-import FormPeripherical from "./FormPeripherical";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import {
   FormPropsPeripherical,
   schemaPeripherical,
 } from "../../utils/Schemas/PeriphericalSchema";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import "./clients.css";
-// import Modal from "../../components/Modal/Modal";
 import { queryClient } from "../../queryClient";
-import { useMutation } from "@tanstack/react-query";
 import { createPeripherical } from "../../hooks/usePeriphericals";
-import { useSetAtom } from "jotai";
-import { openModalAtom } from "@/Context/ModalContext";
+import FormPeripherical from "./FormPeripherical";
+import "./clients.css";
+import Modal from "@/components/Modal/ModalUseState";
+import { Button } from "@/components/ui/button";
 
 export default function TablePeriphericals() {
-  const openModal = useSetAtom(openModalAtom);
-  const handleModal = () =>
-    openModal({
-      title: "Adicionar item ao estoque",
-      content: (
-        <FormPeripherical
-          errors={errors}
-          handleForm={handleForm}
-          handleSubmit={handleSubmit}
-          register={register}
-        />
-      ),
-      // onConfirm: () => console.log("Confirmed!"),
-      // onCancel: () => console.log("Cancelled!"),
-    });
+  const [showModal, setShowModal] = useState(false);
 
   const {
     register,
@@ -46,35 +29,30 @@ export default function TablePeriphericals() {
   const mutation = useMutation({
     mutationFn: createPeripherical,
     onSuccess: () => {
-      // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ["table-data"] });
     },
   });
 
   const handleForm = async (data: any) => {
-    console.log(data);
-    queryClient.setQueriesData({ queryKey: ["table-data"] }, data);
-    const state = queryClient.getQueriesData({ queryKey: ["table-data"] });
-    console.log(state);
     try {
       mutation.mutate(data);
       reset();
-      handleModal();
+      closeModal(); // Fecha o modal após o envio
     } catch (err: any) {
       console.log(err.message);
     }
   };
 
-  // useEffect(() => {
-  //   console.log("rendering");
-  // }, [showModal]);
+  const handleOpenModal = () => setShowModal(true);
+  const closeModal = () => setShowModal(false);
+
   return (
-    <>
-      <button style={{ marginTop: "30px" }} onClick={handleModal}>
-        Adicionar novo
-      </button>
-      {/* {showModal && (
-        <Modal onClose={handleCreateNewClick} isOpen={showModal}>
+    <main className="flex justify-center">
+      <Button onClick={handleOpenModal} className="mt-14 text-2xl">
+        Adicionar
+      </Button>
+      {showModal && (
+        <Modal onClose={closeModal} isOpen={showModal}>
           <FormPeripherical
             errors={errors}
             handleForm={handleForm}
@@ -82,7 +60,7 @@ export default function TablePeriphericals() {
             register={register}
           />
         </Modal>
-      )} */}
-    </>
+      )}
+    </main>
   );
 }

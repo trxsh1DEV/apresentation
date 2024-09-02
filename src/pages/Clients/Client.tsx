@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 // import "./style.css";
 import { AgentType } from "../../utils/types/types";
-import SearchInput from "@/components/InputCommom";
+import SearchInput from "@/components/InputSearch";
 import InputComponent from "@/components/InputComponent";
 import {
   Select,
@@ -400,8 +400,8 @@ export default function Client() {
                   <Select defaultValue={agent.inventory.custom?.department}>
                     <SelectTrigger
                       id="department_ref"
-                      // className="w-[252px] bg-slate-800 ring-1 ring-ring px-3 py-2 text-lg ring-offset-background placeholder:text-muted-foreground"
-                      className="w-[252px] dark:bg-slate-800 px-3 py-2 text-xl ring-ring focus:outline-none focus:ring-4 focus:ring-ring focus:ring-offset-2"
+                      // className="w-[270px] bg-slate-800 ring-1 ring-ring px-3 py-2 text-lg ring-offset-background placeholder:text-muted-foreground"
+                      className="w-[270px] dark:bg-slate-800 px-3 py-2 text-xl ring-ring focus:outline-none focus:ring-4 focus:ring-ring focus:ring-offset-2"
                     >
                       <SelectValue
                         id="department"
@@ -434,7 +434,7 @@ export default function Client() {
                   <Select defaultValue={agent.inventory.custom?.local}>
                     <SelectTrigger
                       id="local_ref"
-                      className="w-[252px] dark:bg-slate-800 px-3 py-2 text-xl ring-ring focus:outline-none focus:ring-4 focus:ring-ring focus:ring-offset-2"
+                      className="w-[270px] dark:bg-slate-800 px-3 py-2 text-xl ring-ring focus:outline-none focus:ring-4 focus:ring-ring focus:ring-offset-2"
                     >
                       <SelectValue
                         data-select-type="edit-field"
@@ -468,7 +468,7 @@ export default function Client() {
                   <Select defaultValue={agent.inventory.custom?.bond}>
                     <SelectTrigger
                       id="bond_ref"
-                      className="w-[252px] dark:bg-slate-800 px-3 py-2 text-xl ring-ring focus:outline-none focus:ring-4 focus:ring-ring focus:ring-offset-2"
+                      className="w-[270px] dark:bg-slate-800 px-3 py-2 text-xl ring-ring focus:outline-none focus:ring-4 focus:ring-ring focus:ring-offset-2"
                     >
                       <SelectValue
                         data-select-type="edit-field"

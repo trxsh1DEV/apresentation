@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { Input } from "../../components/Input/Input";
 
 export default function FormPeripherical({
@@ -17,18 +18,28 @@ export default function FormPeripherical({
               label="Host"
               helperText={errors.host?.message}
             />
-
             <Input
+              {...register(`purchase_price`, {
+                valueAsNumber: true,
+              })}
+              label="Preço de compra"
+              helperText={errors.purchase_price?.message}
+              type="number"
+              defaultValue={0}
+            />
+
+            {/* <Input
               {...register("status")}
               label="Status"
               helperText={errors.status?.message}
-            />
+            /> */}
           </div>
 
           <div className="Container">
             <Input
               {...register("class")}
               label="Classe"
+              placeholder="Ex: Notebook ou Impressora"
               helperText={errors.class?.message}
             />
 
@@ -71,10 +82,16 @@ export default function FormPeripherical({
             />
 
             <Input
+              {...register(`nfe`)}
+              label="NF-e"
+              helperText={errors.nfe?.message}
+            />
+
+            {/* <Input
               {...register("so")}
               label="SO"
               helperText={errors.so?.message}
-            />
+            /> */}
           </div>
 
           <div className="Container">
@@ -117,30 +134,15 @@ export default function FormPeripherical({
             />
           </div>
 
-          <div className="Container">
-            <Input
-              {...register(`nfe`)}
-              label="NF-e"
-              helperText={errors.nfe?.message}
-            />
-
-            <Input
-              {...register(`purchase_price`, {
-                valueAsNumber: true,
-              })}
-              label="Preço de compra"
-              helperText={errors.purchase_price?.message}
-              type="number"
-            />
-          </div>
-
           {/* <div className="form-group">
               <label className="Label" htmlFor="message">Message:</label>
               <textar
               className="InputStyle" ea id="message" name="message" required></textarea>
             </div> */}
 
-          <button type="submit">Submit</button>
+          <Button type="submit" className="text-2xl mt-3">
+            Criar
+          </Button>
         </form>
       </div>
     </>

@@ -1,7 +1,8 @@
 import { HTMLAttributes, forwardRef, useId } from "react";
+import "./style.css";
 
 // Define um tipo específico para 'type' que inclui todos os tipos válidos de input
-type InputType = 
+type InputType =
   | "text"
   | "password"
   | "email"
@@ -25,27 +26,29 @@ type InputType =
   | "button";
 
 type InputProps = HTMLAttributes<HTMLInputElement> & {
-  type?: InputType;  // Agora o 'type' é limitado aos tipos válidos
-  name?: string;     // 'name' continua sendo uma string opcional
+  type?: InputType; // Agora o 'type' é limitado aos tipos válidos
+  name?: string; // 'name' continua sendo uma string opcional
   label?: string;
   helperText?: string;
   hasError?: boolean;
+  placeholder?: string;
 };
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   (
     {
-      type = "text",  // 'type' padrão é 'text'
-      name = "",      // 'name' padrão é uma string vazia
+      type = "text", // 'type' padrão é 'text'
+      name = "", // 'name' padrão é uma string vazia
       label = "\u00A0",
       helperText = "",
-      hasError = false,
+      placeholder,
+      // hasError = false,
       ...props
     },
     ref
   ) => {
     const inputId = useId();
-    hasError = helperText.length > 0;
+    const hasError = helperText.length > 0;
 
     return (
       <div className="InputContent">
@@ -57,12 +60,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           type={type}
           name={name}
           ref={ref}
+          placeholder={placeholder}
           className={`InputStyle ${hasError ? "hasError" : ""}`}
           {...props}
         />
-        {hasError && <p>{helperText}</p>}
+        {hasError && <p className="text-lg text-red-500 ">{helperText}</p>}
       </div>
     );
   }
 );
-

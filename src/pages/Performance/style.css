@@ -61,10 +61,10 @@ input[readonly]:focus {
     right: -4%;
 }
 
-/* .icon-x {
-    background-image: url('x.png');
+.icon-x {
+    background-image: url('icon-x.png');
 }
 
 .icon-ok {
-    background-image: url('ok.png');
-} */
+    background-image: url('icon-ok.png');
+}

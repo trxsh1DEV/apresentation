@@ -8,10 +8,11 @@ import {
   MessageCircle,
   Siren,
   MonitorSmartphone,
-  LocateFixed,
   Code,
+  DownloadCloud,
 } from "lucide-react";
-import { userIsLogged } from "@/pages/Auth/token-methods";
+import { logout, userIsLogged } from "@/pages/Auth/token-methods";
+import { BarChart4 } from "lucide-react";
 
 const Sidebar = () => {
   return (
@@ -31,9 +32,9 @@ const Sidebar = () => {
           </div>
         </NavLink>
 
-        <NavLink to="/" className="text-azure block w-52 p-2.5">
+        <NavLink to="/development" className="text-azure block w-52 p-2.5">
           <div className="flex items-center font-medium gap-2.5 px-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:text-white hover:bg-green-300  dark:hover:bg-slate-600 dark:hover:text-indigo-400">
-            <LayoutDashboardIcon size={32} />
+            <BarChart4 size={32} />
             <span className="ml-2 py-2">Dashboards</span>
           </div>
         </NavLink>
@@ -52,42 +53,56 @@ const Sidebar = () => {
           </div>
         </NavLink>
 
-        <NavLink to="/" className="text-azure block w-52 p-2.5">
-          <div className="flex items-center font-medium gap-2.5 px-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:text-white hover:bg-green-300  dark:hover:bg-slate-600 dark:hover:text-indigo-400">
-            <LocateFixed size={32} />
-            <span className="ml-2 py-2">Geolocalização</span>
-          </div>
-        </NavLink>
-
-        <NavLink to="/" className="text-azure block w-52 p-2.5">
+        <NavLink to="/development" className="text-azure block w-52 p-2.5">
           <div className="flex items-center font-medium gap-2.5 px-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:text-white hover:bg-green-300  dark:hover:bg-slate-600 dark:hover:text-indigo-400">
             <Code size={32} />
             <span className="ml-2 py-2">API</span>
           </div>
         </NavLink>
 
-        <NavLink to="/" className="text-azure block w-52 p-2.5">
+        <NavLink
+          to="https://wa.me/5511969642568"
+          target="_blank"
+          className="text-azure block w-52 p-2.5"
+        >
           <div className="flex items-center font-medium gap-2.5 px-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:text-white hover:bg-green-300  dark:hover:bg-slate-600 dark:hover:text-indigo-400">
             <MessageCircle size={32} />
             <span className="ml-2 py-2">Suporte</span>
           </div>
         </NavLink>
 
-        <NavLink to="/myprofile" className="text-azure block w-52 p-2.5">
+        <NavLink to="/custom" className="text-azure block w-52 p-2.5">
+          <div className="flex items-center font-medium gap-2.5 px-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:text-white hover:bg-green-300  dark:hover:bg-slate-600 dark:hover:text-indigo-400">
+            <LayoutDashboardIcon size={32} />
+            <span className="ml-2 py-2">Customização</span>
+          </div>
+        </NavLink>
+
+        <NavLink to="/download" className="text-azure block w-52 p-2.5">
+          <div className="flex items-center font-medium gap-2.5 px-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:text-white hover:bg-green-300  dark:hover:bg-slate-600 dark:hover:text-indigo-400">
+            <DownloadCloud size={32} />
+            <span className="ml-2 py-2">Download</span>
+          </div>
+        </NavLink>
+
+        <NavLink to="/profile" className="text-azure block w-52 p-2.5">
           <div className="flex items-center font-medium gap-2.5 px-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:text-white hover:bg-green-300  dark:hover:bg-slate-600 dark:hover:text-indigo-400">
             <UserCircle size={32} />
             <span className="ml-2 py-2">Meu perfil</span>
           </div>
         </NavLink>
+
         {userIsLogged() ? (
           <NavLink to="/login" className="text-azure block w-52 p-2.5">
             <div className="flex items-center font-medium gap-2.5 px-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:text-white hover:bg-green-300  dark:hover:bg-slate-600 dark:hover:text-indigo-400">
               <LogOut size={32} />
-              <span className="ml-2 py-2">Sair</span>
+              <span className="ml-2 py-2" onClick={() => logout()}>
+                Sair
+              </span>
             </div>
           </NavLink>
         ) : (
-          <NavLink to="/login" className="text-azure block w-52 p-2.5">
+          <NavLink to="/" className="text-azure block w-52 p-2.5">
             <div className="flex items-center font-medium gap-2.5 px-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:text-white hover:bg-green-300  dark:hover:bg-slate-600 dark:hover:text-indigo-400">
               <LogOut size={32} />
               <span className="ml-2 py-2">Entrar</span>

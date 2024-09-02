@@ -29,7 +29,6 @@ const AlertTrigger: React.FC = () => {
         throw new Error("Falha ao buscar alertas da API");
       }
       const data = await response.data;
-      console.log(data);
       setAlerts(data);
     } catch (err) {
       console.error("Erro ao buscar alertas:", err);
@@ -77,7 +76,7 @@ const AlertTrigger: React.FC = () => {
 
   return (
     <div className="p-4 bg-gray-900 text-white mx-auto min-w-max max-w-5xl">
-      <H1Custom className="text-center">Configuração de Alertas</H1Custom>
+      <H1Custom className="text-center mb-6">Configuração de Alertas</H1Custom>
       <div className="space-y-2">
         {alerts.map((alert) => (
           <div
@@ -104,7 +103,7 @@ const AlertTrigger: React.FC = () => {
             </div>
           </div>
         ))}
-        <div>Add</div>
+        {/* <Button>Adi</Button> */}
       </div>
     </div>
   );

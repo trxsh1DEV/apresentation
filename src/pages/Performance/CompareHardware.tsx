@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { requestWithToken } from "../../utils/request";
 import "./style.css";
-import SearchInput from "../../components/InputCommom";
+import SearchInput from "../../components/InputSearch";
 
 export default function CompareHardware() {
   const [icons, setIcons] = useState<any>({});

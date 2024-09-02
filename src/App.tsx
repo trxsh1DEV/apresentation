@@ -8,15 +8,20 @@ import { queryClient } from "./queryClient";
 import Charts from "./pages/Charts/Charts";
 import CompareHardware from "./pages/Performance/CompareHardware";
 import SeuComponente from "./components/test";
-import { ThemeProvider } from "./components/ui/theme-provider";
 import Modal from "./components/Modal/ModalComponent";
 import AlertTrigger from "./pages/Triggers/Trigger";
 import Layout from "./pages/Layout/Layout";
 import StockAutomatic from "./pages/Stock/StockTable";
 import LoginPage from "./pages/Auth/Login";
 import ProtectedRoute from "./pages/Auth/ProtectedRoute";
+import { RootThemeProvider } from "./styles/theme";
+import UserProfile from "./pages/Profile/Profile";
+import NotFound from "./pages/Message/NotFound";
+import DevelopmentFeature from "./pages/Message/DevelopmentFeature";
+import AddItemPage from "./pages/Custom/Custom";
+import DownloadPage from "./pages/Download/Download";
 
-export function App() {
+export default function App() {
   const router = createBrowserRouter([
     {
       path: "/",
@@ -50,6 +55,10 @@ export function App() {
               element: <SeuComponente />,
             },
             {
+              path: "/profile",
+              element: <UserProfile />,
+            },
+            {
               path: "/charts",
               element: <Charts />,
             },
@@ -60,6 +69,22 @@ export function App() {
             {
               path: "/triggers",
               element: <AlertTrigger />,
+            },
+            {
+              path: "/download",
+              element: <DownloadPage />,
+            },
+            {
+              path: "/custom",
+              element: <AddItemPage />,
+            },
+            {
+              path: "/development",
+              element: <DevelopmentFeature />,
+            },
+            {
+              path: "*",
+              element: <NotFound />,
             },
           ],
         },
@@ -72,13 +97,11 @@ export function App() {
   ]);
 
   return (
-    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+    <RootThemeProvider>
       <QueryClientProvider client={queryClient}>
         <Modal />
         <RouterProvider router={router} />
       </QueryClientProvider>
-    </ThemeProvider>
+    </RootThemeProvider>
   );
 }
-
-export default App;

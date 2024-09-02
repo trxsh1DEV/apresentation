@@ -10,7 +10,7 @@ import {
   useMaterialReactTable,
   type MRT_ColumnDef,
 } from "material-react-table";
-import { Box, IconButton, ThemeProvider, Tooltip } from "@mui/material";
+import { Box, IconButton, Tooltip } from "@mui/material";
 import { useSetAtom } from "jotai";
 import { formatDateString } from "../../utils/utils";
 import { TypePeripheral } from "../../utils/types/types";
@@ -20,7 +20,6 @@ import { requestWithToken } from "../../utils/request";
 import BlackScreen from "./Shell";
 import { openModalAtom } from "../../Context/ModalContext";
 import { Code, Eraser, Eye, Package, ShieldCheck } from "lucide-react";
-import { tableTheme } from "@/styles/theme";
 
 type InventoryTypeEspecified = {
   hostname: string;
@@ -323,11 +322,7 @@ const Clients: React.FC = () => {
 };
 
 export const TableInventoryDevices = () => {
-  return (
-    <ThemeProvider theme={tableTheme()}>
-      <Clients />
-    </ThemeProvider>
-  );
+  return <Clients />;
 };
 
 export default TableInventoryDevices;
