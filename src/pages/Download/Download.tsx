@@ -46,7 +46,8 @@ const DownloadPage = () => {
         <span className="font-bold text-2xl">{company.companyCode}</span>
       </p>
       <a
-        href="https://drive.google.com/uc?export=download&id=11pXZjpNZC72pLHl4ZYcpss-NjHLTgYF1"
+        href="https://drive.google.com/uc?export=download&id=1VzhreJhhOvdr1RznQ4gf-FIYXmN2lqvi"
+        // https://drive.google.com/file/d/1VzhreJhhOvdr1RznQ4gf-FIYXmN2lqvi/view?usp=sharing
         download
         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
       >
