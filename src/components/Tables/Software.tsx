@@ -111,7 +111,6 @@ const Softwares = ({ data }: { data: InterfaceSoftwareItem[] }) => {
 };
 
 export const TableSoftwares = ({ data }: { data: InterfaceSoftwareItem[] }) => {
-  console.log("tst", data);
   return (
     <main className="w-full">
       <Softwares data={data} />

@@ -1,9 +1,7 @@
 import React, {
-  useCallback,
-  useEffect,
+  Suspense,
   useMemo,
   // useRef,
-  useState,
 } from "react";
 import {
   MaterialReactTable,
@@ -20,6 +18,10 @@ import { requestWithToken } from "../../utils/request";
 import BlackScreen from "./Shell";
 import { openModalAtom } from "../../Context/ModalContext";
 import { Code, Eraser, Eye, Package, ShieldCheck } from "lucide-react";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { ErrorBoundary } from "react-error-boundary";
+import { ErrorFallback } from "@/data/error/ErrorFallback";
+import { UnexpectedError } from "@/data/error/UnexpectedError";
 
 type InventoryTypeEspecified = {
   hostname: string;
@@ -41,9 +43,24 @@ const csvConfig = mkConfig({
   useKeysAsHeaders: true,
 });
 
-const Clients: React.FC = () => {
-  const [clients, setClients] = useState<InventoryTypeEspecified[] | null>([]);
+const DataTableAgents: React.FC = () => {
+  // const [clients, setClients] = useState<InventoryTypeEspecified[] | null>([]);
   // const fileInputRef = useRef<any>();
+  const { data: clients } = useSuspenseQuery<InventoryTypeEspecified[] | null>({
+    queryKey: ["agent-table-data"],
+    queryFn: async () => {
+      try {
+        const response = await requestWithToken.get("/clients");
+        return response.data;
+      } catch (error: any) {
+        throw new UnexpectedError(
+          "Falha ao buscar os dados: " +
+            (error.response?.data?.message || error.message)
+        ); // Ou retorne um valor padrão que você gostaria de usar em caso de erro
+      }
+    },
+    retry: 1,
+  });
 
   const openModal = useSetAtom(openModalAtom);
 
@@ -64,9 +81,6 @@ const Clients: React.FC = () => {
     const csv = generateCsv(csvConfig)(clientsData);
     download(csvConfig)(csv);
   };
-  if (clients) {
-    // console.log(clients[0].inventory);
-  }
 
   const columns = useMemo<MRT_ColumnDef<InventoryTypeEspecified>[]>(
     () => [
@@ -115,27 +129,6 @@ const Clients: React.FC = () => {
     []
   );
 
-  const fetchClients = useCallback(async () => {
-    {
-      try {
-        const response = await requestWithToken.get("/clients");
-        // console.log(response.data);
-        if (!response.data || response.data.length <= 0)
-          return setClients(null);
-        setClients(response.data);
-      } catch (error: any) {
-        console.error(
-          "Error fetching clients:",
-          error?.response?.data?.errors?.[0] || error.message
-        );
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchClients();
-  }, []);
-
   const sendCommand = async (clientId: string, command: string) => {
     console.log("oi", clientId);
     try {
@@ -176,15 +169,9 @@ const Clients: React.FC = () => {
   const handleTerminal = (clientId: string) => {
     console.log(clientId);
     openModal({
-      // title: "Dynamic Modal",
       content: <BlackScreen clientId={clientId} />,
-      // onConfirm: () => console.log("Confirmed!"),
-      // onCancel: () => console.log("Cancelled!"),
     });
   };
-  // if (clients) {
-  //   console.log(clients[0].inventory.inventoryGeneral.storage[0].total);
-  // }
 
   const table = useMaterialReactTable({
     columns,
@@ -192,6 +179,11 @@ const Clients: React.FC = () => {
     enableDensityToggle: false,
     enableColumnActions: false,
     columnFilterDisplayMode: "popover",
+    renderEmptyRowsFallback: () => (
+      <div className="w-full text-center text-3xl font-semibold mt-14 overflow-hidden">
+        Nenhum agente foi encontrado
+      </div>
+    ),
     renderTopToolbarCustomActions: () => (
       <div
         style={{
@@ -314,15 +306,23 @@ const Clients: React.FC = () => {
 
   return (
     <>
-      <h1>Connected Clients</h1>
-      {!clients && <div>Nenhum dado disponível</div>}
-      {clients && clients.length > 0 && <MaterialReactTable table={table} />}
+      <main>
+        <h1>Connected Clients</h1>
+        <MaterialReactTable table={table} />
+      </main>
     </>
   );
 };
 
-export const TableInventoryDevices = () => {
-  return <Clients />;
-};
-
-export default TableInventoryDevices;
+export default function TableAgents() {
+  return (
+    <ErrorBoundary
+      FallbackComponent={ErrorFallback || "Ocorreu um erro no servidor"}
+      onReset={() => location.reload()}
+    >
+      <Suspense fallback={<div>Carregando...</div>}>
+        <DataTableAgents />
+      </Suspense>
+    </ErrorBoundary>
+  );
+}
