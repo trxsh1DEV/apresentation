@@ -1,4 +1,4 @@
-import { InterfaceSoftwareItem } from "@/pages/Software/Software";
+import { InterfaceSoftwareItem } from "@/components/Tables/Software";
 
 export type AgentType = {
   uid: string;
