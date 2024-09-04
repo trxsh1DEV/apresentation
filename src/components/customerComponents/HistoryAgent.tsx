@@ -126,7 +126,7 @@ const HistoryEntry: FC<{ entry: any; index: number }> = ({ entry, index }) => {
       title: "Sistema",
       icon: <Laptop className="mr-2" />,
       data: entry.inventoryGeneral?.filter((item: any) =>
-        item.path.startsWith("system")
+        item.path?.startsWith("system")
       ),
     },
     {
@@ -134,7 +134,7 @@ const HistoryEntry: FC<{ entry: any; index: number }> = ({ entry, index }) => {
       icon: <Cpu className="mr-2" />,
       data: entry.inventoryGeneral?.filter(
         (item: any) =>
-          item.path.startsWith("cpu") || item.path.startsWith("memory")
+          item.path?.startsWith("cpu") || item.path?.startsWith("memory")
       ),
     },
     {
