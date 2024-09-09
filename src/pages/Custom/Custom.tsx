@@ -68,7 +68,7 @@ const AddItemPage: React.FC = () => {
               <SelectValue
                 id="department"
                 data-select-type="edit-field"
-                placeholder="Selecione um DP"
+                placeholder="Selecione uma das opções"
               />
             </SelectTrigger>
             <SelectContent>

@@ -46,9 +46,8 @@ const DownloadPage = () => {
         <span className="font-bold text-2xl">{company.companyCode}</span>
       </p>
       <a
-        href="https://drive.google.com/uc?export=download&id=1VzhreJhhOvdr1RznQ4gf-FIYXmN2lqvi"
-        // https://drive.google.com/file/d/1VzhreJhhOvdr1RznQ4gf-FIYXmN2lqvi/view?usp=sharing
-        download
+        href="https://1drv.ms/u/s!AlAd6XB1SOttgrlzTFJPZJeXy9kAzg?e=jcPddo"
+        target="_blank"
         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
       >
         Baixar Programa
