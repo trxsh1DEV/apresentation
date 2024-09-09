@@ -46,7 +46,7 @@ const DownloadPage = () => {
         <span className="font-bold text-2xl">{company.companyCode}</span>
       </p>
       <a
-        href="https://1drv.ms/u/s!AlAd6XB1SOttgrlzTFJPZJeXy9kAzg?e=jcPddo"
+        href="https://1drv.ms/u/s!AlAd6XB1SOttgrl1fkhnmHN0wYTX6Q?e=3nV7Hr"
         target="_blank"
         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
       >
