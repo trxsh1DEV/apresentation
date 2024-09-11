@@ -20,6 +20,9 @@ import NotFound from "./pages/Message/NotFound";
 import DevelopmentFeature from "./pages/Message/DevelopmentFeature";
 import AddItemPage from "./pages/Custom/Custom";
 import DownloadPage from "./pages/Download/Download";
+import PaymentSuccessPage from "./pages/Payment/PaymentSuccess";
+import PaymentFailurePage from "./pages/Payment/PaymentFailure";
+import PaymentPage from "./pages/Payment/PaymentPage";
 
 export default function App() {
   const router = createBrowserRouter([
@@ -37,6 +40,10 @@ export default function App() {
             {
               path: "/devices/inventory/general",
               element: <TableInventoryDevices />,
+            },
+            {
+              path: "/payment",
+              element: <PaymentPage />,
             },
             {
               path: "/performance",
@@ -91,6 +98,14 @@ export default function App() {
         {
           path: "/login",
           element: <LoginPage />,
+        },
+        {
+          path: "/payment-success",
+          element: <PaymentSuccessPage />,
+        },
+        {
+          path: "/payment-failure",
+          element: <PaymentFailurePage />,
         },
       ],
     },

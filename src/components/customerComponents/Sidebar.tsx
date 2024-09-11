@@ -10,6 +10,7 @@ import {
   MonitorSmartphone,
   Code,
   DownloadCloud,
+  CreditCard,
 } from "lucide-react";
 import { logout, userIsLogged } from "@/pages/Auth/token-methods";
 import { BarChart4 } from "lucide-react";
@@ -82,6 +83,13 @@ const Sidebar = () => {
           <div className="flex items-center font-medium gap-2.5 px-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:text-white hover:bg-green-300  dark:hover:bg-slate-600 dark:hover:text-indigo-400">
             <DownloadCloud size={32} />
             <span className="ml-2 py-2">Download</span>
+          </div>
+        </NavLink>
+
+        <NavLink to="/payment" className="text-azure block w-52 p-2.5">
+          <div className="flex items-center font-medium gap-2.5 px-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:text-white hover:bg-green-300  dark:hover:bg-slate-600 dark:hover:text-indigo-400">
+            <CreditCard size={32} />
+            <span className="ml-2 py-2">Pagamento</span>
           </div>
         </NavLink>
 
