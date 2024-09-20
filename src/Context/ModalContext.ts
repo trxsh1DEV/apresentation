@@ -6,6 +6,7 @@ export interface ModalProps {
   content: ReactNode;
   onConfirm?: () => void;
   onCancel?: () => void;
+  independenceMode?: boolean;
 }
 
 interface ModalState {

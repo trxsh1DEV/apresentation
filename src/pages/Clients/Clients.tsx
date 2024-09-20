@@ -1,8 +1,4 @@
-import React, {
-  Suspense,
-  useMemo,
-  // useRef,
-} from "react";
+import React, { Suspense, useMemo, useRef } from "react";
 import {
   MaterialReactTable,
   useMaterialReactTable,
@@ -12,12 +8,22 @@ import { Box, IconButton, Tooltip } from "@mui/material";
 import { useSetAtom } from "jotai";
 import { formatDateString } from "../../utils/utils";
 import { TypePeripheral } from "../../utils/types/types";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { mkConfig, generateCsv, download } from "export-to-csv";
 import { requestWithToken } from "../../utils/request";
 import BlackScreen from "./Shell";
 import { openModalAtom } from "../../Context/ModalContext";
-import { Code, Eraser, Eye, Package, ShieldCheck } from "lucide-react";
+import {
+  BookOpenCheck,
+  // Code,
+  // Eraser,
+  // Forward,
+  Package,
+  Eye,
+  // ShieldCheck,
+  TerminalSquare,
+  Upload,
+} from "lucide-react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ErrorBoundary } from "react-error-boundary";
 import { ErrorFallback } from "@/data/error/ErrorFallback";
@@ -45,7 +51,8 @@ const csvConfig = mkConfig({
 
 const DataTableAgents: React.FC = () => {
   // const [clients, setClients] = useState<InventoryTypeEspecified[] | null>([]);
-  // const fileInputRef = useRef<any>();
+  const fileInputRef = useRef<any>();
+  const navigate = useNavigate();
   const { data: clients } = useSuspenseQuery<InventoryTypeEspecified[] | null>({
     queryKey: ["agent-table-data"],
     queryFn: async () => {
@@ -145,31 +152,38 @@ const DataTableAgents: React.FC = () => {
     }
   };
 
-  // const uploadBatFile = async (clientId: string, file: any) => {
-  //   const formData = new FormData();
-  //   formData.append("clientId", clientId);
-  //   formData.append("file", file);
+  const uploadBatFile = async (clientId: string, file: any) => {
+    const formData = new FormData();
+    formData.append("clientId", clientId);
+    formData.append("file", file);
 
-  //   try {
-  //     await requestWithToken.post("/sockets/send-file", formData, {
-  //       headers: {
-  //         "Content-Type": "multipart/form-data", // Define o cabeçalho correto para a requisição multipart/form-data
-  //       },
-  //     });
-  //     alert("Upload do arquivo .bat concluído com sucesso!");
-  //   } catch (error: any) {
-  //     console.error("Erro ao fazer upload do arquivo .bat:", error);
-  //     alert(error.response.data.message);
-  //   } finally {
-  //     // Limpa o valor do elemento input
-  //     fileInputRef.current.value = "";
-  //   }
-  // };
+    try {
+      await requestWithToken.post("/sockets/send-file", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data", // Define o cabeçalho correto para a requisição multipart/form-data
+        },
+      });
+      alert("Upload do arquivo .bat concluído com sucesso!");
+    } catch (error: any) {
+      console.error("Erro ao fazer upload do arquivo .bat:", error);
+      alert(error.response.data.message);
+    } finally {
+      // Limpa o valor do elemento input
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const handleCommandsPresets = (clientId: string) => {
+    // Navega para a nova página, passando o clientId como parâmetro na URL
+    navigate(`/remote-commands/${clientId}`);
+  };
 
   const handleTerminal = (clientId: string) => {
     console.log(clientId);
     openModal({
       content: <BlackScreen clientId={clientId} />,
+      title: "Terminal Remoto",
+      independenceMode: true,
     });
   };
 
@@ -212,7 +226,7 @@ const DataTableAgents: React.FC = () => {
     renderRowActions: ({ row }) => (
       <Box sx={{ display: "flex" }}>
         <Tooltip
-          title={row.original.online ? "Obter Inventário" : "Agent Offline"}
+          title={row.original.online ? "Atualizar Inventário" : "Agent Offline"}
         >
           <span>
             <IconButton
@@ -236,11 +250,12 @@ const DataTableAgents: React.FC = () => {
               onClick={() => handleTerminal(row.id)}
               disabled={!row.original.online}
             >
-              <Code size={32} />
+              <TerminalSquare size={32} />
             </IconButton>
           </span>
         </Tooltip>
-        {/* <Tooltip
+
+        <Tooltip
           title={
             row.original.online
               ? "Enviar Script (.bat | .ps1)"
@@ -249,7 +264,7 @@ const DataTableAgents: React.FC = () => {
         >
           <span>
             <IconButton
-              color="primary"
+              color="warning"
               onClick={() => fileInputRef.current.click()}
               disabled={!row.original.online}
             >
@@ -265,8 +280,8 @@ const DataTableAgents: React.FC = () => {
               <Upload size={32} />
             </IconButton>
           </span>
-        </Tooltip> */}
-        <Tooltip
+        </Tooltip>
+        {/* <Tooltip
           title={row.original.online ? "Formatar Dispositivo" : "Agent Offline"}
         >
           <span>
@@ -289,6 +304,22 @@ const DataTableAgents: React.FC = () => {
               disabled={!row.original.online}
             >
               <ShieldCheck size={32} />
+            </IconButton>
+          </span>
+        </Tooltip> */}
+
+        <Tooltip
+          title={
+            row.original.online ? "Comandos pré-configurados" : "Agent Offline"
+          }
+        >
+          <span>
+            <IconButton
+              color="success"
+              onClick={() => handleCommandsPresets(row.id)}
+              disabled={!row.original.online}
+            >
+              <BookOpenCheck size={32} />
             </IconButton>
           </span>
         </Tooltip>

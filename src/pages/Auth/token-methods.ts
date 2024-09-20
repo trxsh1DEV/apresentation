@@ -11,6 +11,7 @@ export const dataToken = () => {
 };
 
 export const logout = () => {
+  console.log("Logout function called");
   Cookies.remove("token");
   window.location.href = "/login";
 };

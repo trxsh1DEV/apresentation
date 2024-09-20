@@ -21,6 +21,9 @@ export const createTableTheme = (mode: Theme): ThemeOptions => ({
     secondary: {
       main: "#d57cd8",
     },
+    warning: {
+      main: "#e2eb34",
+    },
   },
 });
 

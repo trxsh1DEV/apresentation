@@ -7,7 +7,6 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./queryClient";
 import Charts from "./pages/Charts/Charts";
 import CompareHardware from "./pages/Performance/CompareHardware";
-import SeuComponente from "./components/test";
 import Modal from "./components/Modal/ModalComponent";
 import AlertTrigger from "./pages/Triggers/Trigger";
 import Layout from "./pages/Layout/Layout";
@@ -23,6 +22,10 @@ import DownloadPage from "./pages/Download/Download";
 import PaymentSuccessPage from "./pages/Payment/PaymentSuccess";
 import PaymentFailurePage from "./pages/Payment/PaymentFailure";
 import PaymentPage from "./pages/Payment/PaymentPage";
+import Trial from "./pages/Payment/Trial";
+import { Toaster } from "./components/ui/toaster";
+import { ToastDemo } from "./components/customerComponents/ToastDemo";
+import { RemoteCommandPage } from "./pages/Clients/CommandsPage";
 
 export default function App() {
   const router = createBrowserRouter([
@@ -57,10 +60,10 @@ export default function App() {
               path: "/stock/automatic",
               element: <StockAutomatic />,
             },
-            {
-              path: "/teste",
-              element: <SeuComponente />,
-            },
+            // {
+            //   path: "/teste",
+            //   element: <SeuComponente />,
+            // },
             {
               path: "/profile",
               element: <UserProfile />,
@@ -76,6 +79,10 @@ export default function App() {
             {
               path: "/triggers",
               element: <AlertTrigger />,
+            },
+            {
+              path: "/remote-commands/:clientId",
+              element: <RemoteCommandPage />,
             },
             {
               path: "/download",
@@ -100,8 +107,16 @@ export default function App() {
           element: <LoginPage />,
         },
         {
+          path: "/toast",
+          element: <ToastDemo />,
+        },
+        {
           path: "/payment-success",
           element: <PaymentSuccessPage />,
+        },
+        {
+          path: "/trial",
+          element: <Trial />,
         },
         {
           path: "/payment-failure",
@@ -113,6 +128,7 @@ export default function App() {
 
   return (
     <RootThemeProvider>
+      <Toaster />
       <QueryClientProvider client={queryClient}>
         <Modal />
         <RouterProvider router={router} />

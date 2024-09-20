@@ -102,11 +102,12 @@ const Sidebar = () => {
 
         {userIsLogged() ? (
           <NavLink to="/login" className="text-azure block w-52 p-2.5">
-            <div className="flex items-center font-medium gap-2.5 px-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:text-white hover:bg-green-300  dark:hover:bg-slate-600 dark:hover:text-indigo-400">
+            <div
+              onClick={() => logout()}
+              className="flex items-center font-medium gap-2.5 px-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:text-white hover:bg-green-300  dark:hover:bg-slate-600 dark:hover:text-indigo-400"
+            >
               <LogOut size={32} />
-              <span className="ml-2 py-2" onClick={() => logout()}>
-                Sair
-              </span>
+              <span className="ml-2 py-2">Sair</span>
             </div>
           </NavLink>
         ) : (

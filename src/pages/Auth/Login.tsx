@@ -3,6 +3,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BASE_URL } from "@/utils/request";
 import Cookies from "js-cookie";
+// import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 const loginSchema = z.object({
   email: z.string().min(3, "email must be at least 3 characters"),
@@ -19,6 +21,7 @@ const LoginPage = () => {
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
   });
+  const { toast } = useToast();
 
   const onSubmit = async ({ email, password }: LoginFormValues) => {
     if (!email || !password) return;
@@ -33,6 +36,10 @@ const LoginPage = () => {
       });
 
       if (!response.ok) {
+        toast({
+          title: "Falha ao tentar autenticar",
+          description: "Revise seu e-mail e senha",
+        });
         throw new Error(`Error: ${response.status}`);
       }
 

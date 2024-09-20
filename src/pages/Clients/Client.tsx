@@ -24,6 +24,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { ErrorBoundary } from "react-error-boundary";
 import { ErrorFallback } from "@/data/error/ErrorFallback";
 import { UnexpectedError } from "@/data/error/UnexpectedError";
+import { Button } from "@/components/ui/button";
 
 // const renderKeyValuePair = (
 //   key: string,
@@ -464,7 +465,13 @@ function DataClient() {
                 </SelectContent>
               </Select>
             </div>
-            <button onClick={handleEdit}>Salvar</button>
+            <div className="col-span-full flex justify-center mt-5">
+              {" "}
+              {/* Centralizando o botão "Salvar" */}
+              <Button className="w-60 text-xl" onClick={handleEdit}>
+                Salvar
+              </Button>
+            </div>
           </div>
         )}
         {activeTab === "Software" && (
