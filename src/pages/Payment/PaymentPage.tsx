@@ -75,7 +75,7 @@ const PaymentPage: React.FC = () => {
   const handleSubscription = async () => {
     setIsLoading(true); // Ativa o loading antes de iniciar a requisição
     try {
-      if (!selectedPlan?.price) return;
+      if (!selectedPlan) return;
       const price = selectedPlan?.price;
 
       // const formattedPriceBRL = new Intl.NumberFormat("pt-BR", {
@@ -83,7 +83,7 @@ const PaymentPage: React.FC = () => {
       //   currency: "BRL",
       // }).format(selectedPlan?.price);
 
-      if (+price <= 0) {
+      if (Number(price) <= 0) {
         return navigate("/trial");
       }
 
