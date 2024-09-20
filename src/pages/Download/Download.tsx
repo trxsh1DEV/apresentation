@@ -2,7 +2,7 @@ import requestWithToken from "@/utils/request";
 import { useCallback, useEffect, useState } from "react";
 
 const DownloadPage = () => {
-  const [company, setCompany] = useState<any | null>();
+  const [company, setCompany] = useState<any | null>(null);
   const fetchUser = useCallback(async () => {
     try {
       const resultToken = await requestWithToken.get("/auth/profile");
@@ -46,8 +46,9 @@ const DownloadPage = () => {
         <span className="font-bold text-2xl">{company.companyCode}</span>
       </p>
       <a
-        href="https://1drv.ms/u/s!AlAd6XB1SOttgrl2MIId8SdVRR7cFg?e=gvWqEK"
+        href="https://agentezero-api.infonova.com.br/updates/latest"
         target="_blank"
+        download
         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
       >
         Baixar Programa
