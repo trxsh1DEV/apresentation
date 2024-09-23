@@ -1,12 +1,13 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import Chart from "chart.js/auto";
 import { Line } from "react-chartjs-2";
 import GaugeChart from "react-gauge-chart";
 import { data, historyData } from "./mock";
 
-const Charts: React.FC = () => {
+const Charts = ({ datas }: any) => {
   const cpuRamBarsRef = useRef<Chart | null>(null);
   const diskSpacePieRef = useRef<any>(null);
+  console.log(datas);
 
   // Labels para o eixo X
   const labels = historyData.map((values) => `${values.day}`);
@@ -18,6 +19,15 @@ const Charts: React.FC = () => {
   const historyDiskSpace = historyData.map(
     (data) => (data.free_disk_space / data.total_disk_space) * 100
   );
+  /* TODO - Criar uma request que retorne os seguites campos
+    cpu_usage: 70,
+    ram_usage: 92,
+    cpu_temperature: 85,
+    disk_health: 60,
+    free_disk_space: 120,
+    total_disk_space: 240,
+    day: "Dom",
+  */
 
   useEffect(() => {
     const getColor = (value: number) => {

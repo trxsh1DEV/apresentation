@@ -529,7 +529,7 @@ function DataClient() {
             <div className="text-center col-span-full text-5xl font-bold mb-5">
               Monitoramento
             </div>
-            <Charts />
+            <Charts datas={data.inventory} />
           </div>
         )}
         {activeTab === "Detalhes" && (

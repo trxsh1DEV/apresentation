@@ -143,7 +143,7 @@ const UserProfile: FC = () => {
           </div>
           <button
             type="submit"
-            className="mt-4 px-4 py-2 bg-green-500 text-white rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="mt-4 px-4 py-2 bg-green-500 text-white rounded-md shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
             Atualizar
           </button>
