@@ -24,7 +24,6 @@ import requestWithToken from "@/utils/request";
 import { UnexpectedError } from "@/data/error/UnexpectedError";
 import { LoadingSpinner } from "@/components/ui/myIsLoading";
 import { countByField, countByManufacturers } from "@/utils/utils";
-import { mockMemoryData, softTest } from "./mock";
 import { FC, useEffect, useRef } from "react";
 
 ChartJS.register(
@@ -464,8 +463,7 @@ const Dashboard = () => {
     combinedCategories
   );
 
-  const groupedMemoryData = groupMemorySize(mockMemoryData);
-  console.log(groupedMemoryData);
+  const groupedMemoryData = groupMemorySize(memoryTotal);
 
   // Extraindo apenas o campo "typeMachine" de cada item
   const filteredSoftwareCount = Object.entries(softwareCount)
