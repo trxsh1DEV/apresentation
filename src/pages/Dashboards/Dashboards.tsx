@@ -407,6 +407,7 @@ const Dashboard = () => {
       softwareCount: {} as { [key: string]: number },
     }
   );
+  console.log(memoryTotal);
   const groupedData = groupDiskSizes(diskTotal);
 
   const generalCategories = mapToGeneralCategories(
