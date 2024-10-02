@@ -182,13 +182,12 @@ const Charts = ({ data, historyData }: ChartsProps) => {
       // Cálculo do espaço em disco em GB
       const freeDiskSpace = dataItem.free_disk_space || 0;
       const totalDiskSpace = dataItem.total_disk_space || 1; // Prevenir divisão por zero
-
       // Guardar o valor do espaço livre em GB
       // acc.historyDiskSpace.push(freeDiskSpace); // Em GB
-
       // Guardar a porcentagem de espaço livre em disco
-      const freeDiskSpacePercentage = (freeDiskSpace / totalDiskSpace) * 100;
-      acc.historyDiskSpacePercentage.push(Math.round(freeDiskSpacePercentage)); // Em %
+      acc.historyDiskSpacePercentage.push(
+        Math.round((freeDiskSpace / totalDiskSpace) * 100)
+      ); // Em %
 
       return acc;
     },
@@ -324,7 +323,9 @@ const Charts = ({ data, historyData }: ChartsProps) => {
       {
         data: [
           (data?.free_disk_space ?? 0) || 0,
-          (data?.total_disk_space ?? 0) - (data?.free_disk_space ?? 0) || 0,
+          (
+            (data?.total_disk_space ?? 0) - (data?.free_disk_space ?? 0)
+          ).toPrecision(4) || 0,
         ],
         backgroundColor: ["rgba(75, 192, 192, 0.2)", "rgba(255, 99, 132, 0.2)"],
         borderColor: ["rgba(75, 192, 192, 1)", "rgba(255, 99, 132, 1)"],
