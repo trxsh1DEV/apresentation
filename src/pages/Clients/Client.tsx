@@ -15,7 +15,7 @@ import {
 import { Label } from "@/components/ui/label";
 import TableSoftwares from "../../components/Tables/Software";
 import { H1Custom } from "@/components/customerComponents/Customercomponents";
-import Charts from "../Charts/Charts";
+import { WrapperCharts } from "../Charts/Charts";
 import { requestWithToken } from "@/utils/request";
 import TableProcesses from "@/components/Tables/ProcessTable";
 import AgentInfo from "@/components/customerComponents/AgentInfo";
@@ -25,6 +25,8 @@ import { ErrorBoundary } from "react-error-boundary";
 import { ErrorFallback } from "@/data/error/ErrorFallback";
 import { UnexpectedError } from "@/data/error/UnexpectedError";
 import { Button } from "@/components/ui/button";
+import { getDayOfWeek } from "@/utils/utils";
+import { LoadingSpinner } from "@/components/ui/myIsLoading";
 
 // const renderKeyValuePair = (
 //   key: string,
@@ -119,7 +121,7 @@ export default function Client() {
       FallbackComponent={ErrorFallback}
       onReset={() => location.reload()}
     >
-      <Suspense fallback={<div>Carregando...</div>}>
+      <Suspense fallback={<LoadingSpinner />}>
         <DataClient />
       </Suspense>
     </ErrorBoundary>
@@ -190,6 +192,7 @@ function DataClient() {
 
   // if (isLoading) return <div>Loading...</div>;
   // if (isError) return <div>Error loading data</div>;
+  // console.log(data.inventory);
 
   return (
     <main className="w-full">
@@ -501,7 +504,7 @@ function DataClient() {
                 loading="lazy"
                 allowFullScreen
                 referrerPolicy="no-referrer-when-downgrade"
-                src="https://www.google.com/maps?q=-23.6039,-46.9192&hl=es;z=14&output=embed"
+                src={`https://www.google.com/maps?q=${data.inventory.location}&hl=es;z=14&output=embed`}
               ></iframe>
             </div>
           </div>
@@ -529,7 +532,22 @@ function DataClient() {
             <div className="text-center col-span-full text-5xl font-bold mb-5">
               Monitoramento
             </div>
-            <Charts datas={data.inventory} />
+            <WrapperCharts
+              data={{
+                cpu_temp: data.inventory.inventoryGeneral.cpu.cpu_temp || 0,
+                cpu_usage: data.inventory.inventoryGeneral.cpu.cpu_usage,
+                free_disk_space:
+                  data.inventory.inventoryGeneral.storage[0].available,
+                ram_usage: data.inventory.inventoryGeneral.memory.used,
+                ram_total: data.inventory.inventoryGeneral.memory.total,
+                total_disk_space:
+                  data.inventory.inventoryGeneral.storage[0].total,
+                day: getDayOfWeek(
+                  data.inventory.inventoryGeneral.system.last_update
+                ),
+              }}
+              id={data.uid}
+            />
           </div>
         )}
         {activeTab === "Detalhes" && (

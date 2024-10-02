@@ -74,10 +74,11 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* font-family: 'Poppins', sans-serif; */
   }
 }
 
-.ProseMirror {
+/* .ProseMirror {
   padding: 10px;
   background: transparent;
   border-radius: 0 0 5px 5px;
@@ -163,23 +164,12 @@
   }
 }
 
-/* Character count */
 .character-count {
   align-items: center;
-  /* color: var(--gray-5); */
   display: flex;
   font-size: 0.75rem;
   gap: .5rem;
   margin: 1.5rem;
-
-  /* svg {
-    color: fuchsia;
-  }
-
-  &--warning,
-  &--warning svg {
-    color: red;
-  } */
 }
 
 .tiptap p.is-editor-empty:first-child::before {
@@ -188,4 +178,4 @@
   float: left;
   height: 0;
   pointer-events: none;
-}
+} */

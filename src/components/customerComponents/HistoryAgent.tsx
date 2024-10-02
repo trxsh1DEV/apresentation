@@ -186,6 +186,7 @@ const HistoryAgent: FC<{ id: string }> = ({ id }) => {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // console.log(data);
 
   const fetchData = useCallback(async () => {
     try {

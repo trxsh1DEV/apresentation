@@ -14,20 +14,21 @@ import { requestWithToken } from "../../utils/request";
 import BlackScreen from "./Shell";
 import { openModalAtom } from "../../Context/ModalContext";
 import {
-  BookOpenCheck,
+  FileText,
   // Code,
   // Eraser,
   // Forward,
   Package,
   Eye,
   // ShieldCheck,
-  TerminalSquare,
   Upload,
+  Code,
 } from "lucide-react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ErrorBoundary } from "react-error-boundary";
 import { ErrorFallback } from "@/data/error/ErrorFallback";
 import { UnexpectedError } from "@/data/error/UnexpectedError";
+import { LoadingSpinner } from "@/components/ui/myIsLoading";
 
 type InventoryTypeEspecified = {
   hostname: string;
@@ -99,6 +100,10 @@ const DataTableAgents: React.FC = () => {
         accessorKey: "so",
         header: "SO",
       },
+      // {
+      //   accessorKey: "uid",
+      //   header: "UID",
+      // },
       {
         accessorKey: "typeMachine",
         header: "Categoria",
@@ -250,7 +255,7 @@ const DataTableAgents: React.FC = () => {
               onClick={() => handleTerminal(row.id)}
               disabled={!row.original.online}
             >
-              <TerminalSquare size={32} />
+              <Code size={32} />
             </IconButton>
           </span>
         </Tooltip>
@@ -264,7 +269,7 @@ const DataTableAgents: React.FC = () => {
         >
           <span>
             <IconButton
-              color="warning"
+              color="error"
               onClick={() => fileInputRef.current.click()}
               disabled={!row.original.online}
             >
@@ -319,7 +324,7 @@ const DataTableAgents: React.FC = () => {
               onClick={() => handleCommandsPresets(row.id)}
               disabled={!row.original.online}
             >
-              <BookOpenCheck size={32} />
+              <FileText size={32} />
             </IconButton>
           </span>
         </Tooltip>
@@ -351,7 +356,13 @@ export default function TableAgents() {
       FallbackComponent={ErrorFallback || "Ocorreu um erro no servidor"}
       onReset={() => location.reload()}
     >
-      <Suspense fallback={<div>Carregando...</div>}>
+      <Suspense
+        fallback={
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <LoadingSpinner className="w-12 h-12" />
+          </div>
+        }
+      >
         <DataTableAgents />
       </Suspense>
     </ErrorBoundary>

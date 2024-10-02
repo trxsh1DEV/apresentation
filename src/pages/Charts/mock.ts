@@ -1,18 +1,17 @@
-export const data = {
+export const mockDataTest = {
   cpu_usage: 75.3,
   ram_usage: 87.8,
-  cpu_temperature: 68,
+  cpu_temp: 68,
   disk_health: 85,
   free_disk_space: 94,
   total_disk_space: 240,
 };
 
-export const historyData = [
+export const mockHistoryData = [
   {
     cpu_usage: 40,
     ram_usage: 86,
-    cpu_temperature: 65,
-    disk_health: 80,
+    cpu_temp: 65,
     free_disk_space: 120,
     total_disk_space: 240,
     day: "Sab",
@@ -20,8 +19,7 @@ export const historyData = [
   {
     cpu_usage: 95,
     ram_usage: 35,
-    cpu_temperature: 80,
-    disk_health: 65,
+    cpu_temp: 80,
     free_disk_space: 80,
     total_disk_space: 240,
     day: "Ter",
@@ -29,8 +27,7 @@ export const historyData = [
   {
     cpu_usage: 70,
     ram_usage: 92,
-    cpu_temperature: 85,
-    disk_health: 60,
+    cpu_temp: 85,
     free_disk_space: 120,
     total_disk_space: 240,
     day: "Dom",
@@ -38,8 +35,7 @@ export const historyData = [
   {
     cpu_usage: 80,
     ram_usage: 65,
-    cpu_temperature: 70,
-    disk_health: 75,
+    cpu_temp: 70,
     free_disk_space: 110,
     total_disk_space: 240,
     day: "Seg",
@@ -47,8 +43,7 @@ export const historyData = [
   {
     cpu_usage: 30,
     ram_usage: 70,
-    cpu_temperature: 75,
-    disk_health: 70,
+    cpu_temp: 75,
     free_disk_space: 160,
     total_disk_space: 240,
     day: "Sab",
@@ -56,8 +51,7 @@ export const historyData = [
   {
     cpu_usage: 81,
     ram_usage: 48,
-    cpu_temperature: 80,
-    disk_health: 65,
+    cpu_temp: 80,
     free_disk_space: 80,
     total_disk_space: 240,
     day: "Seg",
@@ -65,8 +59,7 @@ export const historyData = [
   {
     cpu_usage: 70,
     ram_usage: 92,
-    cpu_temperature: 85,
-    disk_health: 60,
+    cpu_temp: 85,
     free_disk_space: 120,
     total_disk_space: 240,
     day: "Ter",
@@ -74,8 +67,7 @@ export const historyData = [
   {
     cpu_usage: 95,
     ram_usage: 35,
-    cpu_temperature: 80,
-    disk_health: 65,
+    cpu_temp: 80,
     free_disk_space: 80,
     total_disk_space: 240,
     day: "Qua",
@@ -83,8 +75,7 @@ export const historyData = [
   {
     cpu_usage: 70,
     ram_usage: 92,
-    cpu_temperature: 85,
-    disk_health: 60,
+    cpu_temp: 85,
     free_disk_space: 120,
     total_disk_space: 240,
     day: "Qui",
@@ -92,8 +83,7 @@ export const historyData = [
   {
     cpu_usage: 81,
     ram_usage: 48,
-    cpu_temperature: 80,
-    disk_health: 65,
+    cpu_temp: 80,
     free_disk_space: 80,
     total_disk_space: 240,
     day: "Sex",
@@ -101,8 +91,7 @@ export const historyData = [
   {
     cpu_usage: 70,
     ram_usage: 92,
-    cpu_temperature: 85,
-    disk_health: 60,
+    cpu_temp: 85,
     free_disk_space: 120,
     total_disk_space: 240,
     day: "Dom",

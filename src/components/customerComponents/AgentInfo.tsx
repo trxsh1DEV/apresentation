@@ -34,8 +34,8 @@ const AgentInfo: FC<AgentInventoryType> = ({
             <p>Frequência: {inventoryGeneral.cpu.cpu_freq} MHz</p>
             <p>Núcleos Físicos: {inventoryGeneral.cpu.physical_cores}</p>
             <p>Núcleos Lógicos: {inventoryGeneral.cpu.logic_cores}</p>
-            {inventoryGeneral.cpu.cpu_temperature && (
-              <p>Temperatura: {inventoryGeneral.cpu.cpu_temperature}°C</p>
+            {inventoryGeneral.cpu.cpu_temp && (
+              <p>Temperatura: {inventoryGeneral.cpu.cpu_temp}°C</p>
             )}
           </div>
 
@@ -58,6 +58,10 @@ const AgentInfo: FC<AgentInventoryType> = ({
             <p>Arquitetura: {inventoryGeneral.system.architecture}</p>
             <p>Domínio: {inventoryGeneral.system.domain}</p>
             <p>Tipo de Máquina: {inventoryGeneral.system.type_machine}</p>
+            <p>
+              Tempo ligado (Hoje): {inventoryGeneral.system.time_machine_on}{" "}
+              Horas
+            </p>
             <p>Hostname: {inventoryGeneral.system.hostname}</p>
             <p>Usuário Logado: {inventoryGeneral.system.user_logged}</p>
             <p>Última Atualização: {inventoryGeneral.system.last_update}</p>

@@ -52,6 +52,12 @@ const commands = [
     command: "systeminfo",
   },
   {
+    name: "Exibir detalhes de disco",
+    description:
+      "Exibe detalhes do disco como modelo, nome, serialnumber e status",
+    command: "wmic diskdrive get model,name,serialnumber,status",
+  },
+  {
     name: "Configurar IP Estático",
     description: "Define um endereço IP estático para uma interface de rede.",
     command:

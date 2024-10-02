@@ -11,11 +11,14 @@ export type AgentType = {
     };
 
     processes: Processes;
+    location: string;
 
     peripherals: TypePeripheral;
     custom?: TypeCustom;
   };
 };
+
+export type OmitHistoryData<T> = Omit<T, "historyData">;
 
 type TypeInventoryGeneral = {
   motherboard: {
@@ -28,10 +31,12 @@ type TypeInventoryGeneral = {
   cpu: {
     model: string;
     architecture: string;
+    cpu_usage: number;
+    cpu_temp?: number; // Optional, as per CpuDto
+    cpu_use: number;
     cpu_freq: number | null; // Can be null, as per CpuDto
     physical_cores: number;
     logic_cores: number;
-    cpu_temperature?: number; // Optional, as per CpuDto
   };
   memory: {
     total: number;
@@ -47,6 +52,8 @@ type TypeInventoryGeneral = {
     type_machine: string;
     hostname: string;
     user_logged: string;
+    time_machine_on: number;
+    hours_month_on: number;
     secure_boot: boolean;
     windows_key: string | null; // Can be null, as per SystemDto
     data_install_so: string;

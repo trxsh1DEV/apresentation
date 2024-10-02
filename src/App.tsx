@@ -5,7 +5,6 @@ import Client from "./pages/Clients/Client";
 import { TablePeripherals } from "./pages/Peripherical/TablePeriphericals";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./queryClient";
-import Charts from "./pages/Charts/Charts";
 import CompareHardware from "./pages/Performance/CompareHardware";
 import Modal from "./components/Modal/ModalComponent";
 import AlertTrigger from "./pages/Triggers/Trigger";
@@ -26,6 +25,7 @@ import Trial from "./pages/Payment/Trial";
 import { Toaster } from "./components/ui/toaster";
 import { ToastDemo } from "./components/customerComponents/ToastDemo";
 import { RemoteCommandPage } from "./pages/Clients/CommandsPage";
+import Dashboard from "./pages/Dashboards/Dashboards";
 
 export default function App() {
   const router = createBrowserRouter([
@@ -49,6 +49,18 @@ export default function App() {
               element: <PaymentPage />,
             },
             {
+              path: "/payment-success",
+              element: <PaymentSuccessPage />,
+            },
+            {
+              path: "/trial",
+              element: <Trial />,
+            },
+            {
+              path: "/payment-failure",
+              element: <PaymentFailurePage />,
+            },
+            {
               path: "/performance",
               element: <CompareHardware />,
             },
@@ -68,9 +80,13 @@ export default function App() {
               path: "/profile",
               element: <UserProfile />,
             },
+            // {
+            //   path: "/charts",
+            //   element: <Charts />,
+            // },
             {
-              path: "/charts",
-              element: <Charts />,
+              path: "/dashboards-general",
+              element: <Dashboard />,
             },
             {
               path: "/agent/:id",
@@ -109,18 +125,6 @@ export default function App() {
         {
           path: "/toast",
           element: <ToastDemo />,
-        },
-        {
-          path: "/payment-success",
-          element: <PaymentSuccessPage />,
-        },
-        {
-          path: "/trial",
-          element: <Trial />,
-        },
-        {
-          path: "/payment-failure",
-          element: <PaymentFailurePage />,
         },
       ],
     },
