@@ -121,7 +121,13 @@ export default function Client() {
       FallbackComponent={ErrorFallback}
       onReset={() => location.reload()}
     >
-      <Suspense fallback={<LoadingSpinner />}>
+      <Suspense
+        fallback={
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <LoadingSpinner className="w-12 h-12" />
+          </div>
+        }
+      >
         <DataClient />
       </Suspense>
     </ErrorBoundary>

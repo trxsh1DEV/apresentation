@@ -17,8 +17,8 @@ export const mockHistoryData = [
     day: "Sab",
   },
   {
-    cpu_usage: 95,
-    ram_usage: 35,
+    cpu_usage: 0,
+    ram_usage: 0,
     cpu_temp: 80,
     free_disk_space: 80,
     total_disk_space: 240,
@@ -26,7 +26,7 @@ export const mockHistoryData = [
   },
   {
     cpu_usage: 70,
-    ram_usage: 92,
+    ram_usage: 98,
     cpu_temp: 85,
     free_disk_space: 120,
     total_disk_space: 240,
@@ -34,7 +34,7 @@ export const mockHistoryData = [
   },
   {
     cpu_usage: 80,
-    ram_usage: 65,
+    ram_usage: 0,
     cpu_temp: 70,
     free_disk_space: 110,
     total_disk_space: 240,

@@ -53,6 +53,7 @@ interface MachineData {
   memoryTotal: number;
   cpuModel: string;
   manufacturer: string;
+  memoryType: string;
   hoursOnMonth: string[];
 }
 
@@ -159,17 +160,104 @@ interface Disk {
 }
 interface MemoryRam {
   memoryTotal: number; // Tamanho do disco em alguma unidade (GB, MB, etc.)
+  memoryType: string;
 }
 
 interface DiskGroup {
   count: number;
   total: number;
 }
+interface MemoryGroup extends DiskGroup {
+  memoryTypes: string[]; // Tipos de memória presentes no grupo
+  percentPerMemoryType: { [key: string]: number }; // Porcentagem de cada tipo de memória em relação ao total
+}
 
+// Interface para dados agrupados
 interface GroupedSizes {
-  labels: string[];
-  data: number[];
-  totalSizes: string[];
+  labels: string[]; // Rótulos para o gráfico
+  data: number[]; // Contadores de cada grupo
+  totalSizes: string[]; // Totais dos tamanhos por grupo
+}
+
+// Interface para dados agrupados de memória que herda de GroupedSizes
+interface GroupedSizesMemory extends GroupedSizes {
+  memoryTypes: string[][]; // Tipos de memória para cada grupo
+  percentPerMemoryType: { [key: string]: { [type: string]: string | number } }; // Porcentagens por tipo de memória para cada grupo
+}
+
+function groupMemorySize(memorys: MemoryRam[]): GroupedSizesMemory {
+  const groups: { [key: string]: MemoryGroup } = {};
+
+  memorys.forEach((memory) => {
+    const size = memory.memoryTotal;
+    const type = memory.memoryType;
+    let groupKey: string;
+
+    // Lógica de agrupamento por faixas específicas
+    if (size < 4) {
+      groupKey = "0-4";
+    } else if (size < 8) {
+      groupKey = "4-8";
+    } else if (size < 16) {
+      groupKey = "8-16";
+    } else {
+      groupKey = "16+";
+    }
+
+    // Inicializa o grupo se não existir
+    if (!groups[groupKey]) {
+      groups[groupKey] = {
+        count: 0,
+        total: 0,
+        memoryTypes: [],
+        percentPerMemoryType: {},
+      };
+    }
+
+    // Incrementa o contador e o total do grupo
+    groups[groupKey].count++;
+    groups[groupKey].total += size;
+
+    // Adiciona o tipo de memória ao grupo, se ainda não estiver no array
+    if (!groups[groupKey].memoryTypes.includes(type)) {
+      groups[groupKey].memoryTypes.push(type);
+      // Inicializa a porcentagem para esse tipo de memória
+      groups[groupKey].percentPerMemoryType[type] = 0;
+    }
+
+    // Incrementa a contagem do tipo de memória
+    groups[groupKey].percentPerMemoryType[type] += size; // Soma o tamanho ao tipo correspondente
+  });
+
+  // Calcula a porcentagem para cada tipo de memória em cada grupo
+  for (const key in groups) {
+    const totalSize = groups[key].total;
+    for (const type of groups[key].memoryTypes) {
+      const typeSize = groups[key].percentPerMemoryType[type];
+      groups[key].percentPerMemoryType[type] = Number(
+        ((typeSize / totalSize) * 100).toFixed(2)
+      ); // Calcula a porcentagem
+    }
+  }
+
+  // Ordena as chaves para garantir que o gráfico fique em ordem crescente
+  const sortedKeys = Object.keys(groups).sort((a, b) => {
+    return parseInt(a.split("-")[0]) - parseInt(b.split("-")[0]);
+  });
+
+  return {
+    labels: sortedKeys,
+    data: sortedKeys.map((key) => groups[key].count),
+    totalSizes: sortedKeys.map((key) => groups[key].total.toFixed(2)),
+    memoryTypes: sortedKeys.map((key) => groups[key].memoryTypes),
+    percentPerMemoryType: sortedKeys.reduce(
+      (acc, key) => {
+        acc[key] = groups[key].percentPerMemoryType; // Atribui o objeto de porcentagens para cada grupo
+        return acc;
+      },
+      {} as { [key: string]: { [type: string]: number } }
+    ), // Certifique-se de que o tipo está correto aqui
+  };
 }
 
 function groupDiskSizes(disks: Disk[]): GroupedSizes {
@@ -192,46 +280,6 @@ function groupDiskSizes(disks: Disk[]): GroupedSizes {
       groupKey = "730-1000+";
     } else {
       groupKey = "1000+";
-    }
-
-    // Inicializa o grupo se não existir
-    if (!groups[groupKey]) {
-      groups[groupKey] = { count: 0, total: 0 };
-    }
-
-    // Incrementa o contador e o total do grupo
-    groups[groupKey].count++;
-    groups[groupKey].total += size;
-  });
-
-  // Ordena as chaves para garantir que o gráfico fique em ordem crescente
-  const sortedKeys = Object.keys(groups).sort((a, b) => {
-    return parseInt(a.split("-")[0]) - parseInt(b.split("-")[0]);
-  });
-
-  return {
-    labels: sortedKeys,
-    data: sortedKeys.map((key) => groups[key].count),
-    totalSizes: sortedKeys.map((key) => groups[key].total.toFixed(2)),
-  };
-}
-
-function groupMemorySize(disks: MemoryRam[]): GroupedSizes {
-  const groups: { [key: string]: DiskGroup } = {};
-
-  disks.forEach((disk) => {
-    const size = disk.memoryTotal;
-    let groupKey: string;
-
-    // Lógica de agrupamento por faixas específicas
-    if (size < 4) {
-      groupKey = "0-4";
-    } else if (size < 8) {
-      groupKey = "4-8";
-    } else if (size < 16) {
-      groupKey = "8-16";
-    } else {
-      groupKey = "16+";
     }
 
     // Inicializa o grupo se não existir
@@ -352,8 +400,7 @@ const Dashboard = () => {
   if (isError) {
     return <div>Erro ao carregar os dados</div>;
   }
-  if (!historyData) return;
-
+  if (!historyData || historyData.length < 2) return;
   //   if (!isLoading && !isError && historyData) {
   const {
     machineTypes,
@@ -381,7 +428,10 @@ const Dashboard = () => {
       });
       acc.cpuModelName.push({ cpuModel: item.cpuModel });
       acc.diskTotal.push({ diskTotal: item.diskTotal });
-      acc.memoryTotal.push({ memoryTotal: item.memoryTotal });
+      acc.memoryTotal.push({
+        memoryTotal: item.memoryTotal,
+        memoryType: item.memoryType,
+      });
 
       // Processando categorySoftwares para combinedCategories e softwareCount
       Object.entries(item.categorySoftwares).forEach(([software, category]) => {
@@ -407,7 +457,6 @@ const Dashboard = () => {
       softwareCount: {} as { [key: string]: number },
     }
   );
-  console.log(memoryTotal);
   const groupedData = groupDiskSizes(diskTotal);
 
   const generalCategories = mapToGeneralCategories(
@@ -416,21 +465,33 @@ const Dashboard = () => {
   );
 
   const groupedMemoryData = groupMemorySize(mockMemoryData);
+  console.log(groupedMemoryData);
 
   // Extraindo apenas o campo "typeMachine" de cada item
-
-  const filteredSoftwareCount = Object.entries(softTest)
-    // Ordena as entradas pelo valor do count em ordem decrescente
+  const filteredSoftwareCount = Object.entries(softwareCount)
     .sort(([, countA]: any, [, countB]: any) => countB - countA)
-    // .filter(([, count]: any) => count > 1)
-    // Mantém apenas os 10 maiores valores
-    .slice(0, 10)
     .reduce(
       (acc: any, [software, count]) => {
-        // Pega a primeira parte da string antes do primeiro espaço
-        const softwareName = software.split(" ")[0];
+        // Pega até a terceira palavra, ou o nome completo se tiver menos de 3 palavras
+        const softwareName = software.split(" ").slice(0, 2).join(" ");
+        switch (softwareName) {
+          case "Microsoft Visual":
+            // console.log("oi", software.split(" ").slice(0, 3).join(" "));
+            // softwareName = software.split(" ").slice(0, 3).join(" ");
+            return acc;
+          case "Microsoft Edge":
+            if (
+              software.split(" ").slice(0, 3).join(" ") !== "Microsoft Edge"
+            ) {
+              return acc; // Pula a iteração retornando o acumulador
+            }
+            // sof
+            break;
 
-        // Se já existir no acumulador, somar os valores
+          default:
+            break;
+        }
+
         if (acc[softwareName]) {
           acc[softwareName] += count;
         } else {
@@ -442,11 +503,34 @@ const Dashboard = () => {
       {} as { [key: string]: number }
     );
 
+  const topRankSoftwares = Object.entries(filteredSoftwareCount)
+    .slice(0, 16)
+    .reduce(
+      (acc: any, [software, count]) => {
+        acc[software] = count;
+        return acc;
+      },
+      {} as { [key: string]: number }
+    );
+
   const machineCounts = countMachineTypes(machineTypes);
   const brandCounts = countByManufacturers(
     brandManufactures,
     Object.keys(brandManufactures[0])[0] || "manufacturer",
-    ["DELL", "ASUS", "ACER", "SAMSUNG", "LENOVO"]
+    [
+      "DELL",
+      "ASUS",
+      "ACER",
+      "SAMSUNG",
+      "LENOVO",
+      "ELSA",
+      "MAXSUN",
+      "GIGABYTE",
+      "ASROCK",
+      "MSI",
+      "SUPERFRAME",
+      "BIOSTAR",
+    ]
   );
   const cpuModelCounts = countByManufacturers(
     cpuModelName,
@@ -473,7 +557,7 @@ const Dashboard = () => {
     labels: groupedMemoryData.labels,
     datasets: [
       {
-        label: "Qtde de Memória",
+        label: "Quantidade de Memória",
         data: groupedMemoryData.data,
         backgroundColor: "rgba(54, 162, 235, 0.2)",
         borderColor: ["rgba(54, 162, 235, 1)"],
@@ -515,13 +599,13 @@ const Dashboard = () => {
         label: "Inventariados",
         data: [20, 15, 10, 5, 7], // Quantidade de itens inventariados
         backgroundColor: "#4caf50", // Cor para inventariados (verde)
-        borderColor: ["rgba(255, 99, 132, 1)", "rgba(54, 162, 235, 1)"],
+        // borderColor: ["rgb(54, 235, 78, 1)"],
       },
       {
         label: "Em Estoque",
         data: [8, 3, 5, 2, 4], // Quantidade de itens em estoque
         backgroundColor: "#2196f3", // Cor para em estoque (azul)
-        borderColor: ["rgba(255, 99, 132, 1)", "rgba(54, 162, 235, 1)"],
+        // borderColor: ["rgba(54, 162, 235, 1)"],
       },
     ],
   };
@@ -532,10 +616,10 @@ const Dashboard = () => {
       {
         label: "Horas de Computadores Ligados",
         data: dataHoursMonth,
-        fill: true,
+        // fill: true,
         backgroundColor: "rgba(75, 192, 192, 0.2)",
         borderColor: "rgba(75, 192, 192, 1)",
-        tension: 0.5,
+        // tension: 0.5,
       },
     ],
   };
@@ -556,7 +640,6 @@ const Dashboard = () => {
       },
     ],
   };
-  console.log(brandChart);
 
   const soData = countByField(SystemOperation, "so");
 
@@ -594,11 +677,11 @@ const Dashboard = () => {
     ],
   };
   const softwareData = {
-    labels: Object.keys(filteredSoftwareCount),
+    labels: Object.keys(topRankSoftwares),
     datasets: [
       {
         label: "Quantidade de Software",
-        data: Object.values(filteredSoftwareCount),
+        data: Object.values(topRankSoftwares),
         backgroundColor: "rgba(0, 123, 255, 0.2)",
         borderColor: ["rgba(255, 99, 132, 1)", "rgba(54, 162, 235, 1)"],
         pointBackgroundColor: "rgb(0, 123, 255)",
@@ -703,7 +786,7 @@ const Dashboard = () => {
         },
       },
     },
-    // cutout: "60%",
+    cutout: "40%",
   };
 
   const barOptionsDisk = (title: string, display: boolean) => {
@@ -735,7 +818,23 @@ const Dashboard = () => {
                 title == "Disco"
                   ? groupedData.totalSizes[context.dataIndex]
                   : groupedMemoryData.totalSizes[context.dataIndex];
-              return `${label}: ${value} (Total: ${totalSize} GB)`;
+
+              const memoryGroup = context.label; // ex: '4-8' ou '8-16'
+              const memoryTypes =
+                groupedMemoryData.memoryTypes[context.dataIndex];
+              const percentPerMemoryType =
+                groupedMemoryData.percentPerMemoryType[memoryGroup];
+
+              // Iniciando o array de linhas com a primeira linha
+              const lines = [`${label}: ${value} (Total: ${totalSize} GB)`];
+
+              // Adicionando as porcentagens como linhas separadas
+              memoryTypes.forEach((memoryType: string) => {
+                const percentage = percentPerMemoryType[memoryType];
+                lines.push(`${memoryType}: ${percentage}%`);
+              });
+
+              return lines;
             },
           },
         },
@@ -784,8 +883,7 @@ const Dashboard = () => {
 
   const lineOptions: any = {
     ...baseOptions,
-    tension: 0.1,
-    devicePixelRatio: 2, // Garante que a densidade de pixels se ajuste ao dispositivo
+    tension: 0.3,
     scales: {
       x: {
         ticks: { color: "white", font: { size: 14 } },
@@ -794,7 +892,45 @@ const Dashboard = () => {
       y: {
         ticks: { color: "white", font: { size: 14 } },
         grid: { color: "rgba(255, 255, 255, 0.1)" },
+        // suggestedMin: 20, // Definindo o valor mínimo baseado nos dados
       },
+    },
+    elements: {
+      point: {
+        radius: 5,
+      },
+      line: {
+        // tension: 0.2,
+      },
+    },
+    plugins: {
+      ...baseOptions.plugins,
+      legend: {
+        display: true,
+        labels: {
+          color: "white",
+          font: {
+            size: 15,
+            // weight: "bold",
+          },
+        },
+      },
+      datalabels: {
+        // ...baseOptions.plugins.datalabels,
+        display: true, // Ativa os rótulos de dados
+        align: "top",
+        anchor: "end",
+        offset: -5, // Controla o espaçamento do valor acima dos pontos
+        color: "white",
+        textStrokeColor: "black", // Cor do contorno
+        textStrokeWidth: 3, // Largura do contorno
+        font: {
+          size: 16,
+          weight: "bold",
+        },
+      },
+      // Adiciona o plugin de datalabels sem sobrescrever a chave plugins
+      datalabelsPlugin: ChartDataLabels,
     },
   };
 
@@ -848,7 +984,7 @@ const Dashboard = () => {
           font: {
             size: 14,
           },
-          // stepSize: 2, // Ajuste este valor conforme necessário
+          stepSize: 2, // Ajuste este valor conforme necessário
         },
         pointLabels: {
           color: "white",

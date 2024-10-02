@@ -52,8 +52,8 @@ export interface ChartsProps {
 }
 
 const processHistoryData = (
-  history: any,
-  totalDiskSpace: number
+  history: any
+  // totalDiskSpace: number
   // totalMemory: number
 ) => {
   // Inicializa um array para armazenar os dados processados
@@ -65,8 +65,8 @@ const processHistoryData = (
     const processedData: InterfaceData = {
       cpu_usage: 0,
       cpu_temp: 0,
-      ram_usage: 0,
       ram_total: 0,
+      ram_usage: 0,
       free_disk_space: 0,
       total_disk_space: 0,
       day: null,
@@ -101,11 +101,11 @@ const processHistoryData = (
         default:
           break;
       }
-      processedData.total_disk_space = totalDiskSpace;
       // processedData.ram_total = totalMemory;
     });
 
     // Adiciona os dados processados ao array
+    // processedData.total_disk_space = totalDiskSpace;
     processedDataArray.push(processedData);
   });
 
@@ -118,7 +118,9 @@ const useHistoryData = (id: string) => {
     queryKey: ["historyData", id],
     queryFn: async () => {
       try {
-        const result = await requestWithToken.get(`/inventory/history/${id}`);
+        const result = await requestWithToken.get(
+          `/inventory/history/${id}?length=2`
+        );
         return result.data;
       } catch (error: any) {
         throw new UnexpectedError(
@@ -139,7 +141,9 @@ export const WrapperCharts = ({ data, id }: OmitHistoryData<ChartsProps>) => {
   if (isLoading) {
     return (
       <div>
-        <LoadingSpinner />
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <LoadingSpinner className="w-12 h-12" />
+        </div>
       </div>
     );
   }
@@ -153,8 +157,8 @@ export const WrapperCharts = ({ data, id }: OmitHistoryData<ChartsProps>) => {
   }
 
   const processedData = processHistoryData(
-    historyData,
-    data?.total_disk_space || 1
+    historyData
+    // data?.total_disk_space || 1
     // data?.ram_total || 0
   );
 
@@ -162,7 +166,7 @@ export const WrapperCharts = ({ data, id }: OmitHistoryData<ChartsProps>) => {
 };
 
 const Charts = ({ data, historyData }: ChartsProps) => {
-  // console.log(data,historyData);
+  console.log(data, historyData);
 
   const {
     labels,
@@ -175,18 +179,18 @@ const Charts = ({ data, historyData }: ChartsProps) => {
     (acc: any, dataItem: any) => {
       acc.labels.push(`${dataItem.day}`);
 
-      acc.historyCPUUsage.push(dataItem.cpu_usage);
-      acc.historyRAMUsage.push(dataItem.ram_usage);
-      acc.historyCPUTemperature.push(dataItem.cpu_temp);
+      acc.historyCPUUsage.push(Math.round(dataItem.cpu_usage * 100) / 100);
+      acc.historyRAMUsage.push(Math.round(dataItem.ram_usage * 100) / 100);
+      acc.historyCPUTemperature.push(Math.round(dataItem.cpu_temp * 100) / 100);
 
       // Cálculo do espaço em disco em GB
       const freeDiskSpace = dataItem.free_disk_space || 0;
-      const totalDiskSpace = dataItem.total_disk_space || 1; // Prevenir divisão por zero
+      const totalDiskSpace = data.total_disk_space || 1; // Prevenir divisão por zero
       // Guardar o valor do espaço livre em GB
       // acc.historyDiskSpace.push(freeDiskSpace); // Em GB
       // Guardar a porcentagem de espaço livre em disco
       acc.historyDiskSpacePercentage.push(
-        Math.round((freeDiskSpace / totalDiskSpace) * 100)
+        ((freeDiskSpace / totalDiskSpace) * 100).toPrecision(4)
       ); // Em %
 
       return acc;
@@ -200,6 +204,43 @@ const Charts = ({ data, historyData }: ChartsProps) => {
       historyDiskSpacePercentage: [] as number[], // Espaço livre em porcentagem
     }
   );
+  // console.log(historyData);
+
+  const findAlternativeValue = (
+    currentIndex: number,
+    historyConsult: number[]
+  ): number => {
+    // Busca um valor não-zero anterior
+    for (let i = currentIndex - 1; i >= 0; i--) {
+      if (historyConsult[i] !== 0) {
+        return historyConsult[i];
+      }
+    }
+
+    // Se não encontrar um valor anterior, busca um valor posterior
+    for (let i = currentIndex + 1; i < historyConsult.length; i++) {
+      if (historyConsult[i] !== 0) {
+        return historyConsult[i];
+      }
+    }
+
+    // Se não encontrar nenhum valor não-zero, retorna 0
+    return 0;
+  };
+  const getAlternativeValue = (
+    value: number,
+    context: any,
+    historyConsult: number[]
+  ) => {
+    if (value !== 0) return value;
+
+    const currentIndex = context.dataIndex;
+    return findAlternativeValue(currentIndex, historyConsult);
+  };
+
+  const formatMemoryValue = (value: number, ramTotal: number) => {
+    return `${value}% (${((value / 100) * ramTotal).toFixed(2)} GB)`;
+  };
 
   const getColor = (value: number) => {
     let red, green, blue;
@@ -226,35 +267,62 @@ const Charts = ({ data, historyData }: ChartsProps) => {
     return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
   };
 
-  const barCpuData = {
+  const barCpuAndMemoryData = {
     labels: labels, // Seu array de labels existente
     datasets: [
       {
         label: "Uso de CPU (%)",
-        data: historyCPUUsage,
+        // data: historyCPUUsage,
+        data: historyCPUUsage.map((value: any, index: any) => {
+          if (value === 0) {
+            // Encontra o valor anterior não-zero
+            value = findAlternativeValue(index, historyCPUUsage);
+          }
+          return value;
+        }),
         customData: historyCPUUsage.map((value: number) => value), // Exemplo de valor personalizado
-        backgroundColor: historyCPUUsage?.map((value: any) =>
-          getColor(value || 0)
+        backgroundColor: historyCPUUsage?.map(
+          (value: number, index: number) => {
+            if (value === 0) {
+              value = findAlternativeValue(index, historyCPUUsage);
+            }
+            return getColor(value || 0); // Retorna a cor do valor atual
+          }
         ),
-        borderColor: historyCPUUsage?.map(() => "transparent"),
+        // borderColor: historyCPUUsage?.map(() => "transparent"),
         borderWidth: 1,
       },
       {
         label: "Uso de Memória (%)",
-        data: historyRAMUsage,
+        // data: historyRAMUsage,
+        data: historyRAMUsage.map((value: number, index: number) => {
+          if (value === 0) {
+            // Encontra o valor anterior não-zero
+            value = findAlternativeValue(index, historyRAMUsage);
+          }
+          return value;
+        }),
         customData: historyRAMUsage.map(
           (value: number) => `${((value / 100) * data.ram_total).toFixed(2)} GB`
         ), // Exemplo de valor personalizado
-        backgroundColor: historyRAMUsage?.map((value: any) =>
-          getColor(value || 0)
+        // backgroundColor: historyRAMUsage?.map((value: any) =>
+        //   getColor(value || 0)
+        // ),
+        backgroundColor: historyRAMUsage?.map(
+          (value: number, index: number) => {
+            if (value === 0) {
+              value = findAlternativeValue(index, historyRAMUsage);
+            }
+            return getColor(value || 0); // Retorna a cor do valor atual
+          }
         ),
-        borderColor: historyRAMUsage?.map(() => "transparent"),
+        // borderColor: historyRAMUsage?.map(() => "transparent"),
         borderWidth: 1,
       },
     ],
   };
 
-  const barCpuOptions: any = {
+  const barCpuAndMemoryOptions: any = {
     scales: {
       x: {
         // stacked: true,
@@ -272,45 +340,53 @@ const Charts = ({ data, historyData }: ChartsProps) => {
         labels: {
           color: "white",
           font: {
-            size: 14,
+            size: 16,
           },
-          // padding: 20,
         },
       },
       datalabels: {
         color: "white",
         font: {
-          weight: "bold",
-          size: 14,
+          // weight: "bold",
+          // size: 14,
         },
-        formatter: (value: number) => {
-          // const total = context.dataset.data.reduce(
-          //   (sum: number, dataValue: number) => sum + dataValue,
-          //   0
-          // );
-          // if (value > 0) {
-          //   return value + "%";
+        textStrokeColor: "black", // Cor do contorno
+        textStrokeWidth: 3, // Largura do contorno
+        formatter: (value: number, context: any) => {
+          const label = context.dataset.label || "";
+          const historyConsult =
+            label === "Uso de CPU (%)" ? historyCPUUsage : historyRAMUsage;
+          const alternativeValue = getAlternativeValue(
+            value,
+            context,
+            historyConsult
+          );
+
+          // if (label === "Uso de Memória (%)") {
+          //   return formatMemoryValue(alternativeValue, data.ram_total);
           // }
-          return value + "%";
-          // return ""; // Retorna uma string vazia se o valor for 0 ou menor
+          return `${alternativeValue}%`;
         },
       },
       tooltip: {
         callbacks: {
           label: function (context: any) {
             let label = context.dataset.label || "";
-            if (label) {
-              if (label == "Uso de Memória (%)") {
-                label = "Uso de Memória (GB)";
-              }
-              label += ": ";
+            const value = context.parsed.y;
+            const historyConsult =
+              label === "Uso de CPU (%)" ? historyCPUUsage : historyRAMUsage;
+            const alternativeValue = getAlternativeValue(
+              value,
+              context,
+              historyConsult
+            );
+
+            if (label === "Uso de Memória (%)") {
+              label = "Uso de Memória";
+              return `${label}: ${formatMemoryValue(alternativeValue, data.ram_total)}`;
             }
-            if (context.parsed.y !== null) {
-              // Exibe o valor personalizado ao invés da porcentagem
-              const customValue = context.dataset.customData[context.dataIndex];
-              label += customValue;
-            }
-            return label;
+
+            return `${label}: ${alternativeValue}%`;
           },
         },
       },
@@ -342,7 +418,7 @@ const Charts = ({ data, historyData }: ChartsProps) => {
           labels: {
             color: "white",
             font: {
-              size: 14,
+              size: 16,
             },
             // padding: 20,
           },
@@ -350,9 +426,10 @@ const Charts = ({ data, historyData }: ChartsProps) => {
         datalabels: {
           color: "white",
           font: {
-            weight: "bold",
             size: 14,
           },
+          textStrokeColor: "black", // Cor do contorno
+          textStrokeWidth: 3, // Largura do contorno
         },
         title: {
           display: true,
@@ -386,7 +463,7 @@ const Charts = ({ data, historyData }: ChartsProps) => {
             <div>
               <p className="font-bold text-2xl">Temperatura CPU</p>
               <GaugeChart
-                style={{ width: 285 }}
+                style={{ width: 280 }}
                 id="cpuTemperatureGauge"
                 percent={data?.cpu_temp ? data?.cpu_temp / 100 : 0}
                 formatTextValue={(val) => Number(val).toFixed(0) + "°C"}
@@ -396,7 +473,7 @@ const Charts = ({ data, historyData }: ChartsProps) => {
             <div>
               <p className="font-bold text-2xl">Uso de Memória</p>
               <GaugeChart
-                style={{ width: 285 }}
+                style={{ width: 280 }}
                 id="memGabage"
                 // percent={data?.ram_usage || 0 / 100}
                 percent={
@@ -408,7 +485,7 @@ const Charts = ({ data, historyData }: ChartsProps) => {
             <div>
               <p className="font-bold text-2xl">Uso de CPU</p>
               <GaugeChart
-                style={{ width: 285 }}
+                style={{ width: 280 }}
                 id="cpuUsage"
                 // percent={data.cpu_usage || 0 / 100}
                 percent={data?.cpu_usage ? data?.cpu_usage / 100 : 0}
@@ -418,7 +495,7 @@ const Charts = ({ data, historyData }: ChartsProps) => {
             <div>
               <p className="font-bold text-2xl">Uso de Disco</p>
               <GaugeChart
-                style={{ width: 285 }}
+                style={{ width: 280 }}
                 id="diskUsage"
                 // percent={data?.free_disk_space || 0 / (data?.total_disk_space || 0)}
                 percent={
@@ -428,9 +505,19 @@ const Charts = ({ data, historyData }: ChartsProps) => {
                 {...gaugeOptions}
               />
             </div>
+            {/* <div>
+              <p className="font-bold text-2xl">Saúde do Disco</p>
+              <GaugeChart
+                style={{ width: 250 }}
+                id="cpuTemperatureGauge"
+                percent={data?.cpu_temp ? data?.cpu_temp / 100 : 0}
+                formatTextValue={(val) => Number(val).toFixed(0) + "°C"}
+                {...gaugeOptions}
+              />
+            </div> */}
           </div>
           <div className="flex flex-col md:flex-row items-center justify-between h-96 mb-6 ">
-            <Bar data={barCpuData} options={barCpuOptions} />
+            <Bar data={barCpuAndMemoryData} options={barCpuAndMemoryOptions} />
             <Pie
               data={barDiskData}
               options={barDiskOptions(data?.total_disk_space)}
@@ -446,6 +533,16 @@ const Charts = ({ data, historyData }: ChartsProps) => {
                     data: historyCPUUsage,
                     borderColor: "rgba(255, 99, 132, 1)",
                     borderWidth: 1,
+                    // datalabels: { // posso colocar as configurações abaixo em cada um dos objetos de datasets e cada um ter uma config
+                    //   align: "top", // Move os labels para cima dos pontos
+                    //   color: "white", // Cor dos valores
+                    //   font: {
+                    //     size: 12,
+                    //     weight: "bold",
+                    //   },
+                    //   anchor: "end", // Controla a posição do rótulo
+                    //   offset: -5, // Ajusta o deslocamento para empurrar o texto para cima
+                    // },
                   },
                   {
                     label: "Uso de Memória (%)",
@@ -460,7 +557,7 @@ const Charts = ({ data, historyData }: ChartsProps) => {
                     borderWidth: 1,
                   },
                   {
-                    label: "Espaço Livre (%)",
+                    label: "Espaço Ocupado (%)",
                     data: historyDiskSpacePercentage,
                     borderColor: "rgba(75, 192, 192, 1)",
                     borderWidth: 1,
@@ -469,20 +566,53 @@ const Charts = ({ data, historyData }: ChartsProps) => {
               }}
               options={{
                 scales: {
+                  x: {
+                    ticks: {
+                      color: "white",
+                      font: { size: 14 },
+                    },
+                    grid: { color: "rgba(255, 255, 255, 0.1)" },
+                  },
                   y: {
-                    // beginAtZero: true,
+                    ticks: { color: "white", font: { size: 14 } },
+                    grid: { color: "rgba(255, 255, 255, 0.1)" },
+                  },
+                },
+                elements: {
+                  point: {
+                    radius: 5,
+                  },
+                  line: {
+                    // tension: 0.2,
                   },
                 },
                 plugins: {
-                  // title: {
-                  //   display: false,
-                  //   text: "Users Gained between 2016-2020",
-                  // },
                   legend: {
                     display: true,
+                    labels: {
+                      color: "white",
+                      font: {
+                        size: 15,
+                        // weight: "bold",
+                      },
+                    },
+                  },
+                  datalabels: {
+                    display: true, // Ativa os rótulos de dados
+                    align: "top",
+                    anchor: "end",
+                    color: "gray",
+                    offset: -5, // Controla o espaçamento do valor acima dos pontos
+                    // textStrokeColor: "white",
+                    // textStrokeWidth: 1,
+                    font: {
+                      size: 14,
+                      // weight: "bold",
+                    },
                   },
                 },
               }}
+              plugins={[ChartDataLabels]} // Adiciona o plugin de datalabels
               className="h-[1200px]"
             />
           </div>
