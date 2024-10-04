@@ -13,6 +13,8 @@ dist
 # dist-ssr
 *.local
 *.cs
+text.csv
+text.txt
 
 # Editor directories and files
 .vscode/*

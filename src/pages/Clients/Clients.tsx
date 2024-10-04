@@ -29,6 +29,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { ErrorFallback } from "@/data/error/ErrorFallback";
 import { UnexpectedError } from "@/data/error/UnexpectedError";
 import { LoadingSpinner } from "@/components/ui/myIsLoading";
+import { sendCommand } from "@/utils/utils-react";
 
 type InventoryTypeEspecified = {
   hostname: string;
@@ -141,22 +142,6 @@ const DataTableAgents: React.FC = () => {
     []
   );
 
-  const sendCommand = async (clientId: string, command: string) => {
-    console.log("oi", clientId);
-    try {
-      const result = await requestWithToken.post("/sockets/send-command", {
-        clientId,
-        command,
-      });
-      console.log(result.data);
-    } catch (error: any) {
-      console.error(
-        `Error sending ${command} command:`,
-        error?.response?.data.errors[0]
-      );
-    }
-  };
-
   const uploadBatFile = async (clientId: string, file: any) => {
     const formData = new FormData();
     formData.append("clientId", clientId);
@@ -222,6 +207,7 @@ const DataTableAgents: React.FC = () => {
     },
     muiPaginationProps: {
       shape: "rounded",
+      rowsPerPageOptions: [10, 25, 50],
       showRowsPerPage: false,
       variant: "outlined",
     },

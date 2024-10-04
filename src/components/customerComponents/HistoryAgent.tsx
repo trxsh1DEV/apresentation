@@ -12,6 +12,7 @@ import {
   Clock,
 } from "lucide-react";
 import requestWithToken from "@/utils/request";
+import { LoadingSpinner } from "../ui/myIsLoading";
 
 const StatusIcon: React.FC<{ status: string }> = ({ status }) => {
   switch (status) {
@@ -210,7 +211,11 @@ const HistoryAgent: FC<{ id: string }> = ({ id }) => {
   }, [fetchData]);
 
   if (loading) {
-    return <div className="p-6 text-center">Carregando...</div>;
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+        <LoadingSpinner className="w-12 h-12" />
+      </div>
+    );
   }
 
   if (error) {

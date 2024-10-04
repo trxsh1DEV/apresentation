@@ -62,7 +62,7 @@ const Processes = ({ data }: { data: ProcessItem[] }) => {
 
 export const TableProcesses = ({ data }: { data: ProcessItem[] }) => {
   return (
-    <main className="w-full">
+    <main className="w-full bg-red-500">
       <Processes data={data} />
     </main>
   );

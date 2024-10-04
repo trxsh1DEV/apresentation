@@ -300,7 +300,7 @@ const RemoteCommandInterface = ({ clientId }: { clientId: string }) => {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Interface de Comandos Remotos</h1>
-      <ScrollArea className="h-[calc(100vh-150px)]">
+      <ScrollArea className="h-[calc(100vh-150px)] w-full">
         {commands.map((cmd, index) => (
           <CommandCard
             key={index}

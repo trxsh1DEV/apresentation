@@ -195,6 +195,7 @@ function DataClient() {
   const handleTabClick = (tabName: string) => {
     setActiveTab(tabName);
   };
+  console.log("oi");
 
   // if (isLoading) return <div>Loading...</div>;
   // if (isError) return <div>Error loading data</div>;
@@ -226,13 +227,13 @@ function DataClient() {
         ))}
       </div>
       <section
-        className="max-w-[1400px] w-[1200px] h-max mx-auto my-0 px-5 rounded-lg"
+        className="max-w-[1400px] w-[1400px] mx-auto rounded-lg"
         id="FormContainer"
         ref={formElement}
       >
         {/* Renderizar conteúdo conforme a aba ativa */}
         {activeTab === "Geral" && (
-          <div className="grid grid-cols-[repeat(2,1fr)] gap-[15px_40px] items-center mb-0 p-[15px]">
+          <div className="grid grid-cols-[repeat(2,1fr)] gap-[15px_40px] items-center p-[15px]">
             <div className="text-center col-span-full text-4xl font-bold mb-5">
               Informações Gerais
             </div>
@@ -484,17 +485,20 @@ function DataClient() {
           </div>
         )}
         {activeTab === "Software" && (
-          <div className="grid grid-cols-[repeat(2,1fr)] gap-[15px_40px] items-center mb-0 p-[15px]">
-            <div className="text-center col-span-full text-5xl font-bold mb-5">
-              Softwares
+          <div className="grid grid-cols-[repeat(2,1fr)] gap-[15px_40px] items-center ">
+            <div className="text-center col-span-full font-bold">
+              <span className="text-5xl">Softwares</span>
+              <TableSoftwares
+                data={data.inventory.software.software}
+                id={data.uid}
+              />
             </div>
             {/* {renderKeyValuePairs(data.inventory.inventoryGeneral.software)} */}
-            <TableSoftwares data={data.inventory.software.software} />
           </div>
         )}
         {activeTab === "Geolocalização" && (
-          <div className="grid grid-cols-[repeat(2,1fr)] gap-[15px_40px] items-center mb-0 p-[15px] ">
-            <div className="text-center col-span-full text-5xl font-bold mb-5">
+          <div className="grid grid-cols-[repeat(2,1fr)] gap-[15px_40px] items-center  ">
+            <div className="text-center col-span-full text-5xl font-bold">
               Geolocalização
             </div>
             <div className="col-span-full text-3xl font-bold">
@@ -516,26 +520,26 @@ function DataClient() {
           </div>
         )}
         {activeTab === "Histórico de Ocorrências" && (
-          <div className="grid grid-cols-[repeat(2,1fr)] gap-[15px_40px] items-center mb-0 p-[15px]">
-            <div className="text-center col-span-full text-5xl font-bold mb-5">
+          <div className="grid grid-cols-[repeat(2,1fr)] gap-[15px_40px] items-center ">
+            <div className="text-center col-span-full text-5xl font-bold">
               Histórico de Ocorrências
-            </div>
-            <div className="col-span-full flex justify-center ">
-              <HistoryAgent id={id} />
+              <div className="col-span-full flex justify-center ">
+                <HistoryAgent id={id} />
+              </div>
             </div>
           </div>
         )}
         {activeTab === "Processos" && (
-          <div className="grid grid-cols-[repeat(2,1fr)] gap-[15px_40px] items-center mb-0 p-[15px]">
-            <div className="text-center col-span-full text-5xl font-bold mb-5">
-              <div className="mb-5">Processos</div>
+          <div className="grid grid-cols-[repeat(2,1fr)] gap-[15px_40px] items-center">
+            <div className="text-center col-span-full font-bold">
+              <div className="mb-5 text-5xl">Processos</div>
               <TableProcesses data={data.inventory.processes.processes.apps} />
             </div>
           </div>
         )}
         {activeTab === "Monitoramento" && (
-          <div className="grid grid-cols-[repeat(2,1fr)] gap-[15px_40px] items-center mb-0 p-[15px]">
-            <div className="text-center col-span-full text-5xl font-bold mb-5">
+          <div className="grid grid-cols-[repeat(2,1fr)] gap-[15px_40px] items-center ">
+            <div className="text-center col-span-full text-5xl font-bold">
               Monitoramento
             </div>
             <WrapperCharts
@@ -557,8 +561,8 @@ function DataClient() {
           </div>
         )}
         {activeTab === "Detalhes" && (
-          <div className="grid grid-cols-[repeat(2,1fr)] gap-[15px_40px] items-center mb-0 p-[15px]">
-            <div className="text-center col-span-full font-bold mb-5">
+          <div className="grid grid-cols-[repeat(2,1fr)] gap-[15px_40px] items-center ">
+            <div className="text-center col-span-full font-bold">
               <div className="text-5xl">Detalhes da Coleta</div>
               <AgentInfo
                 inventoryGeneral={data.inventory.inventoryGeneral}

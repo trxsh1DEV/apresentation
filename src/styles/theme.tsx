@@ -15,14 +15,49 @@ import {
 export const createTableTheme = (mode: Theme): ThemeOptions => ({
   palette: {
     mode: mode === "system" ? "light" : mode, // Ajuste conforme necessário
-    primary: {
-      main: "#3f51b5",
-    },
+    // primary: {
+    // main: "#3f51b5",
+    // },
     secondary: {
       main: "#d57cd8",
     },
     warning: {
       main: "#e2eb34",
+    },
+  },
+  components: {
+    MuiTableCell: {
+      styleOverrides: {
+        root: {
+          fontSize: "16px", // Tamanho da fonte para todas as células
+        },
+        head: {
+          fontSize: "16px", // Tamanho da fonte no cabeçalho
+          fontWeight: "bold", // Fonte forte no cabeçalho
+          fontFamily: "sans-serif", // Alterar font-family no cabeçalho
+        },
+      },
+    },
+    // MuiTableRow: {
+    //   styleOverrides: {
+    //     root: {
+    //       "&:nth-of-type(odd)": {
+    //         backgroundColor: "#b700ff", // Cor para linhas ímpares
+    //       },
+    //       "&:nth-of-type(even)": {
+    //         backgroundColor: "#ffffff", // Cor para linhas pares
+    //       },
+    //     },
+    //   },
+    // },
+    MuiTableBody: {
+      styleOverrides: {
+        // root: {
+        //   "& tr:nth-of-type(odd) > td": {
+        //     backgroundColor: "#3f3f3f",
+        //   },
+        // },
+      },
     },
   },
 });
