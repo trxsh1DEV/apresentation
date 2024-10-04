@@ -10,6 +10,8 @@ import {
 } from "@/components/ui/dialog";
 // import { Button } from "@/components/ui/button";
 import "./style.css";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { DialogDescription } from "@radix-ui/react-dialog";
 
 const Modal: React.FC = () => {
   const { isOpen, modalProps } = useAtomValue(modalAtom);
@@ -17,8 +19,8 @@ const Modal: React.FC = () => {
 
   if (!isOpen || !modalProps) return null;
 
-  const { title, content, onConfirm, onCancel, independenceMode } = modalProps;
-  console.log(independenceMode);
+  const { title, content, size, onConfirm, onCancel, independenceMode } =
+    modalProps;
 
   return (
     // <div className="modal-container">
@@ -93,11 +95,15 @@ const Modal: React.FC = () => {
         </div>
       ) : (
         <Dialog open={isOpen} onOpenChange={() => closeModal()}>
-          <DialogContent className="sm:max-w-[90%] md:max-w-[800px] max-h-[90vh] min-w-96 bg-zinc-900 text-white border-zinc-700">
+          <DialogContent
+            aria-describedby="modal description"
+            className={`sm:max-w-[90%] md:max-w-[${size || 800}px] max-h-[90vh] min-w-96 bg-zinc-900 text-white border-zinc-700`}
+          >
             <DialogHeader className="border-b border-zinc-700 pb-2">
               <DialogTitle className="text-xl font-bold border-none">
                 {title}
               </DialogTitle>
+              <DialogDescription></DialogDescription>
               {/* <Button
             variant="ghost"
             className="absolute right-4 top-4 rounded-full p-1 hover:bg-zinc-700"
@@ -106,13 +112,16 @@ const Modal: React.FC = () => {
             <X className="h-5 w-5" />
           </Button> */}
             </DialogHeader>
-            {/* <div className="mt-4 flex-grow overflow-hidden">{content}</div> */}
-            <div className="mt-4 flex-grow overflow-auto max-h-[70vh]">
-              {content}
+            <div id="modal-description" className="sr-only">
+              Descrição do modal para leitores de tela.
             </div>
-            {/* <ScrollArea className="mt-4 flex-grow overflow-auto max-h-[70vh]">
-          {content}
-        </ScrollArea> */}
+            {/* <div className="mt-4 flex-grow overflow-hidden">{content}</div> */}
+            {/* <div className="mt-4 flex-grow overflow-auto max-h-[70vh]">
+              {content}
+            </div> */}
+            <ScrollArea className="mt-4 flex-grow overflow-auto max-h-[70vh]">
+              {content}
+            </ScrollArea>
           </DialogContent>
         </Dialog>
       )}

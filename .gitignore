@@ -12,9 +12,12 @@ node_modules
 dist
 # dist-ssr
 *.local
+
+# My excludind
 *.cs
-text.csv
-text.txt
+text.*
+# test.*
+lista_de_pacotes.*
 
 # Editor directories and files
 .vscode/*

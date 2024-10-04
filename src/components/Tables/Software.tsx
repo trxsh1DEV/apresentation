@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { FC, useMemo, useState } from "react";
 import {
   MaterialReactTable,
   useMaterialReactTable,
@@ -6,8 +6,10 @@ import {
 } from "material-react-table";
 import { formatDateString } from "@/utils/utils";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, MinusCircle } from "lucide-react";
+import { PlusCircle, MinusCircle, Plus } from "lucide-react";
 import { sendCommand } from "@/utils/utils-react";
+import { useSetAtom } from "jotai";
+import { openModalAtom } from "@/Context/ModalContext";
 
 //example data type
 interface BaseSoftware {
@@ -37,6 +39,18 @@ export type InterfaceSoftware = {
   software: InterfaceSoftwareItem;
 };
 export type InterfaceSoftwareItem = LicensedSoftware | UnlicensedSoftware;
+interface App {
+  name: string;
+  appId: string;
+  version: string;
+}
+
+const handleAddSoftware = (id: string, appId: string) => {
+  // Lógica para adicionar software
+  // const input = prompt();
+  console.log(id, appId);
+  sendCommand(id, "winget install -e --id " + appId);
+};
 
 const Softwares = ({
   data,
@@ -46,6 +60,7 @@ const Softwares = ({
   id: string;
 }) => {
   const [rowSelection, setRowSelection] = useState<any>({});
+  const openModal = useSetAtom(openModalAtom);
   // data.forEach((item) => {
   //   if (item.name.includes("Microsoft")) {
   //     console.log(item);
@@ -72,13 +87,13 @@ const Softwares = ({
         header: "Versão",
         enableColumnFilter: false,
         enableSorting: false,
-        size: 50,
+        maxSize: 50,
       },
       {
         accessorKey: "category",
         header: "Categoria",
         enableSorting: false,
-        size: 100,
+        maxSize: 100,
       },
       {
         accessorKey: "publisher",
@@ -88,13 +103,13 @@ const Softwares = ({
       // {
       //   accessorKey: "uninstall_path",
       //   header: "Desinstalação",
-      //   size: 200,
+      //   maxSize: 200,
       // },
       {
         accessorKey: "have_license",
         header: "Possui licença",
         Cell: ({ cell }: any) => (cell.getValue() ? "Sim" : "Não"),
-        size: 50,
+        maxSize: 50,
       },
       {
         accessorKey: "createdAt",
@@ -104,7 +119,7 @@ const Softwares = ({
       {
         accessorKey: "license_key",
         header: "Chave da licença",
-        size: 100,
+        maxSize: 100,
         enableColumnFilter: false,
         enableSorting: false,
       },
@@ -122,7 +137,7 @@ const Softwares = ({
     muiPaginationProps: {
       shape: "rounded",
       showRowsPerPage: true,
-      rowsPerPageOptions: [10, 25, 50],
+      rowsPerPageOptions: [10, 25, 50, 100],
       variant: "outlined",
     },
     enableRowSelection: true,
@@ -167,10 +182,12 @@ const Softwares = ({
     state: { rowSelection },
   });
 
-  const handleAddSoftware = () => {
-    // Lógica para adicionar software
-    const input = prompt();
-    sendCommand(id, "winget install " + (input || ""));
+  const handleModal = () => {
+    openModal({
+      content: <AppStore id={id} />,
+      title: "Loja de aplicativos",
+      size: "1200",
+    });
   };
 
   const handleRemoveSoftware = () => {
@@ -192,7 +209,7 @@ const Softwares = ({
     <div>
       <div className="flex justify-end space-x-4 mb-4">
         <Button
-          onClick={handleAddSoftware}
+          onClick={handleModal}
           className="bg-green-500 hover:bg-green-600 text-lg"
         >
           <PlusCircle className="mr-2 h-6 w-6" /> Adicionar Software
@@ -206,6 +223,249 @@ const Softwares = ({
         </Button>
       </div>
       <MaterialReactTable table={table} />
+    </div>
+  );
+};
+
+const apps: App[] = [
+  {
+    name: "Google Chrome",
+    appId: "Google.Chrome",
+    version: "129.0.6668.90",
+  },
+  {
+    name: "Mozilla Firefox",
+    appId: "Mozilla.Firefox",
+    version: "131",
+  },
+  {
+    name: "Microsoft Edge",
+    appId: "Microsoft.Edge",
+    version: "129.0.2792.65",
+  },
+  {
+    name: "LibreOffice",
+    appId: "TheDocumentFoundation.LibreOffice",
+    version: "24.8.2.1",
+  },
+  {
+    name: "Adobe Acrobat Reader DC",
+    appId: "Adobe.Acrobat.Reader.32-bit",
+    version: "24.003.20112",
+  },
+  {
+    name: "Foxit PDF Reader",
+    appId: "Foxit.FoxitReader",
+    version: "2024.3.0.26795",
+  },
+  {
+    name: "GIMP",
+    appId: "GIMP.GIMP",
+    version: "2.10.38",
+  },
+  {
+    name: "AnyDesk",
+    appId: "AnyDeskSoftwareGmbH.AnyDesk",
+    version: "8.1.0",
+  },
+  {
+    name: "7-Zip",
+    appId: "7zip.7zip",
+    version: "24.08",
+  },
+  {
+    name: "WinRAR",
+    appId: "RARLab.WinRAR",
+    version: "7.01.0",
+  },
+  {
+    name: "TeamViewer",
+    appId: "TeamViewer.TeamViewer",
+    version: "15.58.5",
+  },
+  {
+    name: "UltraViewer",
+    appId: "DucFabulous.UltraViewer",
+    version: "6.6.108",
+  },
+  {
+    name: "Adobe Creative Cloud",
+    appId: "Adobe.CreativeCloud",
+    version: "6.4.0.361",
+  },
+  {
+    name: "VLC media player",
+    appId: "VideoLAN.VLC",
+    version: "3.0.21",
+  },
+  {
+    name: "Spotify",
+    appId: "Spotify.Spotify",
+    version: "1.2.47.366.g0â€¦",
+  },
+  {
+    name: "Zoom Workplace",
+    appId: "Zoom.Zoom",
+    version: "6.2.47507",
+  },
+  {
+    name: "Microsoft Teams",
+    appId: "Microsoft.Teams",
+    version: "24243.1309.31â€¦",
+  },
+  {
+    name: "Slack",
+    appId: "SlackTechnologies.Slack",
+    version: "4.40.128",
+  },
+  {
+    name: "Telegram Desktop",
+    appId: "Telegram.TelegramDesktop",
+    version: "5.5.5",
+  },
+  {
+    name: "Discord",
+    appId: "Discord.Discord",
+    version: "1.0.9165",
+  },
+  {
+    name: "Skype",
+    appId: "Microsoft.Skype",
+    version: "8.129",
+  },
+  {
+    name: "Blender",
+    appId: "BlenderFoundation.Blender",
+    version: "4.2.2",
+  },
+  {
+    name: "Notepad++",
+    appId: "Notepad++.Notepad++",
+    version: "8.7",
+  },
+  {
+    name: "CCleaner",
+    appId: "Piriform.CCleaner",
+    version: "6.28",
+  },
+  {
+    name: "CPUID CPU-Z",
+    appId: "CPUID.CPU-Z",
+    version: "2.11",
+  },
+  {
+    name: "Google Drive",
+    appId: "Google.GoogleDrive",
+    version: "97.0.1.0",
+  },
+  {
+    name: "Dropbox",
+    appId: "Dropbox.Dropbox",
+    version: "209.4.3661",
+  },
+  {
+    name: "OBS Studio",
+    appId: "OBSProject.OBSStudio",
+    version: "30.2.3",
+  },
+  {
+    name: "Miro",
+    appId: "Miro.Miro",
+    version: "0.8.72",
+  },
+  {
+    name: "WinSCP",
+    appId: "WinSCP.WinSCP",
+    version: "6.3.5",
+  },
+  {
+    name: "PuTTY",
+    appId: "PuTTY.PuTTY",
+    version: "0.81.0.0",
+  },
+  {
+    name: "Microsoft Visual Studio Code",
+    appId: "Microsoft.VisualStudioCode",
+    version: "1.93.1",
+  },
+];
+
+const AppCard: FC<{ app: App; id: string }> = ({ app, id }) => {
+  let iconUrl = `https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://${app.name.split(" ")[0].toLowerCase()}.com&size=32`;
+  switch (app.name) {
+    case "7-Zip":
+      iconUrl =
+        "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.7-zip.org&size=32";
+      break;
+    case "GIMP":
+      iconUrl =
+        "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.gimp.org&size=32";
+      break;
+    case "UltraViewer":
+      iconUrl =
+        "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.ultraviewer.net&size=32";
+      break;
+    case "Notepad++":
+      iconUrl =
+        "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.notepad-plus-plus.org&size=32";
+      break;
+    case "Steam":
+      iconUrl =
+        "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://store.steampowered.com/&size=32";
+      break;
+    case "Skype":
+      iconUrl =
+        "https://img.icons8.com/?size=32&id=117566&format=png&color=000000";
+      break;
+    case "WinSCP":
+      iconUrl =
+        "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://winscp.net/&size=32";
+      break;
+    default:
+      break;
+  }
+
+  return (
+    <div className="bg-gray-800 rounded-lg p-4 flex flex-col items-start space-y-2">
+      <div className="flex items-center space-x-2">
+        <img src={iconUrl} alt={`${app.name} icon`} className="w-8 h-8" />
+        <h3 className="text-white font-semibold">
+          {app.name.split(" ").length >= 3
+            ? app.name.split(" ").slice(0, 3).join(" ")
+            : app.name.length > 24
+              ? app.name.slice(0, 24) + "..."
+              : app.name}
+        </h3>
+      </div>
+      <p className="text-gray-400 text-sm">
+        {app.appId.split(" ").length >= 3
+          ? app.appId.split(" ").slice(0, 3).join(".")
+          : app.appId.length > 23
+            ? app.appId.slice(0, 23) + "..."
+            : app.appId}
+      </p>
+      <p className="text-gray-400 text-xs">Version: {app.version}</p>
+      <Plus
+        onClick={() => handleAddSoftware(id, app.appId)}
+        className="mr-2 h-6 w-6 cursor-pointer mx-auto"
+      />
+      {/* <div onClick={() => handleAddSoftware(id, app.appId)} className="">
+      </div> */}
+    </div>
+  );
+};
+
+const AppStore: FC<{ id: string }> = ({ id }) => {
+  return (
+    <div className="bg-gray-900 min-h-screen p-8">
+      <h1 className="text-3xl font-bold text-white mb-8">
+        Aplicativos Mais Utilizados
+      </h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {apps.map((app) => (
+          <AppCard key={app.appId} app={app} id={id} />
+        ))}
+      </div>
     </div>
   );
 };
