@@ -13,16 +13,9 @@ import { openModalAtom } from "@/Context/ModalContext";
 import { useDebounce } from "@uidotdev/usehooks";
 import { useToast } from "@/components/ui/use-toast";
 
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import requestWithToken from "@/utils/request";
+import { Command, CommandInput, CommandList } from "@/components/ui/command";
 import { LoadingSpinner } from "../ui/myIsLoading";
+import requestWithToken from "@/utils/request";
 
 //example data type
 interface BaseSoftware {
@@ -57,7 +50,7 @@ interface App {
   appId: string;
   version: string;
 }
-const apps: App[] = [
+const appsStatic: App[] = [
   {
     name: "Google Chrome",
     appId: "Google.Chrome",
@@ -220,10 +213,10 @@ const apps: App[] = [
   },
 ];
 
-const handleAddSoftware = (id: string, appId: string) => {
-  // Lógica para adicionar software
-  sendCommand(id, "winget install -e --id " + appId);
-};
+// const handleAddSoftware = (id: string, appId: string) => {
+//   // Lógica para adicionar software
+//   sendCommand(id, "winget install -e --id " + appId);
+// };
 
 const Softwares = ({
   data,
@@ -521,34 +514,42 @@ const AppCard: FC<{ app: App; id: string }> = ({ app, id }) => {
 
 const AppStore: FC<{ id: string }> = ({ id }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState<App[]>([]);
+  const [apps, setApps] = useState<App[]>(appsStatic); // Estado inicial para os aplicativos
   const [isLoading, setIsLoading] = useState(false);
-  const debouncedSearchTerm = useDebounce(searchTerm, 1000);
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
+  // Função para buscar aplicativos a partir do endpoint
   const searchApps = useCallback(async (term: string) => {
-    if (!term) {
-      setSearchResults([]);
-      return;
-    }
+    if (!term) return;
 
     setIsLoading(true);
     try {
       const response = await requestWithToken.get(
         `/software/repository/${term}`
       );
-      setSearchResults(response.data);
+      setApps(response.data); // Atualiza o estado de apps com os resultados da busca
     } catch (error) {
       console.error("Erro ao buscar aplicativos:", error);
-      setSearchResults([]);
     } finally {
       setIsLoading(false);
     }
   }, []);
 
+  // Efeito para buscar aplicativos ao pressionar Enter
   useEffect(() => {
-    if (debouncedSearchTerm) {
-      searchApps(debouncedSearchTerm);
+    if (searchTerm == "") {
+      setApps(appsStatic);
     }
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Enter" && debouncedSearchTerm) {
+        searchApps(debouncedSearchTerm);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, [debouncedSearchTerm, searchApps]);
 
   return (
@@ -560,32 +561,38 @@ const AppStore: FC<{ id: string }> = ({ id }) => {
           onValueChange={setSearchTerm}
         />
         <CommandList>
-          <CommandEmpty>Nenhum resultado encontrado.</CommandEmpty>
-          <CommandGroup heading="Resultados da Pesquisa">
+          {/* <CommandEmpty>Nenhum resultado encontrado.</CommandEmpty> */}
+          {/* <CommandGroup heading="Resultados da Pesquisa">
             {isLoading ? (
               <CommandItem>Carregando...</CommandItem>
             ) : (
-              searchResults.map((app) => (
+              apps.map((app) => (
                 <CommandItem
                   className="cursor-pointer"
                   key={app.appId}
-                  onSelect={() => handleAddSoftware(id, app.appId)}
+                  onSelect={() => {
+                    setSearchTerm(app.name); // Atualiza o termo de busca
+                    searchApps(app.name); // Chama a pesquisa com o nome do aplicativo
+                  }}
                 >
                   {app.name}
                 </CommandItem>
               ))
             )}
-          </CommandGroup>
+          </CommandGroup> */}
         </CommandList>
       </Command>
       <h1 className="text-3xl font-bold text-white mb-8">
         Aplicativos Mais Utilizados
       </h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {/* Substitua 'apps' pela variável que contém os aplicativos mais utilizados */}
-        {apps.map((app) => (
-          <AppCard key={app.appId} app={app} id={id} />
-        ))}
+        {isLoading ? (
+          <div className="w-full fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <LoadingSpinner className="w-12 h-12" />
+          </div>
+        ) : (
+          apps.map((app) => <AppCard key={app.appId} app={app} id={id} />)
+        )}
       </div>
     </div>
   );
