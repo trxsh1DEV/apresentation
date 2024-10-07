@@ -195,7 +195,6 @@ function DataClient() {
   const handleTabClick = (tabName: string) => {
     setActiveTab(tabName);
   };
-  console.log("oi");
 
   // if (isLoading) return <div>Loading...</div>;
   // if (isError) return <div>Error loading data</div>;

@@ -24,6 +24,9 @@
  
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
+    
+    --success: 142.8 61.1% 50%; /* Cor verde de sucesso */
+    --success-foreground: 142.8 100% 98%; /* Cor do texto em verde de sucesso */
  
     --accent: 210 40% 96.1%;
     --accent-foreground: ;
@@ -34,6 +37,9 @@
     --ring: 215 20.2% 65.1%;
  
     --radius: 0.5rem;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 48 96% 89%;
   }
  
   .dark {
@@ -57,6 +63,9 @@
  
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
+
+    --success: 142.8 61.1% 40%; /* Cor verde de sucesso para modo escuro */
+    --success-foreground: 142.8 100% 98%; /* Cor do texto em verde de sucesso para modo escuro */
  
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: ;
@@ -65,6 +74,9 @@
     --destructive-foreground: 0 85.7% 97.3%;
  
     --ring: 217.2 32.6% 17.5%;
+
+    --warning: 48 96% 89%;
+    --warning-foreground: 38 92% 50%;
   }
 }
  

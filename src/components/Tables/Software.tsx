@@ -1,4 +1,4 @@
-import { FC, useMemo, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import {
   MaterialReactTable,
   useMaterialReactTable,
@@ -10,6 +10,19 @@ import { PlusCircle, MinusCircle, Plus } from "lucide-react";
 import { sendCommand } from "@/utils/utils-react";
 import { useSetAtom } from "jotai";
 import { openModalAtom } from "@/Context/ModalContext";
+import { useDebounce } from "@uidotdev/usehooks";
+import { useToast } from "@/components/ui/use-toast";
+
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import requestWithToken from "@/utils/request";
+import { LoadingSpinner } from "../ui/myIsLoading";
 
 //example data type
 interface BaseSoftware {
@@ -44,11 +57,171 @@ interface App {
   appId: string;
   version: string;
 }
+const apps: App[] = [
+  {
+    name: "Google Chrome",
+    appId: "Google.Chrome",
+    version: "129.0.6668.90",
+  },
+  {
+    name: "Mozilla Firefox",
+    appId: "Mozilla.Firefox",
+    version: "131",
+  },
+  {
+    name: "Microsoft Edge",
+    appId: "Microsoft.Edge",
+    version: "129.0.2792.65",
+  },
+  {
+    name: "LibreOffice",
+    appId: "TheDocumentFoundation.LibreOffice",
+    version: "24.8.2.1",
+  },
+  {
+    name: "Adobe Acrobat Reader DC",
+    appId: "Adobe.Acrobat.Reader.32-bit",
+    version: "24.003.20112",
+  },
+  {
+    name: "Foxit PDF Reader",
+    appId: "Foxit.FoxitReader",
+    version: "2024.3.0.26795",
+  },
+  {
+    name: "GIMP",
+    appId: "GIMP.GIMP",
+    version: "2.10.38",
+  },
+  {
+    name: "AnyDesk",
+    appId: "AnyDeskSoftwareGmbH.AnyDesk",
+    version: "8.1.0",
+  },
+  {
+    name: "7-Zip",
+    appId: "7zip.7zip",
+    version: "24.08",
+  },
+  {
+    name: "WinRAR",
+    appId: "RARLab.WinRAR",
+    version: "7.01.0",
+  },
+  {
+    name: "TeamViewer",
+    appId: "TeamViewer.TeamViewer",
+    version: "15.58.5",
+  },
+  {
+    name: "UltraViewer",
+    appId: "DucFabulous.UltraViewer",
+    version: "6.6.108",
+  },
+  {
+    name: "Adobe Creative Cloud",
+    appId: "Adobe.CreativeCloud",
+    version: "6.4.0.361",
+  },
+  {
+    name: "VLC media player",
+    appId: "VideoLAN.VLC",
+    version: "3.0.21",
+  },
+  {
+    name: "Spotify",
+    appId: "Spotify.Spotify",
+    version: "1.2.47.366.g0â€¦",
+  },
+  {
+    name: "Zoom Workplace",
+    appId: "Zoom.Zoom",
+    version: "6.2.47507",
+  },
+  {
+    name: "Microsoft Teams",
+    appId: "Microsoft.Teams",
+    version: "24243.1309.31â€¦",
+  },
+  {
+    name: "Slack",
+    appId: "SlackTechnologies.Slack",
+    version: "4.40.128",
+  },
+  {
+    name: "Telegram Desktop",
+    appId: "Telegram.TelegramDesktop",
+    version: "5.5.5",
+  },
+  {
+    name: "Discord",
+    appId: "Discord.Discord",
+    version: "1.0.9165",
+  },
+  {
+    name: "Skype",
+    appId: "Microsoft.Skype",
+    version: "8.129",
+  },
+  {
+    name: "Blender",
+    appId: "BlenderFoundation.Blender",
+    version: "4.2.2",
+  },
+  {
+    name: "Notepad++",
+    appId: "Notepad++.Notepad++",
+    version: "8.7",
+  },
+  {
+    name: "CCleaner",
+    appId: "Piriform.CCleaner",
+    version: "6.28",
+  },
+  {
+    name: "CPUID CPU-Z",
+    appId: "CPUID.CPU-Z",
+    version: "2.11",
+  },
+  {
+    name: "Google Drive",
+    appId: "Google.GoogleDrive",
+    version: "97.0.1.0",
+  },
+  {
+    name: "Dropbox",
+    appId: "Dropbox.Dropbox",
+    version: "209.4.3661",
+  },
+  {
+    name: "OBS Studio",
+    appId: "OBSProject.OBSStudio",
+    version: "30.2.3",
+  },
+  {
+    name: "Miro",
+    appId: "Miro.Miro",
+    version: "0.8.72",
+  },
+  {
+    name: "WinSCP",
+    appId: "WinSCP.WinSCP",
+    version: "6.3.5",
+  },
+  {
+    name: "PuTTY",
+    appId: "PuTTY.PuTTY",
+    version: "0.81.0.0",
+  },
+  {
+    name: "Microsoft Visual Studio Code",
+    appId: "Microsoft.VisualStudioCode",
+    version: "1.93.1",
+  },
+];
 
 const handleAddSoftware = (id: string, appId: string) => {
   // Lógica para adicionar software
-  // const input = prompt();
-  console.log(id, appId);
   sendCommand(id, "winget install -e --id " + appId);
 };
 
@@ -227,170 +400,9 @@ const Softwares = ({
   );
 };
 
-const apps: App[] = [
-  {
-    name: "Google Chrome",
-    appId: "Google.Chrome",
-    version: "129.0.6668.90",
-  },
-  {
-    name: "Mozilla Firefox",
-    appId: "Mozilla.Firefox",
-    version: "131",
-  },
-  {
-    name: "Microsoft Edge",
-    appId: "Microsoft.Edge",
-    version: "129.0.2792.65",
-  },
-  {
-    name: "LibreOffice",
-    appId: "TheDocumentFoundation.LibreOffice",
-    version: "24.8.2.1",
-  },
-  {
-    name: "Adobe Acrobat Reader DC",
-    appId: "Adobe.Acrobat.Reader.32-bit",
-    version: "24.003.20112",
-  },
-  {
-    name: "Foxit PDF Reader",
-    appId: "Foxit.FoxitReader",
-    version: "2024.3.0.26795",
-  },
-  {
-    name: "GIMP",
-    appId: "GIMP.GIMP",
-    version: "2.10.38",
-  },
-  {
-    name: "AnyDesk",
-    appId: "AnyDeskSoftwareGmbH.AnyDesk",
-    version: "8.1.0",
-  },
-  {
-    name: "7-Zip",
-    appId: "7zip.7zip",
-    version: "24.08",
-  },
-  {
-    name: "WinRAR",
-    appId: "RARLab.WinRAR",
-    version: "7.01.0",
-  },
-  {
-    name: "TeamViewer",
-    appId: "TeamViewer.TeamViewer",
-    version: "15.58.5",
-  },
-  {
-    name: "UltraViewer",
-    appId: "DucFabulous.UltraViewer",
-    version: "6.6.108",
-  },
-  {
-    name: "Adobe Creative Cloud",
-    appId: "Adobe.CreativeCloud",
-    version: "6.4.0.361",
-  },
-  {
-    name: "VLC media player",
-    appId: "VideoLAN.VLC",
-    version: "3.0.21",
-  },
-  {
-    name: "Spotify",
-    appId: "Spotify.Spotify",
-    version: "1.2.47.366.g0â€¦",
-  },
-  {
-    name: "Zoom Workplace",
-    appId: "Zoom.Zoom",
-    version: "6.2.47507",
-  },
-  {
-    name: "Microsoft Teams",
-    appId: "Microsoft.Teams",
-    version: "24243.1309.31â€¦",
-  },
-  {
-    name: "Slack",
-    appId: "SlackTechnologies.Slack",
-    version: "4.40.128",
-  },
-  {
-    name: "Telegram Desktop",
-    appId: "Telegram.TelegramDesktop",
-    version: "5.5.5",
-  },
-  {
-    name: "Discord",
-    appId: "Discord.Discord",
-    version: "1.0.9165",
-  },
-  {
-    name: "Skype",
-    appId: "Microsoft.Skype",
-    version: "8.129",
-  },
-  {
-    name: "Blender",
-    appId: "BlenderFoundation.Blender",
-    version: "4.2.2",
-  },
-  {
-    name: "Notepad++",
-    appId: "Notepad++.Notepad++",
-    version: "8.7",
-  },
-  {
-    name: "CCleaner",
-    appId: "Piriform.CCleaner",
-    version: "6.28",
-  },
-  {
-    name: "CPUID CPU-Z",
-    appId: "CPUID.CPU-Z",
-    version: "2.11",
-  },
-  {
-    name: "Google Drive",
-    appId: "Google.GoogleDrive",
-    version: "97.0.1.0",
-  },
-  {
-    name: "Dropbox",
-    appId: "Dropbox.Dropbox",
-    version: "209.4.3661",
-  },
-  {
-    name: "OBS Studio",
-    appId: "OBSProject.OBSStudio",
-    version: "30.2.3",
-  },
-  {
-    name: "Miro",
-    appId: "Miro.Miro",
-    version: "0.8.72",
-  },
-  {
-    name: "WinSCP",
-    appId: "WinSCP.WinSCP",
-    version: "6.3.5",
-  },
-  {
-    name: "PuTTY",
-    appId: "PuTTY.PuTTY",
-    version: "0.81.0.0",
-  },
-  {
-    name: "Microsoft Visual Studio Code",
-    appId: "Microsoft.VisualStudioCode",
-    version: "1.93.1",
-  },
-];
-
 const AppCard: FC<{ app: App; id: string }> = ({ app, id }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
   let iconUrl = `https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://${app.name.split(" ")[0].toLowerCase()}.com&size=32`;
   switch (app.name) {
     case "7-Zip":
@@ -425,6 +437,54 @@ const AppCard: FC<{ app: App; id: string }> = ({ app, id }) => {
       break;
   }
 
+  const handleAddSoftware = async (id: string, appId: string) => {
+    setIsLoading(true); // Ativa o estado de carregamento
+    try {
+      // Lógica para adicionar software
+      const result = await sendCommand(id, `winget install -e --id ${appId}`);
+      const filterStrResult = result
+        .substring(result.lastIndexOf("-"))
+        .trim()
+        .replace(/^-+\s*/, "");
+
+      if (!result) {
+        throw new Error("Comando inválido ou falha na execução.");
+      }
+
+      // Verifica se o resultado contém "success" ou "sucesso"
+      if (
+        ["success", "sucesso"].some((substring) =>
+          result.toLowerCase().includes(substring)
+        )
+      ) {
+        toast({
+          title: "Sucesso",
+          className: "bg-success border-zinc-100",
+          variant: "destructive",
+          description: `Ação realizada com sucesso para o app: ${app.name}`,
+        });
+        return;
+      } else {
+        toast({
+          title: "Falha",
+          duration: 1000,
+          variant: "destructive",
+          description: `Houve um problema na instalação do app: ${app.name}. \nErro: ${filterStrResult}`,
+        });
+        return;
+      }
+    } catch (error: any) {
+      console.error("Erro ao adicionar software:", error);
+      toast({
+        title: "Erro",
+        variant: "destructive",
+        description: `Ocorreu um erro durante a instalação do app: ${app.name}. Detalhes: ${error.message}`,
+      });
+    } finally {
+      setIsLoading(false); // Desativa o estado de carregamento após a requisição
+    }
+  };
+
   return (
     <div className="bg-gray-800 rounded-lg p-4 flex flex-col items-start space-y-2">
       <div className="flex items-center space-x-2">
@@ -445,23 +505,84 @@ const AppCard: FC<{ app: App; id: string }> = ({ app, id }) => {
             : app.appId}
       </p>
       <p className="text-gray-400 text-xs">Version: {app.version}</p>
-      <Plus
-        onClick={() => handleAddSoftware(id, app.appId)}
-        className="mr-2 h-6 w-6 cursor-pointer mx-auto"
-      />
-      {/* <div onClick={() => handleAddSoftware(id, app.appId)} className="">
-      </div> */}
+
+      {/* Ícone de Plus ou LoadingSpinner dependendo do estado de carregamento */}
+      {isLoading ? (
+        <LoadingSpinner className="h-6 w-6 mx-auto" />
+      ) : (
+        <Plus
+          onClick={() => handleAddSoftware(id, app.appId)}
+          className="mr-2 h-6 w-6 cursor-pointer mx-auto"
+        />
+      )}
     </div>
   );
 };
 
 const AppStore: FC<{ id: string }> = ({ id }) => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState<App[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const debouncedSearchTerm = useDebounce(searchTerm, 1000);
+
+  const searchApps = useCallback(async (term: string) => {
+    if (!term) {
+      setSearchResults([]);
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await requestWithToken.get(
+        `/software/repository/${term}`
+      );
+      setSearchResults(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar aplicativos:", error);
+      setSearchResults([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (debouncedSearchTerm) {
+      searchApps(debouncedSearchTerm);
+    }
+  }, [debouncedSearchTerm, searchApps]);
+
   return (
     <div className="bg-gray-900 min-h-screen p-8">
+      <Command className="mb-4">
+        <CommandInput
+          placeholder="Procure por algum app..."
+          value={searchTerm}
+          onValueChange={setSearchTerm}
+        />
+        <CommandList>
+          <CommandEmpty>Nenhum resultado encontrado.</CommandEmpty>
+          <CommandGroup heading="Resultados da Pesquisa">
+            {isLoading ? (
+              <CommandItem>Carregando...</CommandItem>
+            ) : (
+              searchResults.map((app) => (
+                <CommandItem
+                  className="cursor-pointer"
+                  key={app.appId}
+                  onSelect={() => handleAddSoftware(id, app.appId)}
+                >
+                  {app.name}
+                </CommandItem>
+              ))
+            )}
+          </CommandGroup>
+        </CommandList>
+      </Command>
       <h1 className="text-3xl font-bold text-white mb-8">
         Aplicativos Mais Utilizados
       </h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {/* Substitua 'apps' pela variável que contém os aplicativos mais utilizados */}
         {apps.map((app) => (
           <AppCard key={app.appId} app={app} id={id} />
         ))}
