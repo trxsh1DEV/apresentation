@@ -197,7 +197,9 @@ const DataTableAgents: React.FC = () => {
           flexWrap: "wrap",
         }}
       >
-        <button onClick={handleExportData}>Exportar Dados</button>
+        <button className="" onClick={handleExportData}>
+          Exportar Dados
+        </button>
       </div>
     ),
     paginationDisplayMode: "pages",
@@ -329,7 +331,7 @@ const DataTableAgents: React.FC = () => {
   return (
     <>
       <main>
-        <h1>Connected Clients</h1>
+        {/* <h1>Connected Clients</h1> */}
         <MaterialReactTable table={table} />
       </main>
     </>

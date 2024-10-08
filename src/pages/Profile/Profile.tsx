@@ -97,7 +97,9 @@ const UserProfile: FC = () => {
   return (
     <div className="flex items-center justify-center h-screen">
       <div className="max-w-3xl w-full p-6 rounded-lg shadow-md flex items-center justify-center flex-col">
-        <h2 className="text-xl font-semibold mb-4">Perfil do Usuário</h2>
+        <h1 className="text-4xl text-black dark:text-slate-200 font-semibold mb-4">
+          Perfil do Usuário
+        </h1>
         <form
           className=" space-y-4 min-w-[600px] w-4/5 p-6 bg-transparent"
           onSubmit={handleSubmit}

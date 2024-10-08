@@ -488,7 +488,7 @@ function DataClient() {
             <div className="text-center col-span-full font-bold">
               <span className="text-5xl">Softwares</span>
               <TableSoftwares
-                data={data.inventory.software.software}
+                // data={data.inventory.software.software}
                 id={data.uid}
               />
             </div>

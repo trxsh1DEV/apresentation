@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import {
   MaterialReactTable,
   useMaterialReactTable,
@@ -26,7 +26,7 @@ import {
 import { Command, CommandInput, CommandList } from "@/components/ui/command";
 import { LoadingSpinner } from "../ui/myIsLoading";
 import requestWithToken from "@/utils/request";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { UnexpectedError } from "@/data/error/UnexpectedError";
 
 //example data type
@@ -226,10 +226,10 @@ const appsStatic: App[] = [
     version: "1.93.1",
   },
 ];
-let softwareNameList: string[] = [""];
+
 const useSoftwaresData = (uid: string) => {
   return useQuery<InterfaceSoftwareItem[]>({
-    queryKey: ["softwares", uid],
+    queryKey: ["softwares"],
     queryFn: async () => {
       try {
         const result = await requestWithToken.get(`/software/${uid}`);
@@ -247,12 +247,24 @@ const useSoftwaresData = (uid: string) => {
   });
 };
 
-const Softwares = ({ id }: { id: string }) => {
+const Softwares = ({
+  // data,
+  id,
+}: {
+  // data: InterfaceSoftwareItem[];
+  id: string;
+}) => {
   const [rowSelection, setRowSelection] = useState<any>({});
   const openModal = useSetAtom(openModalAtom);
-  const { data: softwaresData, isLoading, isError } = useSoftwaresData(id);
+  const {
+    data: softwaresData,
+    isLoading,
+    isError,
+    refetch,
+  } = useSoftwaresData(id);
   const { toast } = useToast();
-  const queryClient = useQueryClient();
+
+  console.log(rowSelection);
 
   const columns = useMemo<MRT_ColumnDef<InterfaceSoftwareItem>[]>(
     () => [
@@ -333,58 +345,45 @@ const Softwares = ({ id }: { id: string }) => {
     state: { rowSelection },
   });
 
-  softwareNameList =
-    softwaresData?.map((software) => software.name) || [].filter(Boolean);
   const handleModal = () => {
     openModal({
-      content: (
-        <AppStore
-          id={id}
-          // softwareName={
-          //   softwaresData?.map((software) => software.name) ||
-          //   [].filter(Boolean)
-          // }
-        />
-      ),
+      content: <AppStore id={id} />,
       title: "Loja de aplicativos",
       size: "1200",
     });
   };
 
-  const removeSoftwareMutation = useMutation({
-    mutationFn: async (selectedSoftware: string[]) => {
-      return await sendCommand(
+  const handleRemoveSoftware = async () => {
+    const selectedSoftware = Object.keys(rowSelection);
+
+    try {
+      const response = await sendCommand(
         id,
         "uninstall__winget" +
           selectedSoftware.map((cmd) => cmd.replace(/"/g, "")).join(";")
       );
-    },
-    onSuccess: (response) => {
+      console.log(response);
       if (response.includes("Desinstalação bem-sucedida")) {
         toast({
           title: "Sucesso",
           className: "bg-success border-zinc-100",
           variant: "destructive",
-          description: `Desinstalação bem sucedida para o(s) app(s): ${Object.keys(rowSelection)}`,
+          description: `Desinstalação bem sucedida para o(s) app(s): ${selectedSoftware}`,
         });
         setRowSelection({});
-        queryClient.invalidateQueries({ queryKey: ["softwares", id] });
-      } else {
-        throw new Error(response);
+        // Refazer a requisição para atualizar os softwares
+        refetch();
+        return;
       }
-    },
-    onError: (err: any) => {
+      throw new Error(response);
+    } catch (err: any) {
       toast({
         title: "Erro",
+        // duration: 1000,
         variant: "destructive",
-        description: `Houve um problema na desinstalação do(s) app(s): ${Object.keys(rowSelection)}. \nErro: ${err.message}`,
+        description: `Houve um problema na desinstalação do(s) app(s): ${selectedSoftware}. \nErro: ${err.message}`,
       });
-    },
-  });
-
-  const handleRemoveSoftware = () => {
-    const selectedSoftware = Object.keys(rowSelection);
-    removeSoftwareMutation.mutate(selectedSoftware);
+    }
   };
 
   if (isLoading) {
@@ -392,7 +391,7 @@ const Softwares = ({ id }: { id: string }) => {
       <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
         <LoadingSpinner className="w-12 h-12" />
       </div>
-    );
+    ); // Tela de loading
   }
 
   if (isError) {
@@ -444,8 +443,8 @@ const Softwares = ({ id }: { id: string }) => {
 };
 
 const AppCard: FC<{ app: App; id: string }> = ({ app, id }) => {
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   let iconUrl = `https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://${app.name.split(" ")[0].toLowerCase()}.com&size=32`;
   switch (app.name) {
     case "7-Zip":
@@ -479,11 +478,22 @@ const AppCard: FC<{ app: App; id: string }> = ({ app, id }) => {
     default:
       break;
   }
-  const installSoftwareMutation = useMutation({
-    mutationFn: async () => {
-      return await sendCommand(id, `winget install -e --id ${app.appId}`);
-    },
-    onSuccess: (result) => {
+
+  const handleAddSoftware = async (id: string, appId: string) => {
+    setIsLoading(true); // Ativa o estado de carregamento
+    try {
+      // Lógica para adicionar software
+      const result = await sendCommand(id, `winget install -e --id ${appId}`);
+
+      if (!result) {
+        throw new Error("Comando inválido ou falha na execução.");
+      }
+      const filterStrResult = result
+        .substring(result.lastIndexOf("-"))
+        .trim()
+        .replace(/^-+\s*/, "");
+
+      // Verifica se o resultado contém "success" ou "sucesso"
       if (
         ["success", "sucesso"].some((substring) =>
           result.toLowerCase().includes(substring)
@@ -495,25 +505,27 @@ const AppCard: FC<{ app: App; id: string }> = ({ app, id }) => {
           variant: "destructive",
           description: `Instalação bem sucedida para o app: ${app.name}`,
         });
-        queryClient.invalidateQueries({ queryKey: ["softwares", id] });
+        return;
       } else {
-        const filterStrResult = result
-          .substring(result.lastIndexOf("-"))
-          .trim()
-          .replace(/^-+\s*/, "");
-        throw new Error(filterStrResult);
+        toast({
+          title: "Falha",
+          // duration: 1000,
+          variant: "destructive",
+          description: `Houve um problema na instalação do app: ${app.name}. \nErro: ${filterStrResult}`,
+        });
+        return;
       }
-    },
-    onError: (error: any) => {
+    } catch (error: any) {
       toast({
         title: "Erro",
         variant: "destructive",
         description: `Ocorreu um erro durante a instalação do app: ${app.name}. Detalhes: ${error}`,
       });
-    },
-  });
-  console.log(app.name.split(" ").slice(0, 3).join(" "));
-  // console.log(softwareNameList);
+    } finally {
+      setIsLoading(false); // Desativa o estado de carregamento após a requisição
+    }
+  };
+
   return (
     <div className="bg-gray-800 rounded-lg p-4 flex flex-col items-start space-y-2">
       <div className="flex items-center space-x-2">
@@ -536,63 +548,57 @@ const AppCard: FC<{ app: App; id: string }> = ({ app, id }) => {
       <p className="text-gray-400 text-xs">Version: {app.version}</p>
 
       {/* Ícone de Plus ou LoadingSpinner dependendo do estado de carregamento */}
-      {installSoftwareMutation.isPending ? (
+      {isLoading ? (
         <LoadingSpinner className="h-6 w-6 mx-auto" />
       ) : (
-        !softwareNameList.includes(
-          app.name.split(" ").slice(0, 3).join(" ")
-        ) && (
-          <Plus
-            onClick={() => installSoftwareMutation.mutate()}
-            className="mr-2 h-6 w-6 cursor-pointer mx-auto"
-          />
-        )
+        <Plus
+          onClick={() => handleAddSoftware(id, app.appId)}
+          className="mr-2 h-6 w-6 cursor-pointer mx-auto"
+        />
       )}
     </div>
   );
 };
 
-const AppStore: FC<{ id: string }> = ({
-  id,
-  // softwareName,
-}) => {
+const AppStore: FC<{ id: string }> = ({ id }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [apps, setApps] = useState<App[]>(appsStatic);
-  const debouncedSearchTerm = useDebounce(searchTerm, 800);
+  const [apps, setApps] = useState<App[]>(appsStatic); // Estado inicial para os aplicativos
+  const [isLoading, setIsLoading] = useState(false);
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["appSearch", debouncedSearchTerm],
-    queryFn: async () => {
-      if (!debouncedSearchTerm) return appsStatic;
+  // Função para buscar aplicativos a partir do endpoint
+  const searchApps = useCallback(async (term: string) => {
+    if (!term) return;
+
+    setIsLoading(true);
+    try {
       const response = await requestWithToken.get(
-        `/software/repository/${debouncedSearchTerm}`
+        `/software/repository/${term}`
       );
-      return response.data;
-    },
-    enabled: debouncedSearchTerm.length > 0,
-  });
-
-  useEffect(() => {
-    if (data) {
-      setApps(data);
+      setApps(response.data); // Atualiza o estado de apps com os resultados da busca
+    } catch (error) {
+      console.error("Erro ao buscar aplicativos:", error);
+    } finally {
+      setIsLoading(false);
     }
-  }, [data]);
+  }, []);
 
+  // Efeito para buscar aplicativos ao pressionar Enter
   useEffect(() => {
     if (searchTerm == "") {
       setApps(appsStatic);
     }
-    // const handleKeyDown = (event: KeyboardEvent) => {
-    //   if (event.key === "Enter" && debouncedSearchTerm) {
-    //     refetch();
-    //   }
-    // };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Enter" && debouncedSearchTerm) {
+        searchApps(debouncedSearchTerm);
+      }
+    };
 
-    // window.addEventListener("keydown", handleKeyDown);
-    // return () => {
-    //   window.removeEventListener("keydown", handleKeyDown);
-    // };
-  }, [debouncedSearchTerm]);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [debouncedSearchTerm, searchApps]);
 
   return (
     <div className="bg-gray-900 min-h-screen p-8">

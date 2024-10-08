@@ -83,7 +83,7 @@ const AddItemPage: React.FC = () => {
         </div>
         <Button
           onClick={handleAddClick}
-          className="w-full  text-white hover:bg-blue-700 mt-10 text-xl"
+          className="w-full  text-white hover:bg-indigo-500 mt-10 text-xl"
         >
           Adicionar
         </Button>
