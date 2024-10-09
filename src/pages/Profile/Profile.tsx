@@ -1,21 +1,35 @@
-import InputCommom from "@/components/InputCommom";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/components/ui/use-toast";
 import requestWithToken from "@/utils/request";
 import { FC, useCallback, useEffect, useState } from "react";
+import { logout } from "../Auth/token-methods";
 
 type UserProfileProps = {
   username: string;
   email: string;
   company: string;
-  password?: string; // Inclua password como opcional
+  password?: string;
+  initialUsername: string;
 };
 
 const UserProfile: FC = () => {
-  const [formState, setFormState] = useState<UserProfileProps | null>(null); // Inicialize com null
+  const [formState, setFormState] = useState<UserProfileProps | null>(null);
+  const { toast } = useToast();
 
   const fetchUser = useCallback(async () => {
     try {
       const resultToken = await requestWithToken.get("/auth/profile");
-
       const { data: user } = await requestWithToken.get(
         `users/${resultToken.data.email}`
       );
@@ -28,7 +42,8 @@ const UserProfile: FC = () => {
         email: user.email,
         username: user.username,
         company: user.company.name,
-        password: "", // Inicialize password como uma string vazia
+        password: "",
+        initialUsername: user.username,
       });
     } catch (error: any) {
       console.error(
@@ -40,117 +55,198 @@ const UserProfile: FC = () => {
 
   useEffect(() => {
     fetchUser();
-  }, [fetchUser]); // Adicione fetchUser como dependência
+  }, [fetchUser]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = event.target;
-    setFormState((prevState: any) => ({
-      ...prevState,
-      [id]: value,
-    }));
+    setFormState((prevState) =>
+      prevState
+        ? {
+            ...prevState,
+            [id]: value,
+          }
+        : null
+    );
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!formState) return;
 
-    const { username, password, email } = formState;
+    const { username, password, email, initialUsername } = formState;
 
     if (password) {
       try {
         const response = await requestWithToken.patch(
           "/users/update-password/" + email,
-          {
-            password,
-          }
+          { password }
         );
 
         if (!response.data || response.status !== 200) {
-          alert("Ocorreu um erro ao atualizar a senha. Tente novamente.");
-          return;
+          throw Error("Ocorreu um erro ao atualizar a senha. Tente novamente.");
+          // return;
         }
-        alert("Senha atualizada com sucesso!");
-        setFormState((prevState: any) => ({
-          ...prevState,
-          password: "", // Limpa o campo de senha após a atualização
-        }));
+        toast({
+          title: "Sucesso",
+          className: "bg-success border-zinc-100",
+          variant: "destructive",
+          description: `Senha atualizada com sucesso (Redirecionando...)`,
+        });
+
+        setFormState((prevState) =>
+          prevState
+            ? {
+                ...prevState,
+                password: "",
+              }
+            : null
+        );
+
+        // Timer de 1 segundo
+        setTimeout(() => {
+          logout();
+        }, 1000);
       } catch (error: any) {
-        console.error("Erro ao atualizar senha:", error.message);
-        alert("Ocorreu um erro ao atualizar a senha. Tente novamente.");
+        console.error(
+          "Erro ao atualizar senha:",
+          error.response.data.message[0]
+        );
+        toast({
+          title: "Erro",
+          // className: "bg-success border-zinc-100",
+          variant: "destructive",
+          description: `Falha ao atualizar senha do usuário. ${error.response?.data?.message[0] || error.message}`,
+        });
       }
     }
 
-    if (username && username) {
+    if (username && username !== initialUsername) {
       try {
-        await requestWithToken.patch("/users/" + email, {
-          username,
+        await requestWithToken.patch("/users/" + email, { username });
+        toast({
+          title: "Sucesso",
+          className: "bg-success border-zinc-100",
+          variant: "destructive",
+          description: `Perfil do usuário atualizado com sucesso`,
         });
-
-        alert("Nome do usuário atualizado com sucesso!");
       } catch (error) {
         console.error("Erro ao atualizar perfil:", error);
-        alert("Ocorreu um erro ao atualizar o perfil. Tente novamente.");
+        // alert("Ocorreu um erro ao atualizar o perfil. Tente novamente.");
+        toast({
+          title: "Erro",
+          // className: "bg-success border-zinc-100",
+          variant: "destructive",
+          description: `Falha ao atualizar perfil do usuário`,
+        });
       }
     }
   };
 
   return (
     <div className="flex items-center justify-center h-screen">
-      <div className="max-w-3xl w-full p-6 rounded-lg shadow-md flex items-center justify-center flex-col">
-        <h1 className="text-4xl text-black dark:text-slate-200 font-semibold mb-4">
+      <Tabs defaultValue="account" className="w-[600px]">
+        <h1 className="text-4xl text-center mb-6 font-bold">
           Perfil do Usuário
         </h1>
-        <form
-          className=" space-y-4 min-w-[600px] w-4/5 p-6 bg-transparent"
-          onSubmit={handleSubmit}
-        >
-          <div>
-            <InputCommom
-              label="Nome"
-              id="username"
-              value={formState?.username || ""}
-              placeholder="Nome"
-              readOnly={false}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <InputCommom
-              label="Email"
-              id="email"
-              value={formState?.email || ""}
-              placeholder="Email"
-              readOnly={true}
-            />
-          </div>
-          <div>
-            <InputCommom
-              label="Empresa"
-              id="company"
-              value={formState?.company || ""}
-              placeholder="Empresa"
-              readOnly={true}
-            />
-          </div>
-          <div>
-            <InputCommom
-              label="Nova Senha"
-              type="password"
-              id="password"
-              value={formState?.password || ""}
-              placeholder="Nova Senha"
-              readOnly={false}
-              onChange={handleChange}
-            />
-          </div>
-          <button
-            type="submit"
-            className="mt-4 px-4 py-2 bg-green-500 text-white rounded-md shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            Atualizar
-          </button>
-        </form>
-      </div>
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="account">Conta</TabsTrigger>
+          <TabsTrigger value="password">Senha</TabsTrigger>
+        </TabsList>
+        <TabsContent value="account">
+          <Card className="w-full">
+            <CardHeader>
+              <CardTitle>Conta</CardTitle>
+              <CardDescription>
+                Faça alterações na sua conta aqui. Clique em salvar quando
+                terminar.
+              </CardDescription>
+            </CardHeader>
+            <form onSubmit={handleSubmit} className="w-full bg-transparent">
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-lg" htmlFor="username">
+                    Nome
+                  </Label>
+                  <Input
+                    id="username"
+                    className="ring-2 ring-slate-700 text-base" // isso agora deve funcionar
+                    value={formState?.username || ""}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-lg" htmlFor="email">
+                    Email
+                  </Label>
+                  <Input
+                    disabled={true}
+                    id="email"
+                    className="ring-2 ring-slate-700 text-base" // isso agora deve funcionar
+                    value={formState?.email || ""}
+                    readOnly
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-lg" htmlFor="company">
+                    Empresa
+                  </Label>
+                  <Input
+                    id="company"
+                    disabled={true}
+                    className="ring-2 ring-slate-700 text-base" // isso agora deve funcionar
+                    value={formState?.company || ""}
+                    readOnly
+                  />
+                </div>
+              </CardContent>
+              <CardFooter>
+                <Button
+                  type="submit"
+                  className="mx-auto text-lg"
+                  disabled={formState?.username === formState?.initialUsername}
+                >
+                  Salvar alterações
+                </Button>
+              </CardFooter>
+            </form>
+          </Card>
+        </TabsContent>
+        <TabsContent value="password">
+          <Card>
+            <CardHeader>
+              <CardTitle>Senha</CardTitle>
+              <CardDescription>
+                Altere sua senha aqui. Após salvar, você será desconectado.
+              </CardDescription>
+            </CardHeader>
+            <form onSubmit={handleSubmit} className="w-full bg-transparent">
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-lg" htmlFor="password">
+                    Nova senha
+                  </Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    className="text-lg ring-2 ring-slate-700"
+                    value={formState?.password || ""}
+                    onChange={handleChange}
+                  />
+                </div>
+              </CardContent>
+              <CardFooter>
+                <Button
+                  type="submit"
+                  className="mx-auto text-lg"
+                  disabled={(formState?.password?.length || 0) <= 8}
+                >
+                  Salvar Senha
+                </Button>
+              </CardFooter>
+            </form>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

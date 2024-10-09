@@ -291,6 +291,7 @@ const RemoteCommandInterface = ({ clientId }: { clientId: string }) => {
             isLoading={isLoading}
           />
         ),
+        // size: "200",
         title: "Erro ao Executar Comando",
       });
     } finally {

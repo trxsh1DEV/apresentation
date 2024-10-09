@@ -4,7 +4,7 @@ import {
   useMaterialReactTable,
   type MRT_ColumnDef,
 } from "material-react-table";
-import { formatDateString } from "@/utils/utils";
+import { formatDateString, sanitizedSearch } from "@/utils/utils";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, MinusCircle, Plus } from "lucide-react";
 import { sendCommand } from "@/utils/utils-react";
@@ -227,6 +227,17 @@ const appsStatic: App[] = [
   },
 ];
 let softwareNameList: string[] = [""];
+
+const filterSoftwareNames = (data: string[], searchString: string) => {
+  // Usa a função sanitizedSearch para obter a string sanitizada
+  const sanitized = sanitizedSearch(searchString);
+
+  // Cria uma regex case-insensitive com a string de busca sanitizada
+  const regex = new RegExp(sanitized, "i");
+
+  // Filtra os itens, removendo '+' de cada item antes de comparar
+  return data.some((item) => item.replace(/\+/g, "").match(regex));
+};
 const useSoftwaresData = (uid: string) => {
   return useQuery<InterfaceSoftwareItem[]>({
     queryKey: ["softwares", uid],
@@ -247,10 +258,10 @@ const useSoftwaresData = (uid: string) => {
   });
 };
 
-const Softwares = ({ id }: { id: string }) => {
+const TableSoftwares = ({ id }: { id: string }) => {
+  const { data: softwaresData, isLoading, isError } = useSoftwaresData(id);
   const [rowSelection, setRowSelection] = useState<any>({});
   const openModal = useSetAtom(openModalAtom);
-  const { data: softwaresData, isLoading, isError } = useSoftwaresData(id);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -279,12 +290,13 @@ const Softwares = ({ id }: { id: string }) => {
       {
         accessorKey: "category",
         header: "Categoria",
-        enableSorting: false,
+        enableColumnFilter: false,
         maxSize: 100,
       },
       {
         accessorKey: "publisher",
         header: "Desenvolvedor",
+        enableColumnFilter: false,
         maxSize: 200,
       },
       // {
@@ -295,6 +307,7 @@ const Softwares = ({ id }: { id: string }) => {
       {
         accessorKey: "have_license",
         header: "Possui licença",
+        enableColumnFilter: false,
         Cell: ({ cell }: any) => (cell.getValue() ? "Sim" : "Não"),
         maxSize: 50,
       },
@@ -320,6 +333,13 @@ const Softwares = ({ id }: { id: string }) => {
     enableDensityToggle: false,
     enableColumnActions: false,
     getRowId: (row) => row.uninstall_path || "",
+    muiSkeletonProps: {
+      animation: "pulse",
+      height: 28,
+    },
+    muiCircularProgressProps: {
+      Component: <LoadingSpinner className="w-32 h-32" />,
+    },
     columnFilterDisplayMode: "popover",
     muiPaginationProps: {
       shape: "rounded",
@@ -330,7 +350,8 @@ const Softwares = ({ id }: { id: string }) => {
     enableRowSelection: true,
     paginationDisplayMode: "pages",
     onRowSelectionChange: setRowSelection,
-    state: { rowSelection },
+    state: { rowSelection, isLoading },
+    initialState: { pagination: { pageSize: 25, pageIndex: 0 } },
   });
 
   softwareNameList =
@@ -387,20 +408,20 @@ const Softwares = ({ id }: { id: string }) => {
     removeSoftwareMutation.mutate(selectedSoftware);
   };
 
-  if (isLoading) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-        <LoadingSpinner className="w-12 h-12" />
-      </div>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+  //       <LoadingSpinner className="w-12 h-12" />
+  //     </div>
+  //   );
+  // }
 
   if (isError) {
     return <div>Erro ao carregar dados.</div>;
   }
 
   return (
-    <div>
+    <main className="w-full h-full mt-5">
       <div className="flex justify-end space-x-4 mb-4">
         <Button
           onClick={handleModal}
@@ -439,7 +460,7 @@ const Softwares = ({ id }: { id: string }) => {
         </AlertDialog>
       </div>
       <MaterialReactTable table={table} />
-    </div>
+    </main>
   );
 };
 
@@ -479,6 +500,7 @@ const AppCard: FC<{ app: App; id: string }> = ({ app, id }) => {
     default:
       break;
   }
+
   const installSoftwareMutation = useMutation({
     mutationFn: async () => {
       return await sendCommand(id, `winget install -e --id ${app.appId}`);
@@ -512,7 +534,6 @@ const AppCard: FC<{ app: App; id: string }> = ({ app, id }) => {
       });
     },
   });
-  console.log(app.name.split(" ").slice(0, 3).join(" "));
   // console.log(softwareNameList);
   return (
     <div className="bg-gray-800 rounded-lg p-4 flex flex-col items-start space-y-2">
@@ -520,7 +541,7 @@ const AppCard: FC<{ app: App; id: string }> = ({ app, id }) => {
         <img src={iconUrl} alt={`${app.name} icon`} className="w-8 h-8" />
         <h3 className="text-white font-semibold">
           {app.name.split(" ").length >= 3
-            ? app.name.split(" ").slice(0, 3).join(" ")
+            ? app.name.split(" ").slice(0, 4).join(" ")
             : app.name.length > 24
               ? app.name.slice(0, 24) + "..."
               : app.name}
@@ -539,9 +560,7 @@ const AppCard: FC<{ app: App; id: string }> = ({ app, id }) => {
       {installSoftwareMutation.isPending ? (
         <LoadingSpinner className="h-6 w-6 mx-auto" />
       ) : (
-        !softwareNameList.includes(
-          app.name.split(" ").slice(0, 3).join(" ")
-        ) && (
+        !filterSoftwareNames(softwareNameList, app.name) && (
           <Plus
             onClick={() => installSoftwareMutation.mutate()}
             className="mr-2 h-6 w-6 cursor-pointer mx-auto"
@@ -560,7 +579,7 @@ const AppStore: FC<{ id: string }> = ({
   const [apps, setApps] = useState<App[]>(appsStatic);
   const debouncedSearchTerm = useDebounce(searchTerm, 800);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, refetch } = useQuery({
     queryKey: ["appSearch", debouncedSearchTerm],
     queryFn: async () => {
       if (!debouncedSearchTerm) return appsStatic;
@@ -582,16 +601,16 @@ const AppStore: FC<{ id: string }> = ({
     if (searchTerm == "") {
       setApps(appsStatic);
     }
-    // const handleKeyDown = (event: KeyboardEvent) => {
-    //   if (event.key === "Enter" && debouncedSearchTerm) {
-    //     refetch();
-    //   }
-    // };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Enter" && debouncedSearchTerm) {
+        refetch();
+      }
+    };
 
-    // window.addEventListener("keydown", handleKeyDown);
-    // return () => {
-    //   window.removeEventListener("keydown", handleKeyDown);
-    // };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, [debouncedSearchTerm]);
 
   return (
@@ -640,18 +659,18 @@ const AppStore: FC<{ id: string }> = ({
   );
 };
 
-export const TableSoftwares = ({
-  // data,
-  id,
-}: {
-  // data: InterfaceSoftwareItem[];
-  id: string;
-}) => {
-  return (
-    <main className="w-full h-full mt-5">
-      <Softwares id={id} />
-    </main>
-  );
-};
+// export const TableSoftwares = ({
+//   // data,
+//   id,
+// }: {
+//   // data: InterfaceSoftwareItem[];
+//   id: string;
+// }) => {
+//   return (
+//     <main className="w-full h-full mt-5">
+//       <Softwares id={id} />
+//     </main>
+//   );
+// };
 
 export default TableSoftwares;

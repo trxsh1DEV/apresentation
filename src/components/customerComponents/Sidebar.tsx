@@ -17,7 +17,7 @@ import { BarChart4 } from "lucide-react";
 
 const Sidebar = () => {
   return (
-    <nav className="fixed top-0 bottom-0 left-0 h-full w-16 bg-white dark:bg-slate-900 pt-5 mr-16 transition-all duration-300 ease-in-out overflow-hidden hover:w-52 z-20">
+    <nav className="fixed top-0 bottom-0 left-0 h-full w-[70px] bg-slate-100 dark:bg-slate-900 pt-5 mr-16 transition-all duration-300 ease-in-out overflow-hidden hover:w-52 z-20">
       <>
         <NavLink to="/" className="text-azure block w-52 p-2.5">
           <div className="flex items-center font-medium gap-2.5 px-2.5  rounded transition-all duration-300 ease-in cursor-pointer  hover:text-white hover:bg-green-300  dark:hover:bg-slate-600 dark:hover:text-indigo-400">

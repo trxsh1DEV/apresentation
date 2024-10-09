@@ -172,7 +172,7 @@ const DataTableAgents: React.FC = () => {
     console.log(clientId);
     openModal({
       content: <BlackScreen clientId={clientId} />,
-      title: "Terminal Remoto",
+      // title: "Terminal Remoto",
       independenceMode: true,
     });
   };
@@ -215,7 +215,12 @@ const DataTableAgents: React.FC = () => {
     },
     enableRowActions: true,
     getRowId: (row) => row.uid,
-
+    displayColumnDefOptions: {
+      "mrt-row-actions": {
+        header: "Ações", //change header text
+        // size: 300, //make actions column wider
+      },
+    },
     renderRowActions: ({ row }) => (
       <Box sx={{ display: "flex" }}>
         <Tooltip

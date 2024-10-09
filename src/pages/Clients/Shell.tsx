@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { requestWithToken } from "../../utils/request";
 import { useSetAtom } from "jotai";
 import { closeModalAtom } from "../../Context/ModalContext";
-import { XCircle } from "lucide-react";
+import { X } from "lucide-react";
 
 const Shell = ({
   // onClose,
@@ -70,60 +70,56 @@ const Shell = ({
   };
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
-        backgroundColor: "rgba(0, 0, 0, 0.75)",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        color: "white",
-        zIndex: 3,
-      }}
-    >
+    <div className="fixed w-full h-full bg-black bg-opacity-75 flex justify-center items-center z-10">
       <div
-        style={{
-          padding: "20px",
-          backgroundColor: "black",
-          borderRadius: "5px",
-          textAlign: "left",
-          width: "1000px",
-          height: "800px",
-          maxHeight: "80%",
-          overflow: "auto",
-          border: "1px solid white",
-          position: "relative",
-        }}
+        style={
+          {
+            // padding: "20px",
+            // backgroundColor: "black",
+            // borderRadius: "5px",
+            // textAlign: "left",
+            // width: "1000px",
+            // height: "800px",
+            // maxHeight: "80%",
+            // overflow: "auto",
+            // border: "1px solid white",
+            // position: "relative",
+          }
+        }
+        className="rounded-lg border-4 p-4 relative bg-black overflow-auto w-[1000px] h-3/4 text-left"
       >
         <button
           onClick={closeModal}
-          style={{
-            border: "none",
-            position: "fixed",
-            top: "5px",
-            right: "5px",
-            color: "white",
-            backgroundColor: "transparent",
-            cursor: "pointer",
-          }}
+          style={
+            {
+              // border: "none",
+              // position: "absolute",
+              // width: "1000px",
+              // top: "10px",
+              // right: "10px",
+              // left: "0px",
+              // color: "white",
+              // cursor: "pointer",
+              // backgroundColor: "transparent",
+            }
+          }
+          className="absolute top-2 right-2 cursor-pointer bg-transparent"
         >
-          <XCircle size="40" />
+          <X size="32" />
         </button>
         <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            width: "85%",
-            marginBottom: "10px",
-            position: "absolute",
-          }}
-          className="input-shell"
+          style={
+            {
+              // display: "flex",
+              // alignItems: "center",
+              // width: "85%",
+              // marginBottom: "10px",
+              // position: "absolute",
+            }
+          }
+          className="input-shell flex center items-center absolute"
         >
-          <span style={{ marginRight: "5px" }}>$</span>
+          <span>$</span>
           <input
             ref={inputRef}
             type="text"
@@ -131,25 +127,31 @@ const Shell = ({
             onChange={(e: any) => setCommand(e.target.value)}
             onKeyPress={handleKeyPress}
             disabled={isLoading}
-            style={{
-              backgroundColor: "transparent",
-              border: "none",
-              color: "white",
-              fontSize: "18px",
-              outline: "none",
-              flex: 1,
-            }}
+            style={
+              {
+                // backgroundColor: "transparent",
+                // border: "none",
+                // color: "white",
+                // fontSize: "18px",
+                // outline: "none",
+                // flex: 1,
+              }
+            }
+            className="bg-transparent border-none outline-none flex-1 italic"
           />
         </div>
-        <div ref={outputRef} className="output" style={{ marginTop: "35px" }}>
+        <div ref={outputRef} className="output mt-8">
           {output.map((line, index) => (
             <div
               key={index}
-              style={{
-                whiteSpace: "pre-wrap",
-                fontSize: "18px",
-                margin: "15px",
-              }}
+              // style={
+              //   {
+              // whiteSpace: "pre-wrap",
+              // fontSize: "18px",
+              // margin: "15px",
+              //   }
+              // }
+              className="whitespace-pre-wrap m-4 text-lg"
             >
               {line}
               <hr />

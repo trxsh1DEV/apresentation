@@ -12,9 +12,17 @@ export type AgentType = {
 
     processes: Processes;
     location: string;
-
+    first_collect: TypeFirstCollect;
     peripherals: TypePeripheral;
     custom?: TypeCustom;
+  };
+};
+
+export type CustomDataCompanie = {
+  custom: {
+    department?: string[];
+    collaborator?: string[];
+    local?: string[];
   };
 };
 
@@ -33,7 +41,7 @@ type TypeInventoryGeneral = {
     architecture: string;
     cpu_usage: number;
     cpu_temp?: number; // Optional, as per CpuDto
-    cpu_use: number;
+    // cpu_use: number;
     cpu_freq: number | null; // Can be null, as per CpuDto
     physical_cores: number;
     logic_cores: number;
@@ -43,6 +51,7 @@ type TypeInventoryGeneral = {
     available: number;
     used: number;
     percentage: number;
+    type: string;
   };
   system: {
     so: string;
@@ -73,6 +82,8 @@ type TypeInventoryGeneral = {
     used: number;
     available: number;
     percentage: number;
+    temperature: string;
+    status: string;
     bitlocker: boolean | null; // Can be null, as per StorageItemDto
   }[];
   network: {
@@ -113,9 +124,13 @@ export type TypePeripheral = {
   monitors: TypePeripheralMonitor[];
 };
 
+export type TypeFirstCollect = {
+  serialNumber: string;
+};
+
 export type AgentInventoryType = Pick<
   AgentType["inventory"],
-  "inventoryGeneral" | "peripherals"
+  "inventoryGeneral" | "peripherals" | "first_collect"
 >;
 
 export interface ProcessesFields {

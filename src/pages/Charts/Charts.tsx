@@ -119,7 +119,7 @@ const useHistoryData = (id: string) => {
     queryFn: async () => {
       try {
         const result = await requestWithToken.get(
-          `/inventory/history/${id}?length=2`
+          `/inventory/history/${id}?length=10`
         );
         return result.data;
       } catch (error: any) {
@@ -247,7 +247,7 @@ const Charts = ({ data, historyData }: ChartsProps) => {
 
     if (value < 50) {
       if (value < 20) {
-        value = 40;
+        value = 20;
       }
       red = 0;
       green = 255 * (value / 50);

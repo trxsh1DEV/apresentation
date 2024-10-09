@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,10 +10,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import requestWithToken from "@/utils/request";
+import { useToast } from "@/components/ui/use-toast";
 
 const AddItemPage: React.FC = () => {
   const [inputValue, setInputValue] = useState<string>("");
   const [selectedField, setSelectedField] = useState<string>("");
+  const { toast } = useToast();
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
@@ -28,15 +30,26 @@ const AddItemPage: React.FC = () => {
     if (!inputValue || !selectedField) return;
 
     try {
-      const response = await axios.post("https://sua-api.com/endpoint", {
-        field: selectedField,
-        value: inputValue,
+      await requestWithToken.post("/company/custom", {
+        customType: selectedField,
+        value: [inputValue],
       });
-      console.log("Item adicionado com sucesso:", response.data);
+      // console.log("Item adicionado com sucesso:", response.data);
       setInputValue(""); // Limpa o input após o envio
       setSelectedField(""); // Limpa o select após o envio
-    } catch (error) {
-      console.error("Erro ao adicionar item:", error);
+      toast({
+        title: "Sucesso",
+        className: "bg-success border-zinc-100",
+        variant: "destructive",
+        description: `Item '${inputValue}' adicionado com sucesso`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        // className: "bg-success border-zinc-100",
+        variant: "destructive",
+        description: `Ocorreu um problema para adicionar esse item. Erro ${error.message}`,
+      });
     }
   };
 

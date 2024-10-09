@@ -23,7 +23,12 @@ import { useQuery } from "@tanstack/react-query";
 import requestWithToken from "@/utils/request";
 import { UnexpectedError } from "@/data/error/UnexpectedError";
 import { LoadingSpinner } from "@/components/ui/myIsLoading";
-import { countByField, countByManufacturers } from "@/utils/utils";
+import {
+  containsString,
+  countByCpu,
+  countByField,
+  countByManufacturers,
+} from "@/utils/utils";
 import { FC, useEffect, useRef } from "react";
 
 ChartJS.register(
@@ -472,22 +477,21 @@ const Dashboard = () => {
       (acc: any, [software, count]) => {
         // Pega até a terceira palavra, ou o nome completo se tiver menos de 3 palavras
         const softwareName = software.split(" ").slice(0, 2).join(" ");
-        switch (softwareName) {
-          case "Microsoft Visual":
-            // console.log("oi", software.split(" ").slice(0, 3).join(" "));
-            // softwareName = software.split(" ").slice(0, 3).join(" ");
-            return acc;
-          case "Microsoft Edge":
-            if (
-              software.split(" ").slice(0, 3).join(" ") !== "Microsoft Edge"
-            ) {
-              return acc; // Pula a iteração retornando o acumulador
-            }
-            // sof
-            break;
 
-          default:
-            break;
+        if (containsString(softwareName, "Microsoft Visual")) {
+          // console.log("oi", software.split(" ").slice(0, 3).join(" "));
+          // softwareName = software.split(" ").slice(0, 3).join(" ");
+          return acc;
+        } else if (containsString(softwareName, "Microsoft Edge")) {
+          if (software.split(" ").slice(0, 3).join(" ") !== "Microsoft Edge") {
+            return acc; // Pula a iteração retornando o acumulador
+          }
+        } else if (containsString(softwareName, "Microsoft Update")) {
+          return acc;
+        } else if (containsString(softwareName, "AMD")) {
+          if (softwareName !== "AMD Software") {
+            return acc;
+          }
         }
 
         if (acc[softwareName]) {
@@ -502,7 +506,7 @@ const Dashboard = () => {
     );
 
   const topRankSoftwares = Object.entries(filteredSoftwareCount)
-    .slice(0, 16)
+    .slice(0, 11)
     .reduce(
       (acc: any, [software, count]) => {
         acc[software] = count;
@@ -512,6 +516,7 @@ const Dashboard = () => {
     );
 
   const machineCounts = countMachineTypes(machineTypes);
+  console.log(brandManufactures);
   const brandCounts = countByManufacturers(
     brandManufactures,
     Object.keys(brandManufactures[0])[0] || "manufacturer",
@@ -519,6 +524,7 @@ const Dashboard = () => {
       "DELL",
       "ASUS",
       "ACER",
+      "MACHINIST",
       "SAMSUNG",
       "LENOVO",
       "ELSA",
@@ -530,11 +536,26 @@ const Dashboard = () => {
       "BIOSTAR",
     ]
   );
-  const cpuModelCounts = countByManufacturers(
+  const cpuModelCounts = countByCpu(
     cpuModelName,
     Object.keys(cpuModelName[0])[0] || "cpuModel",
     ["Intel", "AMD"]
   );
+  // const cpuModelCounts = {
+  //   branchsCpu: {
+  //     AMD: 2,
+  //     Intel: 3,
+  //   },
+  //   nameCpu: {
+  //     AMD: {
+  //       "AMD Ryzen 3 2200G": 1,
+  //       "AMD Ryzen 5 3500U": 1,
+  //     },
+  //     Intel: {
+  //       "Intel(R) Core(TM) i7-4770K": 3,
+  //     },
+  //   },
+  // };
 
   const [labelsHoursMonth, dataHoursMonth] = formatHoursMonth(hoursOnMonthData);
 
@@ -630,6 +651,9 @@ const Dashboard = () => {
         backgroundColor: [
           "#007bff",
           "#ff4d4f",
+          "#20c997",
+          "#e83e8c",
+          "#fd7e14",
           "#ffc107",
           "#28a745",
           "#6610f2",
@@ -640,6 +664,11 @@ const Dashboard = () => {
   };
 
   const soData = countByField(SystemOperation, "so");
+
+  // Object.keys(cpuModelCounts.nameCpu).map((item) =>
+  //   console.log(item.startsWith("AMD"))
+  // );
+  // console.log(...Object.keys(cpuModelCounts.nameCpu));
 
   const systemOperationData = {
     labels: Object.keys(soData),
@@ -659,12 +688,12 @@ const Dashboard = () => {
     ],
   };
 
-  const cpuModelChart: any = {
+  const cpuBranchChart: any = {
     labels: ["AMD", "Intel"],
     datasets: [
       {
         label: "Processadores",
-        data: Object.values(cpuModelCounts),
+        data: Object.values(cpuModelCounts.branchsCpu),
         backgroundColor: [
           "rgba(255, 99, 132, 0.2)", // Cor para AMD (vermelho mais escuro)
           "rgba(54, 162, 235, 0.2)", // Cor para Intel (azul mais escuro)
@@ -674,6 +703,33 @@ const Dashboard = () => {
       },
     ],
   };
+
+  const cpuNameRankChart = {
+    labels: [
+      ...Object.keys(cpuModelCounts.nameCpu.AMD),
+      ...Object.keys(cpuModelCounts.nameCpu.Intel),
+    ],
+    datasets: [
+      {
+        label: "AMD",
+        data: Object.values(cpuModelCounts.nameCpu.AMD),
+        backgroundColor: "rgba(255, 99, 132, 0.2)",
+        borderColor: "rgba(255, 99, 132, 1)",
+        borderWidth: 1,
+      },
+      {
+        label: "Intel",
+        data: [
+          ...Array(Object.keys(cpuModelCounts.nameCpu.AMD).length).fill(0),
+          ...Object.values(cpuModelCounts.nameCpu.Intel),
+        ],
+        backgroundColor: "rgba(54, 162, 235, 0.2)",
+        borderColor: "rgba(54, 162, 235, 1)",
+        borderWidth: 1,
+      },
+    ],
+  };
+
   const softwareData = {
     labels: Object.keys(topRankSoftwares),
     datasets: [
@@ -816,6 +872,7 @@ const Dashboard = () => {
                 title == "Disco"
                   ? groupedData.totalSizes[context.dataIndex]
                   : groupedMemoryData.totalSizes[context.dataIndex];
+              // console.log(totalSize);
 
               const memoryGroup = context.label; // ex: '4-8' ou '8-16'
               const memoryTypes =
@@ -827,10 +884,11 @@ const Dashboard = () => {
               const lines = [`${label}: ${value} (Total: ${totalSize} GB)`];
 
               // Adicionando as porcentagens como linhas separadas
-              memoryTypes.forEach((memoryType: string) => {
-                const percentage = percentPerMemoryType[memoryType];
-                lines.push(`${memoryType}: ${percentage}%`);
-              });
+              title == "Memória" &&
+                memoryTypes.forEach((memoryType: string) => {
+                  const percentage = percentPerMemoryType[memoryType];
+                  lines.push(`${memoryType}: ${percentage}%`);
+                });
 
               return lines;
             },
@@ -844,7 +902,8 @@ const Dashboard = () => {
     };
   };
 
-  const barOptions = (indexAxios: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-inferrable-types
+  const barOptions = (indexAxios: string, display: boolean = true) => {
     return {
       ...baseOptions,
       devicePixelRatio: 2, // Garante que a densidade de pixels se ajuste ao dispositivo
@@ -862,6 +921,11 @@ const Dashboard = () => {
       },
       plugins: {
         ...baseOptions.plugins,
+        legend: {
+          ...baseOptions.plugins.legend,
+          display: display,
+        },
+        // position: "top",
         // tooltip: {
         //   callbacks: {
         //     label: (tooltipItem: any) => {
@@ -1028,8 +1092,16 @@ const Dashboard = () => {
       <ChartContainer title="Processadores">
         <ChartWrapper
           type="bar"
-          data={cpuModelChart}
-          options={barOptions("x")}
+          data={cpuBranchChart}
+          options={barOptions("x", false)}
+        />
+      </ChartContainer>
+
+      <ChartContainer title="Modelos de Processador">
+        <ChartWrapper
+          type="bar"
+          data={cpuNameRankChart}
+          options={barOptions("y")}
         />
       </ChartContainer>
 
@@ -1076,7 +1148,7 @@ const Dashboard = () => {
         <ChartWrapper type="radar" data={softwareData} options={radarOptions} />
       </ChartContainer>
 
-      <ChartContainer title="Armazenamento de Discos">
+      <ChartContainer title="Armazenamento">
         <ChartWrapper
           type="bar"
           data={diskTotalChart}

@@ -4,6 +4,7 @@ import { AgentInventoryType } from "@/utils/types/types";
 const AgentInfo: FC<AgentInventoryType> = ({
   inventoryGeneral,
   peripherals,
+  first_collect,
 }) => {
   return (
     <div className="mx-auto p-6 shadow-lg rounded-lg">
@@ -37,6 +38,7 @@ const AgentInfo: FC<AgentInventoryType> = ({
             {inventoryGeneral.cpu.cpu_temp && (
               <p>Temperatura: {inventoryGeneral.cpu.cpu_temp}°C</p>
             )}
+            <p>Uso de CPU: {inventoryGeneral.cpu.cpu_usage}%</p>
           </div>
 
           <div className=" p-4 rounded-md text-left">
@@ -47,6 +49,7 @@ const AgentInfo: FC<AgentInventoryType> = ({
             <p>Disponível: {inventoryGeneral.memory.available.toFixed(2)} GB</p>
             <p>Utilizada: {inventoryGeneral.memory.used.toFixed(2)} GB</p>
             <p>Porcentagem: {inventoryGeneral.memory.percentage.toFixed(2)}%</p>
+            <p>Tipo: {inventoryGeneral.memory.type}</p>
           </div>
 
           <div className=" p-4 rounded-md text-left">
@@ -75,11 +78,12 @@ const AgentInfo: FC<AgentInventoryType> = ({
               Secure Boot:{" "}
               {inventoryGeneral.system.secure_boot ? "Ativado" : "Desativado"}
             </p>
+            <p>Serial Number: {first_collect?.serialNumber || "N/A"}</p>
             <p>
               Data de Instalação do SO:{" "}
               {inventoryGeneral.system.data_install_so}
             </p>
-            <p>Usuário Atual: {inventoryGeneral.system.user_logged}</p>
+            {/* <p>Usuário Atual: {inventoryGeneral.system.user_logged}</p> */}
             <table className="w-full border-collapse">
               <thead>
                 <tr>
@@ -135,6 +139,8 @@ const AgentInfo: FC<AgentInventoryType> = ({
                   <th className="border p-2">Identificador</th>
                   <th className="border p-2">Tamanho (GB)</th>
                   <th className="border p-2">Espaço disponível (GB)</th>
+                  <th className="border p-2">Status</th>
+                  <th className="border p-2">Temperatura</th>
                   <th className="border p-2">Bitlocker</th>
                 </tr>
               </thead>
@@ -152,6 +158,8 @@ const AgentInfo: FC<AgentInventoryType> = ({
                     <td className="border p-2">
                       {drive.available.toFixed(1) + " GB"}
                     </td>
+                    <td className="border p-2">{drive.status}</td>
+                    <td className="border p-2">{drive.temperature}</td>
                     <td className="border p-2">
                       {drive.bitlocker ? "Ativado" : "Desativado"}
                     </td>

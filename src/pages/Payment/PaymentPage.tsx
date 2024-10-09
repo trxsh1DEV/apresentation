@@ -12,11 +12,11 @@ type Plan = {
 
 const plans: Plan[] = [
   {
-    name: "Plano Free",
+    name: "Free",
     price: 0,
-    agentLimit: 5,
+    agentLimit: 20,
     description: [
-      "Até 5 agentes para testar",
+      "Até 20 agentes para testar",
       "Comandos e scripts remotos",
       "Inventário de dispositivos",
       "Controle de estoque",
@@ -148,7 +148,7 @@ const PaymentPage: React.FC = () => {
       {selectedPlan && (
         <div className="mt-6 p-6 rounded-lg shadow-lg">
           <h2 className="text-2xl font-bold mb-4">
-            ({selectedPlan.name}) Selecionado
+            (Plano {selectedPlan.name}) Selecionado
           </h2>
 
           <div className="mb-4">

@@ -1,6 +1,6 @@
 import { Suspense, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { AgentType } from "../../utils/types/types";
+import { AgentType, CustomDataCompanie } from "../../utils/types/types";
 import SearchInput from "@/components/InputSearch";
 import InputComponent from "@/components/InputComponent";
 import {
@@ -27,6 +27,7 @@ import { UnexpectedError } from "@/data/error/UnexpectedError";
 import { Button } from "@/components/ui/button";
 import { getDayOfWeek } from "@/utils/utils";
 import { LoadingSpinner } from "@/components/ui/myIsLoading";
+import { useToast } from "@/components/ui/use-toast";
 
 // const renderKeyValuePair = (
 //   key: string,
@@ -139,9 +140,10 @@ function DataClient() {
   const id = location.pathname.split("/")[2];
   const [activeTab, setActiveTab] = useState("Geral");
   const formElement = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
   const { data } = useSuspenseQuery<AgentType>({
-    queryKey: ["agent-data", id],
+    queryKey: ["inventory-data", id],
     queryFn: async () => {
       try {
         const response = await requestWithToken.get(`/clients/full/${id}`);
@@ -155,6 +157,23 @@ function DataClient() {
     },
     retry: 1,
   });
+
+  const { data: companieData } = useSuspenseQuery<CustomDataCompanie>({
+    queryKey: ["company-data"],
+    queryFn: async () => {
+      try {
+        const response = await requestWithToken.get(`/company`);
+        return response.data;
+      } catch (error: any) {
+        throw new UnexpectedError(
+          "Falha ao buscar os dados: " +
+            (error.response?.data?.message || error.message)
+        );
+      }
+    },
+    retry: 1,
+  });
+  // console.log(data.inventory.custom);
 
   const handleEdit = async () => {
     try {
@@ -184,11 +203,25 @@ function DataClient() {
         }
       });
 
-      await requestWithToken.patch(`/inventory/custom/${id}`, {
-        custom: updatedCustom,
+      await requestWithToken.patch(
+        `/inventory/custom/288c56db-92b1-4576-ba91-3be5376a8017`,
+        {
+          custom: updatedCustom,
+        }
+      );
+      toast({
+        title: "Sucesso",
+        className: "bg-success border-zinc-100",
+        variant: "destructive",
+        description: `Campo(s) atualizados com sucesso`,
       });
     } catch (err: any) {
-      console.error(err.message);
+      toast({
+        title: "Erro",
+        // className: "bg-success border-zinc-100",
+        variant: "destructive",
+        description: `Ocorreu um problema para atualizar esse(s) campo(s). Erro ${err.message}`,
+      });
     }
   };
 
@@ -198,7 +231,6 @@ function DataClient() {
 
   // if (isLoading) return <div>Loading...</div>;
   // if (isError) return <div>Error loading data</div>;
-  // console.log(data.inventory);
 
   return (
     <main className="w-full">
@@ -403,12 +435,17 @@ function DataClient() {
                 <SelectContent>
                   <SelectGroup>
                     <SelectLabel>Departamentos</SelectLabel>
-                    <SelectItem value="RH">RH</SelectItem>
+                    {companieData.custom.department?.map((department) => (
+                      <SelectItem key={department} value={department}>
+                        {department}
+                      </SelectItem>
+                    ))}
+                    {/* <SelectItem value="RH">RH</SelectItem>
                     <SelectItem value="Marketing">Marketing</SelectItem>
                     <SelectItem value="Financeiro">Financeiro</SelectItem>
                     <SelectItem value="TI">TI</SelectItem>
                     <SelectItem value="Operação">Operação</SelectItem>
-                    <SelectItem value="Diretoria">Diretoria</SelectItem>
+                    <SelectItem value="Diretoria">Diretoria</SelectItem> */}
                   </SelectGroup>
                 </SelectContent>
               </Select>
@@ -434,14 +471,17 @@ function DataClient() {
                   />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectGroup>
-                    {/* <SelectLabel>Pertence ao</SelectLabel> */}
+                  {/* <SelectGroup>
                     <SelectItem value="Estoque">Estoque</SelectItem>
-                  </SelectGroup>
-                  <SelectItem value="Sala 1">Sala 1</SelectItem>
-                  <SelectItem value="Sala do TI">Sala do TI</SelectItem>
+                  </SelectGroup> */}
+                  {companieData.custom.local?.map((local) => (
+                    <SelectItem key={local} value={local}>
+                      {local}
+                    </SelectItem>
+                  ))}
+                  {/* <SelectItem value="Sala 1">Sala 1</SelectItem>
                   <SelectItem value="12°">12°</SelectItem>
-                  <SelectItem value="21° Expedição">21° Expedição</SelectItem>
+                  <SelectItem value="21° Expedição">21° Expedição</SelectItem> */}
                 </SelectContent>
               </Select>
             </div>
@@ -532,7 +572,10 @@ function DataClient() {
           <div className="grid grid-cols-[repeat(2,1fr)] gap-[15px_40px] items-center">
             <div className="text-center col-span-full font-bold">
               <div className="mb-5 text-5xl">Processos</div>
-              <TableProcesses data={data.inventory.processes.processes.apps} />
+              <TableProcesses
+                id={id}
+                // data={data.inventory.processes.processes.apps}
+              />
             </div>
           </div>
         )}
@@ -566,6 +609,7 @@ function DataClient() {
               <AgentInfo
                 inventoryGeneral={data.inventory.inventoryGeneral}
                 peripherals={data.inventory.peripherals}
+                first_collect={data.inventory.first_collect}
               />
             </div>
             {/* {renderKeyValuePairs({

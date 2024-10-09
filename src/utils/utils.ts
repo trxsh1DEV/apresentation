@@ -99,3 +99,63 @@ export const countByManufacturers = (
     return acc;
   }, {});
 };
+
+export const countByCpu = (
+  data: DataItem[],
+  field: string,
+  valueSearch: string[]
+): any => {
+  return data.reduce(
+    (
+      acc: {
+        branchsCpu: { [brand: string]: number };
+        nameCpu: { [brand: string]: { [name: string]: number } };
+      },
+      item: DataItem
+    ) => {
+      const brand = findValueInString(item[field], valueSearch);
+
+      if (brand) {
+        // Incrementa o contador da marca (branchsCpu)
+        acc.branchsCpu[brand] = (acc.branchsCpu[brand] || 0) + 1;
+
+        // Verifica se já existe a chave da marca em nameCpu, senão, cria uma nova
+        if (!acc.nameCpu[brand]) {
+          acc.nameCpu[brand] = {};
+        }
+
+        // Processa o nome de acordo com a marca
+        const processorName = processProcessorName(item[field], brand);
+        acc.nameCpu[brand][processorName] =
+          (acc.nameCpu[brand][processorName] || 0) + 1;
+      }
+
+      return acc;
+    },
+    { branchsCpu: {}, nameCpu: {} }
+  );
+};
+
+const processProcessorName = (cpuModel: string, brand: string): string => {
+  const words = cpuModel.trim().split(/\s+/); // Remove espaços extras e separa por espaços
+
+  if (brand === "AMD") {
+    return words.slice(0, 4).join(" "); // Pega as 4 primeiras palavras para AMD
+  } else if (brand === "Intel") {
+    return words.slice(0, 3).join(" "); // Pega as 3 primeiras palavras para Intel
+  }
+
+  return cpuModel; // Caso a marca não seja AMD ou Intel, retorna o modelo completo
+};
+
+// Função para sanitizar a string de busca
+export const sanitizedSearch = (searchString: string) => {
+  return searchString
+    .replace(/[.*+?^${}()|[\]\\]/g, "\\$&") // Escapa caracteres especiais
+    .replace(/\+/g, ""); // Remove o símbolo '+'
+};
+
+export const containsString = (text: string, searchString: string) => {
+  const regex = new RegExp(searchString, "i"); // Cria uma regex case-insensitive
+  return regex.test(text); // Verifica se a string contém a busca
+};
