@@ -159,7 +159,7 @@ function DataClient() {
   });
 
   const { data: companieData } = useSuspenseQuery<CustomDataCompanie>({
-    queryKey: ["company-data"],
+    queryKey: ["company-data", id],
     queryFn: async () => {
       try {
         const response = await requestWithToken.get(`/company`);
@@ -203,12 +203,9 @@ function DataClient() {
         }
       });
 
-      await requestWithToken.patch(
-        `/inventory/custom/288c56db-92b1-4576-ba91-3be5376a8017`,
-        {
-          custom: updatedCustom,
-        }
-      );
+      await requestWithToken.patch(`/inventory/custom/${id}`, {
+        custom: updatedCustom,
+      });
       toast({
         title: "Sucesso",
         className: "bg-success border-zinc-100",
