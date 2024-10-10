@@ -381,7 +381,7 @@ function DataClient() {
               //   handleChange("patrimony", e.target.value)
               // }
               placeholder="Ex: PC-0001"
-              value={data.inventory.custom?.patrimony}
+              value={data.inventory?.custom?.patrimony}
               readOnly={false}
               onClick={() => handleCopyContent("patrimony")}
             />
@@ -392,7 +392,7 @@ function DataClient() {
                 id="collaborator"
                 url={`stock/search?query=`}
                 placeholder="Ex: Joao Silva"
-                defaultValue={data.inventory.custom?.collaborator}
+                defaultValue={data.inventory?.custom?.collaborator}
                 label="Colaborador"
               />
             </div>
@@ -400,7 +400,7 @@ function DataClient() {
             <InputComponent
               label="Data Compra"
               id="date_warranty"
-              value={data.inventory.custom?.date_warranty}
+              value={data.inventory?.custom?.date_warranty}
               placeholder="01/01/1970"
               onClick={() => handleCopyContent("date_warranty")}
               // onChange={(e: any) =>
@@ -417,7 +417,7 @@ function DataClient() {
                 Departamento
               </Label>
 
-              <Select defaultValue={data.inventory.custom?.department}>
+              <Select defaultValue={data.inventory?.custom?.department || ""}>
                 <SelectTrigger
                   id="department_ref"
                   // className="w-[270px] bg-slate-800 ring-1 ring-ring px-3 py-2 text-lg ring-offset-background placeholder:text-muted-foreground"
@@ -432,7 +432,7 @@ function DataClient() {
                 <SelectContent>
                   <SelectGroup>
                     <SelectLabel>Departamentos</SelectLabel>
-                    {companieData.custom.department?.map((department) => (
+                    {companieData?.custom?.department?.map((department) => (
                       <SelectItem key={department} value={department}>
                         {department}
                       </SelectItem>
@@ -456,7 +456,7 @@ function DataClient() {
                 Local
               </Label>
 
-              <Select defaultValue={data.inventory.custom?.local}>
+              <Select defaultValue={data.inventory?.custom?.local || ""}>
                 <SelectTrigger
                   id="local_ref"
                   className="w-[256px] dark:bg-slate-800 px-3 py-2 text-xl ring-ring focus:outline-none focus:ring-4 focus:ring-ring focus:ring-offset-2"
@@ -471,7 +471,7 @@ function DataClient() {
                   {/* <SelectGroup>
                     <SelectItem value="Estoque">Estoque</SelectItem>
                   </SelectGroup> */}
-                  {companieData.custom.local?.map((local) => (
+                  {companieData?.custom.local?.map((local) => (
                     <SelectItem key={local} value={local}>
                       {local}
                     </SelectItem>
@@ -491,7 +491,7 @@ function DataClient() {
                 Vinculo
               </Label>
 
-              <Select defaultValue={data.inventory.custom?.bond}>
+              <Select defaultValue={data.inventory?.custom?.bond || ""}>
                 <SelectTrigger
                   id="bond_ref"
                   className="w-[256px] dark:bg-slate-800 px-3 py-2 text-xl ring-ring focus:outline-none focus:ring-4 focus:ring-ring focus:ring-offset-2"
