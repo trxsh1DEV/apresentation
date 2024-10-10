@@ -471,7 +471,7 @@ function DataClient() {
                   {/* <SelectGroup>
                     <SelectItem value="Estoque">Estoque</SelectItem>
                   </SelectGroup> */}
-                  {companieData?.custom.local?.map((local) => (
+                  {companieData?.custom?.local?.map((local) => (
                     <SelectItem key={local} value={local}>
                       {local}
                     </SelectItem>
