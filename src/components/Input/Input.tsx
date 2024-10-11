@@ -1,5 +1,7 @@
 import { HTMLAttributes, forwardRef, useId } from "react";
-import "./style.css";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+// import "./style.css";
 
 // Define um tipo específico para 'type' que inclui todos os tipos válidos de input
 type InputType =
@@ -34,7 +36,7 @@ type InputProps = HTMLAttributes<HTMLInputElement> & {
   placeholder?: string;
 };
 
-export const Input = forwardRef<HTMLInputElement, InputProps>(
+export const InputHookForms = forwardRef<HTMLInputElement, InputProps>(
   (
     {
       type = "text", // 'type' padrão é 'text'
@@ -52,16 +54,20 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
     return (
       <div className="InputContent">
-        <label className="Label" htmlFor={inputId}>
+        <Label
+          className="text-slate-400 text-2xl h-full text-center tracking-[0.12rem] mb-2"
+          htmlFor={inputId}
+        >
           {label}
-        </label>
-        <input
+        </Label>
+        <Input
           id={inputId}
           type={type}
           name={name}
           ref={ref}
           placeholder={placeholder}
-          className={`InputStyle ${hasError ? "hasError" : ""}`}
+          className={`text-xl w-fit max-w-[300px] m-0 p-4 rounded-lg ${hasError ? "hasError" : ""}`}
+          // w-fit max-w-72 m-0 p-4
           {...props}
         />
         {hasError && <p className="text-lg text-red-500 ">{helperText}</p>}

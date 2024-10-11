@@ -155,15 +155,18 @@ export type TypePeripherical = {
   manufacturer: string;
   sample: string;
   so: string;
-  department: string[];
+  department: string;
   patrimony: string;
   date_warranty: string;
   category: string[];
   nfe: string;
   purchase_price: number;
+  in_stock: boolean;
+  observation: string;
   createdAt?: string;
   updatedAt?: string;
   _id?: string;
+  __v?: number;
 };
 
 export type TypeCustom = {

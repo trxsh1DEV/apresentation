@@ -10,7 +10,6 @@ const DownloadPage = () => {
       const { data: user } = await requestWithToken.get(
         `users/${resultToken.data.email}`
       );
-      console.log(user.company.companyCode);
 
       if (!user || !user.email || !user.username || !user.company) {
         return setCompany(null);
@@ -27,6 +26,7 @@ const DownloadPage = () => {
         "Error fetching user:",
         error?.response?.data?.errors?.[0] || error.message
       );
+      throw Error(error?.response?.data?.errors?.[0] || error.message);
     }
   }, []);
 
@@ -47,7 +47,7 @@ const DownloadPage = () => {
       </p>
       <a
         href="https://agentezero-api.infonova.com.br/updates/download-installer"
-        target="_blank"
+        // target="_blank"
         download
         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
       >

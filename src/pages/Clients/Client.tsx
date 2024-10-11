@@ -173,7 +173,6 @@ function DataClient() {
     },
     retry: 1,
   });
-  // console.log(data.inventory.custom);
 
   const handleEdit = async () => {
     try {

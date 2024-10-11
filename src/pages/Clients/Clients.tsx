@@ -6,10 +6,10 @@ import {
 } from "material-react-table";
 import { Box, IconButton, Tooltip } from "@mui/material";
 import { useSetAtom } from "jotai";
-import { formatDateString } from "../../utils/utils";
+import { csvConfig, formatDateString } from "../../utils/utils";
 import { TypePeripheral } from "../../utils/types/types";
 import { Link, useNavigate } from "react-router-dom";
-import { mkConfig, generateCsv, download } from "export-to-csv";
+import { generateCsv, download } from "export-to-csv";
 import { requestWithToken } from "../../utils/request";
 import BlackScreen from "./Shell";
 import { openModalAtom } from "../../Context/ModalContext";
@@ -45,12 +45,6 @@ type InventoryTypeEspecified = {
   uid: string;
 };
 
-const csvConfig = mkConfig({
-  fieldSeparator: ",",
-  decimalSeparator: ".",
-  useKeysAsHeaders: true,
-});
-
 const DataTableAgents: React.FC = () => {
   // const [clients, setClients] = useState<InventoryTypeEspecified[] | null>([]);
   const fileInputRef = useRef<any>();
@@ -75,17 +69,33 @@ const DataTableAgents: React.FC = () => {
 
   const handleExportData = () => {
     if (!clients || clients.length <= 0) return;
-    console.log(clients);
+    // console.log(clients.map((item) => item.));
 
     // Mapeie os clientes para o formato adequado antes de gerar o CSV
-    const clientsData = clients.map((client: any) => ({
-      ...client.inventory.system,
-      // patrimony: client.custom.patrimony,
-      categoria: client.inventory.system.type_machine,
-      "Data de inclusão": formatDateString(client.createdAt),
-      RAM: client.inventory.memory.total + " GB",
-      Armazenamento: client.inventory.storage.total + " GB",
-    }));
+    const clientsData = clients.map(
+      ({
+        createdAt,
+        diskTotal,
+        hostname,
+        memoryTotal,
+        online,
+        so,
+        typeMachine,
+        uid,
+        userLogged,
+      }) => ({
+        // patrimony: client.custom.patrimony,
+        uid,
+        hostname,
+        userLogged,
+        so,
+        online,
+        Tipo: typeMachine,
+        "Data de inclusão": formatDateString(createdAt),
+        RAM: memoryTotal,
+        "Armazenamento (GB)": diskTotal,
+      })
+    );
 
     const csv = generateCsv(csvConfig)(clientsData);
     download(csvConfig)(csv);

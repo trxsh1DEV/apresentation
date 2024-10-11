@@ -4,9 +4,9 @@ import {
   useMaterialReactTable,
   type MRT_ColumnDef,
 } from "material-react-table";
-import { formatDateString, sanitizedSearch } from "@/utils/utils";
+import { csvConfig, formatDateString, sanitizedSearch } from "@/utils/utils";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, MinusCircle, Plus } from "lucide-react";
+import { PlusCircle, MinusCircle, Plus, Download } from "lucide-react";
 import { sendCommand } from "@/utils/utils-react";
 import { useSetAtom } from "jotai";
 import { openModalAtom } from "@/Context/ModalContext";
@@ -28,6 +28,13 @@ import { LoadingSpinner } from "../ui/myIsLoading";
 import requestWithToken from "@/utils/request";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { UnexpectedError } from "@/data/error/UnexpectedError";
+import { download, generateCsv } from "export-to-csv";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 //example data type
 interface BaseSoftware {
@@ -265,6 +272,21 @@ const TableSoftwares = ({ id }: { id: string }) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  const handleExportData = () => {
+    if (!softwaresData || softwaresData.length <= 0) return;
+
+    // Transforma os dados antes de gerar o CSV
+    const transformedSoftwaresData = softwaresData.map(
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      ({ first_inventory, ...rest }) => ({
+        ...rest,
+      })
+    );
+
+    const csv = generateCsv(csvConfig)(transformedSoftwaresData); // Gera o CSV com os dados transformados
+    download(csvConfig)(csv); // Faz o download do arquivo
+  };
+
   const columns = useMemo<MRT_ColumnDef<InterfaceSoftwareItem>[]>(
     () => [
       {
@@ -352,6 +374,28 @@ const TableSoftwares = ({ id }: { id: string }) => {
     onRowSelectionChange: setRowSelection,
     state: { rowSelection, isLoading },
     initialState: { pagination: { pageSize: 25, pageIndex: 0 } },
+    renderTopToolbarCustomActions: () => (
+      <TooltipProvider
+      // sx={{
+      //   display: 'flex',
+      //   gap: '16px',
+      //   padding: '8px',
+      //   flexWrap: 'wrap',
+      // }}
+      >
+        <Tooltip>
+          <TooltipTrigger asChild className="ml-6">
+            {/* Remova o botão extra */}
+            <Button variant="outline" size="icon" onClick={handleExportData}>
+              <Download />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Exportar tudo</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    ),
   });
 
   softwareNameList =
@@ -368,7 +412,7 @@ const TableSoftwares = ({ id }: { id: string }) => {
         />
       ),
       title: "Loja de aplicativos",
-      size: "1200",
+      size: "large",
     });
   };
 

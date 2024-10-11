@@ -12,12 +12,19 @@ import {
 } from "material-react-table";
 import { TypePeripherical } from "../../utils/types/types";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { formatDateString } from "../../utils/utils";
-import { download, generateCsv, mkConfig } from "export-to-csv";
+import { csvConfig, formatDateString } from "../../utils/utils";
+import { download, generateCsv } from "export-to-csv";
 import { requestWithToken } from "../../utils/request";
 // import { ArrowsClockwise, Pen, Trash } from "phosphor-react";
 import TablePeriphericals from "./Periphericals";
-import { Pen, Trash } from "lucide-react";
+import { Download, Pen, Trash } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 // import { Pen, RefreshCcw, Trash } from "lucide-react";
 // import { useDispatch } from "react-redux";
 
@@ -28,11 +35,12 @@ type UserApiResponse = {
   };
 };
 
-const csvConfig = mkConfig({
-  fieldSeparator: ",",
-  decimalSeparator: ".",
-  useKeysAsHeaders: true,
-});
+// const transformDataForCsv = (data: TypePeripherical[]) => {
+//   return data.map((item) => ({
+//     ...item,
+//     category: item.category.join(", "), // Transforma o array em string
+//   }));
+// };
 
 const Peripherical: FC = () => {
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>(
@@ -54,7 +62,7 @@ const Peripherical: FC = () => {
     // refetch,
   } = useQuery<UserApiResponse>({
     queryKey: [
-      "table-data",
+      "table-stock-data",
       columnFilters,
       pagination.pageIndex,
       pagination.pageSize,
@@ -82,27 +90,85 @@ const Peripherical: FC = () => {
 
   const handleExportData = () => {
     if (!data || data.length <= 0) return;
-    data.map((asd) => console.log({ ...asd }));
-    const periphericals: any = data.map((client) => ({ ...client }));
-    const csv = generateCsv(csvConfig)(periphericals);
-    download(csvConfig)(csv);
+
+    // Transforma os dados antes de gerar o CSV
+    const transformedData = data.map(
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      ({ createdAt, _id, updatedAt, __v, ...rest }) => ({
+        ...rest,
+        category: rest.category.join(", "), // Transforma o array em string
+      })
+    );
+
+    const csv = generateCsv(csvConfig)(transformedData); // Gera o CSV com os dados transformados
+    download(csvConfig)(csv); // Faz o download do arquivo
   };
-  // console.log(handleExportData());
 
   const columns = useMemo<MRT_ColumnDef<TypePeripherical>[]>(
     () => [
-      { accessorKey: "status", header: "Situação" },
+      {
+        accessorKey: "status",
+        header: "Situação",
+        enableSorting: false,
+      },
       { accessorKey: "host", header: "Host" },
-      { accessorKey: "class", header: "Classe" },
-      { accessorKey: "sample", header: "Modelo/Versão" },
+      {
+        accessorKey: "class",
+        header: "Classe",
+        enableColumnFilter: false,
+        enableSorting: false,
+      },
+      {
+        accessorKey: "sample",
+        header: "Modelo/Versão",
+        enableColumnFilter: false,
+        enableSorting: false,
+      },
       { accessorKey: "manufacturer", header: "Fabricante" },
       { accessorKey: "department", header: "Departamento" },
-      { accessorKey: "person", header: "Pessoa" },
-      { accessorKey: "category", header: "Categoria" },
+      {
+        accessorKey: "person",
+        header: "Pessoa",
+        enableSorting: false,
+      },
+      {
+        accessorKey: "category",
+        header: "Categoria",
+        Cell: ({ cell }: any) => {
+          const value = cell.getValue()?.join(", ");
+          // return value?.length > 29 ? value?.slice(0, 29) + "..." : value;
+          return (
+            <div className="truncate" title={value}>
+              {value}
+            </div>
+          );
+        },
+      },
+      {
+        accessorKey: "in_stock",
+        header: "Em estoque",
+        Cell: ({ cell }: any) => (cell.getValue() ? "Sim" : "Não"),
+        enableColumnFilter: false,
+      },
       {
         accessorKey: "createdAt",
         header: "Data",
         Cell: ({ cell }: any) => formatDateString(cell.getValue()),
+        enableColumnFilter: false,
+      },
+      {
+        accessorKey: "observation",
+        header: "Observação",
+        enableColumnFilter: false,
+        enableSorting: false,
+        Cell: ({ cell }: any) => {
+          const value = cell.getValue();
+          return (
+            <div className="truncate" title={value}>
+              {value}
+            </div>
+          );
+        },
       },
     ],
     []
@@ -159,14 +225,44 @@ const Peripherical: FC = () => {
     onColumnFiltersChange: setColumnFilters,
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
+    defaultColumn: { maxSize: 150 },
+    displayColumnDefOptions: {
+      "mrt-row-actions": {
+        header: "Ações",
+      },
+    },
+    renderTopToolbarCustomActions: () => (
+      <TooltipProvider
+      // sx={{
+      //   display: 'flex',
+      //   gap: '16px',
+      //   padding: '8px',
+      //   flexWrap: 'wrap',
+      // }}
+      >
+        <Tooltip>
+          <TooltipTrigger asChild className="ml-8">
+            {/* Remova o botão extra */}
+            <Button variant="outline" size="icon" onClick={handleExportData}>
+              <Download />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Exportar tudo</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    ),
   });
 
   return (
-    <>
-      <h1 onClick={() => handleExportData()}>Equipamentos</h1>
+    <main>
+      {/* <h1 onClick={() => handleExportData()}>Equipamentos</h1> */}
+      {/* <ScrollArea> */}
       <MaterialReactTable table={table} />
+      {/* </ScrollArea> */}
       <TablePeriphericals />
-    </>
+    </main>
   );
 };
 

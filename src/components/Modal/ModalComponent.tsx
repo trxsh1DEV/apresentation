@@ -1,4 +1,4 @@
-import React from "react";
+import { FC } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { closeModalAtom, modalAtom } from "../../Context/ModalContext";
 import {
@@ -12,14 +12,26 @@ import "./style.css";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { DialogDescription } from "@radix-ui/react-dialog";
 
-const Modal: React.FC = () => {
+const sizeClasses = {
+  small: "max-w-[400px]",
+  medium: "max-w-[800px]",
+  large: "max-w-[1000px]",
+};
+
+const Modal: FC = () => {
   const { isOpen, modalProps } = useAtomValue(modalAtom);
   const closeModal = useSetAtom(closeModalAtom);
 
   if (!isOpen || !modalProps) return null;
 
-  const { title, content, size, onConfirm, onCancel, independenceMode } =
-    modalProps;
+  const {
+    title,
+    content,
+    size = "medium",
+    onConfirm,
+    onCancel,
+    independenceMode,
+  } = modalProps;
 
   if (independenceMode) {
     return (
@@ -44,10 +56,10 @@ const Modal: React.FC = () => {
       <Dialog open={isOpen} onOpenChange={() => closeModal()}>
         <DialogContent
           aria-describedby="modal description"
-          className={`sm:max-w-[90%] md:max-w-[${size ? size : 800}px] max-h-[90vh] min-w-96 bg-zinc-900 text-white border-zinc-700`}
+          className={`sm:max-w-[90%] ${sizeClasses[size]} max-h-[90vh] min-w-96 bg-zinc-900 text-white border-zinc-700`}
         >
           <DialogHeader className="border-b border-zinc-700 pb-2">
-            <DialogTitle className="text-xl font-bold border-none">
+            <DialogTitle className="text-2xl font-bold border-none">
               {title}
             </DialogTitle>
             <DialogDescription></DialogDescription>

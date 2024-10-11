@@ -1,5 +1,7 @@
+import { mkConfig } from "export-to-csv";
+
 // 23/09/2024 17:42:05
-export const formatDateString = (dateString: string | undefined) => {
+export const formatDateString = (dateString: string | Date) => {
   if (!dateString) return;
   return new Date(dateString).toLocaleString().replace(/,/g, "");
 };
@@ -159,3 +161,9 @@ export const containsString = (text: string, searchString: string) => {
   const regex = new RegExp(searchString, "i"); // Cria uma regex case-insensitive
   return regex.test(text); // Verifica se a string contém a busca
 };
+
+export const csvConfig = mkConfig({
+  fieldSeparator: ",",
+  decimalSeparator: ".",
+  useKeysAsHeaders: true,
+});

@@ -40,6 +40,23 @@
 
     --warning: 38 92% 50%;
     --warning-foreground: 48 96% 89%;
+
+    /* ::-webkit-scrollbar-track {
+      background-color: transparent;
+    } */
+    
+    ::-webkit-scrollbar {
+      right: 0;
+      width: 12px;
+      height: 12px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background-color: #999;
+      border-radius: 8px;
+      width: 12px;
+      height: 12px;
+    }
   }
  
   .dark {
@@ -88,6 +105,14 @@
     @apply bg-background text-foreground;
     font-family: 'Roboto', sans-serif;
   }
+}
+
+.truncate {
+  width: 141px;              /*Ajuste a largura conforme necessário*/
+  white-space: nowrap;      /* Não quebra o texto */
+  overflow: hidden;         /* Oculta o texto que excede o contêiner */
+  text-overflow: ellipsis;  /* Adiciona '...' ao final */
+  display: block;           /* Torna o elemento um bloco */
 }
 
 /* .ProseMirror {

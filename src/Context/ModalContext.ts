@@ -7,7 +7,7 @@ export interface ModalProps {
   onConfirm?: () => void;
   onCancel?: () => void;
   independenceMode?: boolean;
-  size?: string;
+  size?: "small" | "medium" | "large"; // Tamanhos predefinidos
 }
 
 interface ModalState {
