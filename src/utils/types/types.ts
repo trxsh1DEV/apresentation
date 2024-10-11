@@ -55,6 +55,7 @@ type TypeInventoryGeneral = {
   };
   system: {
     so: string;
+    antivirus?: string;
     version: string;
     architecture: string;
     domain: string;

@@ -57,6 +57,7 @@ const AgentInfo: FC<AgentInventoryType> = ({
               Sistema
             </h2>
             <p>SO: {inventoryGeneral.system.so}</p>
+            <p>Antivirus: {inventoryGeneral.system?.antivirus || "N/A"}</p>
             <p>Versão: {inventoryGeneral.system.version}</p>
             <p>Arquitetura: {inventoryGeneral.system.architecture}</p>
             <p>Domínio: {inventoryGeneral.system.domain}</p>
