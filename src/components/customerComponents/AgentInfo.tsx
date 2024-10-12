@@ -35,9 +35,7 @@ const AgentInfo: FC<AgentInventoryType> = ({
             <p>Frequência: {inventoryGeneral.cpu.cpu_freq} MHz</p>
             <p>Núcleos Físicos: {inventoryGeneral.cpu.physical_cores}</p>
             <p>Núcleos Lógicos: {inventoryGeneral.cpu.logic_cores}</p>
-            {inventoryGeneral.cpu.cpu_temp && (
-              <p>Temperatura: {inventoryGeneral.cpu.cpu_temp}°C</p>
-            )}
+            <p>Temperatura: {inventoryGeneral.cpu?.cpu_temp || "N/A"}°C</p>
             <p>Uso de CPU: {inventoryGeneral.cpu.cpu_usage}%</p>
           </div>
 
