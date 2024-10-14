@@ -516,7 +516,6 @@ const Dashboard = () => {
     );
 
   const machineCounts = countMachineTypes(machineTypes);
-  console.log(brandManufactures);
   const brandCounts = countByManufacturers(
     brandManufactures,
     Object.keys(brandManufactures[0])[0] || "manufacturer",
@@ -541,6 +540,7 @@ const Dashboard = () => {
     Object.keys(cpuModelName[0])[0] || "cpuModel",
     ["Intel", "AMD"]
   );
+
   // const cpuModelCounts = {
   //   branchsCpu: {
   //     AMD: 2,
@@ -689,20 +689,19 @@ const Dashboard = () => {
   };
 
   const cpuBranchChart: any = {
-    labels: ["AMD", "Intel"],
+    labels: ["Intel", "AMD"],
     datasets: [
       {
         label: "Processadores",
         data: Object.values(cpuModelCounts.branchsCpu),
-        backgroundColor: [
-          "rgba(255, 99, 132, 0.2)", // Cor para AMD (vermelho mais escuro)
-          "rgba(54, 162, 235, 0.2)", // Cor para Intel (azul mais escuro)
-        ],
-        borderColor: ["rgba(255, 99, 132, 1)", "rgba(54, 162, 235, 1)"],
+        backgroundColor: ["rgba(54, 162, 235, 0.2)", "rgba(255, 99, 132, 0.2)"],
+        borderColor: ["rgba(54, 162, 235, 1)", "rgba(255, 99, 132, 1)"],
         borderWidth: 1,
       },
     ],
   };
+
+  console.log(cpuModelCounts);
 
   const cpuNameRankChart = {
     labels: [

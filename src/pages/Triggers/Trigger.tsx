@@ -5,7 +5,6 @@ import { BASE_URL, requestWithToken } from "@/utils/request";
 import { H1Custom } from "@/components/customerComponents/Customercomponents";
 
 interface Alert {
-  display_name: string;
   name: string;
   isActive: boolean;
 }
@@ -24,12 +23,12 @@ const AlertTrigger: React.FC = () => {
 
   const fetchAlerts = useCallback(async () => {
     try {
-      const response = await requestWithToken.get(`${BASE_URL}/triggers/all`);
+      const response = await requestWithToken.get(`${BASE_URL}/triggers`);
       if (!response?.data) {
         throw new Error("Falha ao buscar alertas da API");
       }
       const data = await response.data;
-      setAlerts(data);
+      setAlerts(data.triggers);
     } catch (err) {
       console.error("Erro ao buscar alertas:", err);
     }
@@ -83,7 +82,7 @@ const AlertTrigger: React.FC = () => {
             key={alert.name}
             className="flex items-center justify-between bg-gray-800 p-3 rounded"
           >
-            <span className="text-2xl">{alert.display_name}</span>
+            <span className="text-2xl">{alert.name}</span>
             <div className="flex items-center space-x-2">
               <span className="text-xl ml-4">
                 {alert.isActive ? "Ativado" : "Desativado"}
@@ -92,7 +91,7 @@ const AlertTrigger: React.FC = () => {
                 variant="outline"
                 pressed={alert.isActive}
                 onPressedChange={() => toggleAlert(alert.name)}
-                aria-label={`Toggle ${alert.display_name}`}
+                aria-label={`Toggle ${alert.name}`}
                 size={"lg"}
               >
                 <Filter

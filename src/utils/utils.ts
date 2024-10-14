@@ -115,6 +115,12 @@ export const countByCpu = (
       },
       item: DataItem
     ) => {
+      // Inicializa os campos de AMD e Intel no acumulador
+      acc.branchsCpu["Intel"] = acc.branchsCpu["Intel"] || 0;
+      acc.branchsCpu["AMD"] = acc.branchsCpu["AMD"] || 0;
+      acc.nameCpu["Intel"] = acc.nameCpu["Intel"] || 0;
+      acc.nameCpu["AMD"] = acc.nameCpu["AMD"] || 0;
+
       const brand = findValueInString(item[field], valueSearch);
 
       if (brand) {
@@ -134,7 +140,7 @@ export const countByCpu = (
 
       return acc;
     },
-    { branchsCpu: {}, nameCpu: {} }
+    { branchsCpu: {}, nameCpu: {} } // Inicialização do acumulador
   );
 };
 
