@@ -29,10 +29,8 @@ const UserProfile: FC = () => {
 
   const fetchUser = useCallback(async () => {
     try {
-      const resultToken = await requestWithToken.get("/auth/profile");
-      const { data: user } = await requestWithToken.get(
-        `users/${resultToken.data.email}`
-      );
+      // const resultToken = await requestWithToken.get("/auth/profile");
+      const { data: user } = await requestWithToken.get(`users`);
 
       if (!user || !user.email || !user.username || !user.company) {
         return setFormState(null);

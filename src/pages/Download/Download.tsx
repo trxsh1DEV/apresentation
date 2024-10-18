@@ -5,11 +5,9 @@ const DownloadPage = () => {
   const [company, setCompany] = useState<any | null>(null);
   const fetchUser = useCallback(async () => {
     try {
-      const resultToken = await requestWithToken.get("/auth/profile");
+      // const resultToken = await requestWithToken.get("/auth/profile");
 
-      const { data: user } = await requestWithToken.get(
-        `users/${resultToken.data.email}`
-      );
+      const { data: user } = await requestWithToken.get(`users`);
 
       if (!user || !user.email || !user.username || !user.company) {
         return setCompany(null);

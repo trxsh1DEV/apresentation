@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,6 +28,7 @@ import {
   CommandGroup,
 } from "@/components/ui/command";
 import { useDebounce } from "@uidotdev/usehooks";
+import { Label } from "@/components/ui/label";
 
 interface App {
   name: string;
@@ -94,40 +95,70 @@ const ProhibitedSoftwareInput: FC<{ onSelect: (name: string) => void }> = ({
 };
 
 const AddItemPage: React.FC = () => {
-  const [customInputValue, setCustomInputValue] = useState<string>("");
-  const [selectedField, setSelectedField] = useState<string>("");
+  const customTypeRef = useRef<any>(null); // useRef para type
+  const customValueRef = useRef<any>(null); // useRef para value
+  const telegramChatIdRef = useRef<HTMLInputElement>(null); // useRef para chatId
+  const telegramTokenRef = useRef<HTMLInputElement>(null);
   const [prohibitedSoftware, setProhibitedSoftware] = useState<string>("");
   const { toast } = useToast();
 
-  const handleCustomInputChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setCustomInputValue(event.target.value);
-  };
-
   const handleSelectChange = (value: string) => {
-    setSelectedField(value);
+    customTypeRef.current = value; // Atualiza o valor da referência
   };
 
-  const handleProhibitedSoftwareSelect = (name: string) => {
-    setProhibitedSoftware(name);
-  };
+  // const handleAddCustom = async () => {
+  //   console.log("oi");
+  //   const customValue = customValueRef.current?.value;
+  //   const customType = customTypeRef.current;
+  //   console.log(customType);
+  //   console.log(customValue);
 
+  //   if (!customType || !customValue) return;
+
+  //   try {
+  //     await requestWithToken.post("/company/custom", {
+  //       customType: customType,
+  //       value: [customValue],
+  //     });
+  //     // customTypeRef.current = ""; // Limpar ref após o uso
+  //     customValueRef.current = ""; // Limpar ref após o uso
+  //     toast({
+  //       title: "Sucesso",
+  //       className: "bg-success border-zinc-100",
+  //       variant: "destructive",
+  //       description: `Item '${customValue}' adicionado com sucesso`,
+  //     });
+  //   } catch (error: any) {
+  //     console.log(error.message);
+  //     toast({
+  //       title: "Erro",
+  //       variant: "destructive",
+  //       description: `Ocorreu um problema para adicionar esse item. Erro ${error.message}`,
+  //     });
+  //   }
+  // };
   const handleAddCustom = async () => {
-    if (!customInputValue || !selectedField) return;
+    const customValue = customValueRef.current?.value;
+    const customType = customTypeRef.current;
+
+    if (!customValue || !customType) return; // Checa se ambos têm valores válidos
 
     try {
       await requestWithToken.post("/company/custom", {
-        customType: selectedField,
-        value: [customInputValue],
+        customType: customType,
+        value: [customValue],
       });
-      setCustomInputValue("");
-      setSelectedField("");
+
+      // Ao invés de limpar as referências diretamente, apenas limpamos o input no DOM
+      if (customValueRef.current) {
+        customValueRef.current.value = ""; // Limpa o campo de input após o envio
+      }
+
       toast({
         title: "Sucesso",
         className: "bg-success border-zinc-100",
         variant: "destructive",
-        description: `Item '${customInputValue}' adicionado com sucesso`,
+        description: `Item '${customValue}' adicionado com sucesso`,
       });
     } catch (error: any) {
       toast({
@@ -136,6 +167,43 @@ const AddItemPage: React.FC = () => {
         description: `Ocorreu um problema para adicionar esse item. Erro ${error.message}`,
       });
     }
+  };
+
+  const handleUpdateIntegration = async () => {
+    const telegramChatId = telegramChatIdRef.current?.value;
+    const telegramToken = telegramTokenRef.current?.value;
+
+    if (!telegramChatId || !telegramToken) {
+      toast({
+        title: "Erro",
+        variant: "destructive",
+        description: "Por favor, preencha todos os campos de integração.",
+      });
+      return;
+    }
+
+    try {
+      await requestWithToken.patch("/company", {
+        telegramToken: telegramToken,
+        telegramChatId: telegramChatId,
+      });
+      toast({
+        title: "Sucesso",
+        className: "bg-success border-zinc-100",
+        variant: "destructive",
+        description: "Integração atualizada com sucesso",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        variant: "destructive",
+        description: `Ocorreu um problema ao atualizar a integração. Erro: ${error.message}`,
+      });
+    }
+  };
+
+  const handleProhibitedSoftwareSelect = (name: string) => {
+    setProhibitedSoftware(name);
   };
 
   const handleAddProhibitedSoftware = () => {
@@ -158,12 +226,15 @@ const AddItemPage: React.FC = () => {
       </h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Card para Customização Geral */}
-        <Card className="flex flex-col text-center">
+        <Card className="flex flex-col text-center min-w-[400px]">
           <CardHeader>
             <CardTitle>Customização Geral</CardTitle>
           </CardHeader>
           <CardContent className="flex-grow">
-            <Select onValueChange={handleSelectChange}>
+            <Select
+              onValueChange={handleSelectChange}
+              // defaultValue=""
+            >
               <SelectTrigger className="mb-4">
                 <SelectValue placeholder="Selecione uma das opções" />
               </SelectTrigger>
@@ -177,8 +248,7 @@ const AddItemPage: React.FC = () => {
               </SelectContent>
             </Select>
             <Input
-              value={customInputValue}
-              onChange={handleCustomInputChange}
+              ref={customValueRef} // Atribui a referência ao input
               placeholder="Digite o valor que quer adicionar"
               className="mb-4"
             />
@@ -210,8 +280,37 @@ const AddItemPage: React.FC = () => {
           </CardFooter>
         </Card>
 
+        <Card className="flex flex-col ">
+          <CardHeader>
+            <CardTitle className="text-center">Integrações</CardTitle>
+          </CardHeader>
+          <CardContent className="flex-grow">
+            <Label htmlFor="telegramChatId">Telegram Chat ID</Label>
+            <Input
+              ref={telegramChatIdRef}
+              id="telegramChatId"
+              placeholder="Ex: -12529385471"
+              className="my-2"
+            />
+            <Label htmlFor="telegramToken">Telegram Token</Label>
+            <Input
+              ref={telegramTokenRef}
+              id="telegramToken"
+              placeholder="Ex: 7505460897:AAHpRFILmlzefeJ_KzA2ywtZgpXx2uvRMLW"
+              className="mb-4 mt-2"
+            />
+          </CardContent>
+          <CardFooter>
+            <Button
+              onClick={handleUpdateIntegration}
+              className="w-full text-lg"
+            >
+              Atualizar Integração
+            </Button>
+          </CardFooter>
+        </Card>
         {/* Card para Futuras Customizações */}
-        <Card className="flex flex-col text-center">
+        {/* <Card className="flex flex-col text-center">
           <CardHeader>
             <CardTitle>Futuras Customizações</CardTitle>
           </CardHeader>
@@ -223,7 +322,7 @@ const AddItemPage: React.FC = () => {
               Em breve
             </Button>
           </CardFooter>
-        </Card>
+        </Card> */}
       </div>
     </div>
   );
