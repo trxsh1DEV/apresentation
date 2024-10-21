@@ -15,14 +15,13 @@ import BlackScreen from "./Shell";
 import { openModalAtom } from "../../Context/ModalContext";
 import {
   FileText,
-  // Code,
   // Eraser,
   // Forward,
   Package,
   Eye,
   // ShieldCheck,
-  Upload,
-  Code,
+  FileCode2,
+  Code2,
 } from "lucide-react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ErrorBoundary } from "react-error-boundary";
@@ -128,7 +127,7 @@ const DataTableAgents: React.FC = () => {
       {
         accessorFn: (row) => row.diskTotal,
         header: "Armazenamento",
-        Cell: ({ cell }: any) => cell.getValue() + " GB",
+        Cell: ({ cell }: any) => cell.getValue().toFixed(2) + " GB",
       },
       // {
       //   accessorKey: "inventory.custom.patrimony",
@@ -146,7 +145,7 @@ const DataTableAgents: React.FC = () => {
       {
         accessorKey: "memoryTotal",
         header: "RAM",
-        Cell: ({ cell }: any) => cell.getValue() + " GB",
+        Cell: ({ cell }: any) => cell.getValue().toFixed(2) + " GB",
       },
     ],
     []
@@ -258,7 +257,7 @@ const DataTableAgents: React.FC = () => {
               onClick={() => handleTerminal(row.id)}
               disabled={!row.original.online}
             >
-              <Code size={32} />
+              <Code2 size={32} />
             </IconButton>
           </span>
         </Tooltip>
@@ -272,7 +271,7 @@ const DataTableAgents: React.FC = () => {
         >
           <span>
             <IconButton
-              color="error"
+              color="warning"
               onClick={() => fileInputRef.current.click()}
               disabled={!row.original.online}
             >
@@ -285,7 +284,7 @@ const DataTableAgents: React.FC = () => {
                 }
                 style={{ display: "none" }}
               />
-              <Upload size={32} />
+              <FileCode2 size={32} />
             </IconButton>
           </span>
         </Tooltip>

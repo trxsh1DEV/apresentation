@@ -22,7 +22,7 @@ export const createTableTheme = (mode: Theme): ThemeOptions => ({
       main: "#d57cd8",
     },
     warning: {
-      main: "#e2eb34",
+      main: "#fc9118",
     },
   },
   components: {

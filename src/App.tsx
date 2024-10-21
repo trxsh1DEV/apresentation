@@ -23,9 +23,10 @@ import PaymentFailurePage from "./pages/Payment/PaymentFailure";
 import PaymentPage from "./pages/Payment/PaymentPage";
 import Trial from "./pages/Payment/Trial";
 import { Toaster } from "./components/ui/toaster";
-import { ToastDemo } from "./components/customerComponents/ToastDemo";
 import { RemoteCommandPage } from "./pages/Clients/CommandsPage";
 import Dashboard from "./pages/Dashboards/Dashboards";
+import Register from "./pages/Auth/Register";
+import MultiStepForm from "./pages/Auth/FormMultiStep";
 
 export default function App() {
   const router = createBrowserRouter([
@@ -123,9 +124,25 @@ export default function App() {
           element: <LoginPage />,
         },
         {
-          path: "/toast",
-          element: <ToastDemo />,
+          path: "/confirm",
+          element: <MultiStepForm />,
         },
+        {
+          path: "/register",
+          element: <Register />,
+        },
+        // {
+        //   path: "/register",
+        //   element: <Register />,
+        // },
+        // {
+        //   path: "/register/test",
+        //   element: <MultiStepForm />,
+        // },
+        // {
+        //   path: "/toast",
+        //   element: <ToastDemo />,
+        // },
       ],
     },
   ]);
