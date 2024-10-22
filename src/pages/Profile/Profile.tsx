@@ -32,13 +32,13 @@ const UserProfile: FC = () => {
       // const resultToken = await requestWithToken.get("/auth/profile");
       const { data: user } = await requestWithToken.get(`users`);
 
-      if (!user || !user.email || !user.username || !user.company) {
+      if (!user || !user.email || !user.company) {
         return setFormState(null);
       }
 
       setFormState({
         email: user.email,
-        username: user.username,
+        username: user.username || "",
         company: user.company.name,
         password: "",
         initialUsername: user.username,

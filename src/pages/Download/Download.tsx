@@ -9,7 +9,7 @@ const DownloadPage = () => {
 
       const { data: user } = await requestWithToken.get(`users`);
 
-      if (!user || !user.email || !user.username || !user.company) {
+      if (!user || !user.email || !user.company) {
         return setCompany(null);
       }
 
