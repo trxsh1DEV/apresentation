@@ -59,6 +59,7 @@ interface MachineData {
   manufacturer: string;
   memoryType: string;
   hoursOnMonth: string[];
+  diskTotal: number[];
 }
 
 interface ChartWrapperProps {
@@ -431,7 +432,10 @@ const Dashboard = () => {
         // .trim(),
       });
       acc.cpuModelName.push({ cpuModel: item.cpuModel });
-      acc.diskTotal.push({ diskTotal: item.diskTotal });
+      // acc.diskTotal.push({
+      //   diskTotal: item.diskTotal[0],
+      // });      
+      acc.diskTotal.push(...item.diskTotal.map((disk: number) => ({ diskTotal: disk })));
       acc.memoryTotal.push({
         memoryTotal: item.memoryTotal,
         memoryType: item.memoryType,
@@ -461,7 +465,9 @@ const Dashboard = () => {
       softwareCount: {} as { [key: string]: number },
     }
   );
+  // console.log(diskTotal)
   const groupedData = groupDiskSizes(diskTotal);
+  console.log(groupedData)
 
   const generalCategories = mapToGeneralCategories(
     softwareCount,
@@ -700,8 +706,6 @@ const Dashboard = () => {
       },
     ],
   };
-
-  console.log(cpuModelCounts);
 
   const cpuNameRankChart = {
     labels: [

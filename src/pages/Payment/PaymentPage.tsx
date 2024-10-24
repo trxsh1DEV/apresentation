@@ -25,7 +25,7 @@ const plans: Plan[] = [
   },
   {
     name: "Starter",
-    price: 5.99,
+    price: 3.99,
     agentLimit: 250,
     description: [
       "Até 250 agentes para implementar",
@@ -43,7 +43,7 @@ const plans: Plan[] = [
   },
   {
     name: "Enterprise",
-    price: 7.99,
+    price: 4.99,
     agentLimit: 10000,
     description: [
       "Agentes ilimitados",

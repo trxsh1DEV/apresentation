@@ -214,6 +214,7 @@ const DataTableAgents: React.FC = () => {
     paginationDisplayMode: "pages",
     initialState: {
       pagination: { pageSize: 20, pageIndex: 0 },
+      sorting: [{id: 'createdAt', desc: true}],
       showColumnFilters: true,
     },
     muiPaginationProps: {
@@ -263,17 +264,19 @@ const DataTableAgents: React.FC = () => {
         </Tooltip>
 
         <Tooltip
-          title={
-            row.original.online
-              ? "Enviar Script (.bat | .ps1)"
-              : "Agent Offline"
-          }
+          // title={
+          //   row.original.online
+          //     ? "Enviar Script (.bat | .ps1)"
+          //     : "Agent Offline"
+          // }
+          title={"Em manutenção"}
         >
           <span>
             <IconButton
               color="warning"
               onClick={() => fileInputRef.current.click()}
-              disabled={!row.original.online}
+              // disabled={!row.original.online}
+              disabled={true}
             >
               <input
                 type="file"
