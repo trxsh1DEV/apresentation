@@ -19,12 +19,6 @@ import { requestWithToken } from "../../utils/request";
 import TablePeriphericals from "./Periphericals";
 import { Download, Pen, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 // import { Pen, RefreshCcw, Trash } from "lucide-react";
 // import { useDispatch } from "react-redux";
 
@@ -232,26 +226,28 @@ const Peripherical: FC = () => {
       },
     },
     renderTopToolbarCustomActions: () => (
-      <TooltipProvider
+      // <TooltipProvider
       // sx={{
       //   display: 'flex',
       //   gap: '16px',
       //   padding: '8px',
       //   flexWrap: 'wrap',
       // }}
-      >
-        <Tooltip>
-          <TooltipTrigger asChild className="ml-8">
-            {/* Remova o botão extra */}
+      // >
+      //         <Tooltip>
+      //     <TooltipTrigger asChild className="ml-2">
+      //       <Button variant="outline" size="icon" onClick={handleExportData}>
+      //         <Download />
+      //       </Button>
+      //     </TooltipTrigger>
+      //     <TooltipContent>
+      //       <p>Exportar tudo</p>
+      //     </TooltipContent>
+      //   </Tooltip>
+      // </TooltipProvider>
             <Button variant="outline" size="icon" onClick={handleExportData}>
-              <Download />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Exportar tudo</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <Download />
+    </Button>
     ),
   });
 

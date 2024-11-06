@@ -1,10 +1,10 @@
-import React, { Suspense, useMemo, useRef } from "react";
+import React, { Suspense, useMemo, useRef, useState } from "react";
 import {
   MaterialReactTable,
   useMaterialReactTable,
   type MRT_ColumnDef,
 } from "material-react-table";
-import { Box, IconButton, Tooltip } from "@mui/material";
+import { IconButton, Menu, Tooltip } from "@mui/material";
 import { useSetAtom } from "jotai";
 import { csvConfig, formatDateString } from "../../utils/utils";
 import { TypePeripheral } from "../../utils/types/types";
@@ -22,6 +22,9 @@ import {
   // ShieldCheck,
   FileCode2,
   Code2,
+  ScreenShare,
+  Download,
+  MoreHorizontal,
 } from "lucide-react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ErrorBoundary } from "react-error-boundary";
@@ -29,6 +32,11 @@ import { ErrorFallback } from "@/data/error/ErrorFallback";
 import { UnexpectedError } from "@/data/error/UnexpectedError";
 import { LoadingSpinner } from "@/components/ui/myIsLoading";
 import { sendCommand } from "@/utils/utils-react";
+// import axios from "axios";
+import { useToast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
+import axios from "axios";
+// import ShowRemoteUrl from "../ShowRemoteUrl";
 
 type InventoryTypeEspecified = {
   hostname: string;
@@ -46,8 +54,6 @@ type InventoryTypeEspecified = {
 
 const DataTableAgents: React.FC = () => {
   // const [clients, setClients] = useState<InventoryTypeEspecified[] | null>([]);
-  const fileInputRef = useRef<any>();
-  const navigate = useNavigate();
   const { data: clients } = useSuspenseQuery<InventoryTypeEspecified[] | null>({
     queryKey: ["agent-table-data"],
     queryFn: async () => {
@@ -63,8 +69,6 @@ const DataTableAgents: React.FC = () => {
     },
     retry: 1,
   });
-
-  const openModal = useSetAtom(openModalAtom);
 
   const handleExportData = () => {
     if (!clients || clients.length <= 0) return;
@@ -151,40 +155,29 @@ const DataTableAgents: React.FC = () => {
     []
   );
 
-  const uploadBatFile = async (clientId: string, file: any) => {
-    const formData = new FormData();
-    formData.append("clientId", clientId);
-    formData.append("file", file);
-
-    try {
-      await requestWithToken.post("/sockets/send-file", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data", // Define o cabeçalho correto para a requisição multipart/form-data
-        },
-      });
-      alert("Upload do arquivo .bat concluído com sucesso!");
-    } catch (error: any) {
-      console.error("Erro ao fazer upload do arquivo .bat:", error);
-      alert(error.response.data.message);
-    } finally {
-      // Limpa o valor do elemento input
-      fileInputRef.current.value = "";
-    }
-  };
-
-  const handleCommandsPresets = (clientId: string) => {
-    // Navega para a nova página, passando o clientId como parâmetro na URL
-    navigate(`/remote-commands/${clientId}`);
-  };
-
-  const handleTerminal = (clientId: string) => {
-    console.log(clientId);
-    openModal({
-      content: <BlackScreen clientId={clientId} />,
-      // title: "Terminal Remoto",
-      independenceMode: true,
-    });
-  };
+  // const handleCommandsPresets = (clientId: string) => {
+  //   navigate(`/remote-commands/${clientId}`);
+  // };
+  
+  // const handleAccessRemote = async (clientId: string) => {
+  //   try {
+  //     const result = await axios.post(
+  //       "http://localhost:3333/sockets/remote-connection", 
+  //       { clientId },
+  //       {
+  //         headers: {
+  //           'Content-Type': 'application/x-www-form-urlencoded',
+  //         },
+  //       },
+  //     );
+  //     console.log(result.data);
+      
+  //     // Aqui você pode redirecionar para a interface do Guacamole
+  //     // ou abrir em uma nova janela usando o token recebido
+  //   } catch (err: any) {
+  //     console.error('Error accessing remote connection:', err);
+  //   }
+  // };
 
   const table = useMaterialReactTable({
     columns,
@@ -206,9 +199,9 @@ const DataTableAgents: React.FC = () => {
           flexWrap: "wrap",
         }}
       >
-        <button className="" onClick={handleExportData}>
-          Exportar Dados
-        </button>
+            <Button variant="outline" size="icon" onClick={handleExportData}>
+              <Download />
+            </Button>
       </div>
     ),
     paginationDisplayMode: "pages",
@@ -232,116 +225,7 @@ const DataTableAgents: React.FC = () => {
       },
     },
     renderRowActions: ({ row }) => (
-      <Box sx={{ display: "flex" }}>
-        <Tooltip
-          title={row.original.online ? "Atualizar Inventário" : "Agent Offline"}
-        >
-          <span>
-            <IconButton
-              color="secondary"
-              onClick={() => sendCommand(row.id, "get_inventory")}
-              disabled={!row.original.online}
-            >
-              <Package size={32} />
-            </IconButton>
-          </span>
-        </Tooltip>
-
-        <Tooltip
-          title={
-            row.original.online ? "Comando Personalizado" : "Agent Offline"
-          }
-        >
-          <span>
-            <IconButton
-              color="info"
-              onClick={() => handleTerminal(row.id)}
-              disabled={!row.original.online}
-            >
-              <Code2 size={32} />
-            </IconButton>
-          </span>
-        </Tooltip>
-
-        <Tooltip
-          // title={
-          //   row.original.online
-          //     ? "Enviar Script (.bat | .ps1)"
-          //     : "Agent Offline"
-          // }
-          title={"Em manutenção"}
-        >
-          <span>
-            <IconButton
-              color="warning"
-              onClick={() => fileInputRef.current.click()}
-              // disabled={!row.original.online}
-              disabled={true}
-            >
-              <input
-                type="file"
-                accept=".bat"
-                ref={fileInputRef}
-                onChange={(e: any) =>
-                  uploadBatFile(row.id, e?.target?.files[0])
-                }
-                style={{ display: "none" }}
-              />
-              <FileCode2 size={32} />
-            </IconButton>
-          </span>
-        </Tooltip>
-        {/* <Tooltip
-          title={row.original.online ? "Formatar Dispositivo" : "Agent Offline"}
-        >
-          <span>
-            <IconButton
-              color="error"
-              onClick={() => console.log(row.id)}
-              disabled={!row.original.online}
-            >
-              <Eraser size={32} />
-            </IconButton>
-          </span>
-        </Tooltip>
-        <Tooltip
-          title={row.original.online ? "Ativar BitLocker" : "Agent Offline"}
-        >
-          <span>
-            <IconButton
-              color="success"
-              onClick={() => console.log(row.id)}
-              disabled={!row.original.online}
-            >
-              <ShieldCheck size={32} />
-            </IconButton>
-          </span>
-        </Tooltip> */}
-
-        <Tooltip
-          title={
-            row.original.online ? "Comandos pré-configurados" : "Agent Offline"
-          }
-        >
-          <span>
-            <IconButton
-              color="success"
-              onClick={() => handleCommandsPresets(row.id)}
-              disabled={!row.original.online}
-            >
-              <FileText size={32} />
-            </IconButton>
-          </span>
-        </Tooltip>
-
-        <Tooltip title="Mais detalhes">
-          <Link to={`/agent/${row.id}`}>
-            <IconButton color="default">
-              <Eye size={32} />
-            </IconButton>
-          </Link>
-        </Tooltip>
-      </Box>
+      <CombinedRowActions row={row} />
     ),
   });
 
@@ -354,6 +238,225 @@ const DataTableAgents: React.FC = () => {
     </>
   );
 };
+
+const CombinedRowActions = ({row}: any) => {
+  const [anchorEl, setAnchorEl] = useState(null);
+    const fileInputRef = useRef<any>();
+  const openModal = useSetAtom(openModalAtom);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+
+  const open = Boolean(anchorEl);
+
+  const handleTerminal = (clientId: string) => {
+    console.log(clientId);
+    openModal({
+      content: <BlackScreen clientId={clientId} />,
+      // title: "Terminal Remoto",
+      independenceMode: true,
+    });
+  };
+
+  const loginAndLaunchRemoteControl = async (_email: string, _password: string, deviceID: string) => {
+    try {
+        // Faz login
+        // const loginResponse = await axios.post("http://localhost:5000/api/Login/", 
+        //     { email, password },
+        //     {
+        //         withCredentials: true,
+        //         headers: {
+        //             "Content-Type": "application/json",
+        //         }
+        //     }
+        // );
+  
+        // if (loginResponse.status !== 200) {
+        //     throw new Error('Login failed');
+        // }
+  
+        const apiKey = "cce78ef8-6864-4d0d-9493-1ebd407300db:tFhx8N2Qa1HE4KKgGLIgmKHzuBHX8CkmxVKVtLKYVqdR7Gf3"
+        // const company = await requestWithToken.get("/company");
+
+        // if(company.data.domain == "aformula"){
+        //   apiKey = "2f85339c-0f49-4068-97d7-06f7ed90611b:TZXHrKaF1uLAI2jlGWnIiyvGOm6xEZ648g2emqaefHh5ZPG7"
+        // }
+  
+        
+        // Lança o controle remoto
+        const controlResponse = await axios.get(`https://remote.infonova.com.br/api/RemoteControl/${deviceID}`, {
+            withCredentials: true,
+            headers: {
+              "X-Api-Key": apiKey
+            }
+        });
+
+        
+        if (controlResponse.status !== 200) {
+          throw new Error('Failed to launch remote control');
+      }
+  
+      const url = controlResponse.data.split("Viewer")[1];
+      
+      // Armazena a URL no sessionStorage
+      sessionStorage.setItem("remoteControlUrl", url);
+      
+      // Abre a nova aba sem precisar passar a URL como parâmetro
+      window.open(`/remote-control`, "_blank");
+    } catch (err: any) {
+      // console.log('err',err.response.data)
+      toast({
+        title: "Erro",
+        // className: "bg-success border-zinc-100",
+        variant: "destructive",
+        description: `Erro ao realizar conexão com o dispositivo. Erro: "${err.response.data || err.message}"`,
+      });
+    }
+  };
+  
+  
+  const handleClick = (event: any) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+    const uploadBatFile = async (clientId: string, file: any) => {
+    const formData = new FormData();
+    formData.append("clientId", clientId);
+    formData.append("file", file);
+
+    try {
+      await requestWithToken.post("/sockets/send-file", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data", // Define o cabeçalho correto para a requisição multipart/form-data
+        },
+      });
+      alert("Upload do arquivo .bat concluído com sucesso!");
+    } catch (error: any) {
+      console.error("Erro ao fazer upload do arquivo .bat:", error);
+      alert(error.response.data.message);
+    } finally {
+      // Limpa o valor do elemento input
+      fileInputRef.current.value = "";
+    }
+  };
+  
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  return (
+    <div className="relative flex items-center">
+      {/* Menu trigger button */}
+      <button
+  onClick={handleClick}
+  className="p-2 hover:bg-gray-600 rounded-full transition-colors"
+>
+  <MoreHorizontal className="w-5 h-5 text-gray-200 transition-colors" />
+</button>
+
+      {/* Menu */}
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        className="mt-2"
+      >
+        <div className="py-1 min-w-32 rounded-md shadow-lg">
+          {/* Upload MenuItem */}
+          <button
+            onClick={() => {
+              fileInputRef.current.click();
+              handleClose();
+            }}
+            // disabled={!row.original.online}
+            disabled={true}
+            className="w-full px-4 py-2 flex items-center gap-3 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+          <input
+            type="file"
+            accept=".bat"
+            ref={fileInputRef}
+            onChange={(e: any) =>
+              uploadBatFile(row.id, e?.target?.files[0])
+            }
+            style={{ display: "none" }}
+          />
+
+            <FileCode2 size={24} className="text-teal-400 text-" />
+            <span className="text-base">Upload</span>
+          </button>
+
+          {/* Delete MenuItem */}
+          <button
+            onClick={() => {
+              navigate(`/remote-commands/${row.id}`);
+              handleClose();
+            }}
+            disabled={!row.original.online}
+            className="w-full px-4 py-2 flex items-center gap-3 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            <FileText size={24} className="text-indigo-500" />
+            <span className="text-base">Scripts</span>
+          </button>
+        </div>
+      </Menu>
+
+    <Tooltip
+      title={row.original.online ? "Atualizar Inventário" : "Agent Offline"}
+    >
+      <span>
+        <IconButton
+          color="secondary"
+          onClick={() => sendCommand(row.id, "get_inventory")}
+          disabled={!row.original.online}
+        >
+          <Package size={32} />
+        </IconButton>
+      </span>
+    </Tooltip>
+
+    <Tooltip
+      title={
+        row.original.online ? "Terminal Remoto" : "Agent Offline"
+      }
+    >
+      <span>
+        <IconButton
+          color="info"
+          onClick={() => handleTerminal(row.id)}
+          disabled={!row.original.online}
+        >
+          <Code2 size={32} />
+        </IconButton>
+      </span>
+    </Tooltip>
+
+    <Tooltip
+      title={
+        row.original.online ? "Acesso remoto" : "Agent Offline"
+      }
+    >
+      <span>
+        <IconButton
+          color="success"
+          onClick={() => loginAndLaunchRemoteControl("", "", row.id)}
+          disabled={!row.original.online}
+        >
+          <ScreenShare size={32} />
+        </IconButton>
+      </span>
+    </Tooltip>
+
+    <Tooltip title="Mais detalhes">
+      <Link to={`/agent/${row.id}`}>
+        <IconButton color="default">
+          <Eye size={32} />
+        </IconButton>
+      </Link>
+    </Tooltip>
+  </div>
+  )
+}
 
 export default function TableAgents() {
   return (

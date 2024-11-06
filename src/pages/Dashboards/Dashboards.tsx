@@ -54,6 +54,7 @@ interface MachineData {
   hostname: string;
   so: string;
   typeMachine: string;
+  categorySoftwares: { [key: string]: string };
   memoryTotal: number;
   cpuModel: string;
   manufacturer: string;
@@ -405,7 +406,7 @@ const Dashboard = () => {
   if (isError) {
     return <div>Erro ao carregar os dados</div>;
   }
-  if (!historyData || historyData.length < 2) return;
+  if (!historyData || historyData.length < 1) return;
   //   if (!isLoading && !isError && historyData) {
   const {
     machineTypes,

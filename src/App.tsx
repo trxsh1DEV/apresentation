@@ -27,6 +27,7 @@ import { RemoteCommandPage } from "./pages/Clients/CommandsPage";
 import Dashboard from "./pages/Dashboards/Dashboards";
 import Register from "./pages/Auth/Register";
 import MultiStepForm from "./pages/Auth/FormMultiStep";
+import RemoteControlIframe from "./pages/ShowRemoteUrl";
 
 export default function App() {
   const router = createBrowserRouter([
@@ -73,10 +74,6 @@ export default function App() {
               path: "/stock/automatic",
               element: <StockAutomatic />,
             },
-            // {
-            //   path: "/teste",
-            //   element: <SeuComponente />,
-            // },
             {
               path: "/profile",
               element: <UserProfile />,
@@ -108,6 +105,10 @@ export default function App() {
             {
               path: "/custom",
               element: <AddItemPage />,
+            },
+            {
+              path: "/remote-control",
+              element: <RemoteControlIframe />,
             },
             {
               path: "/development",
