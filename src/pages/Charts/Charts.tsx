@@ -166,8 +166,6 @@ export const WrapperCharts = ({ data, id }: OmitHistoryData<ChartsProps>) => {
 };
 
 const Charts = ({ data, historyData }: ChartsProps) => {
-  console.log(data, historyData);
-
   const {
     labels,
     historyCPUUsage,

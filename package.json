@@ -41,7 +41,7 @@
     "lodash": "^4.5.0",
     "lucide-react": "^0.244.0",
     "material-react-table": "^2.13.0",
-    "qs": "^6.13.0",
+    "prettier-eslint": "^16.3.0",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
     "react-day-picker": "^8.10.1",
@@ -50,7 +50,7 @@
     "react-gauge-chart": "^0.5.1",
     "react-hook-form": "^7.53.0",
     "react-router-dom": "^6.26.1",
-    "recharts": "^2.12.7",
+    "recharts": "^2.13.3",
     "tailwindcss-animate": "^1.0.6",
     "zod": "^3.23.8"
   },

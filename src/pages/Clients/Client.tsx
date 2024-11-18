@@ -28,6 +28,7 @@ import { Button } from "@/components/ui/button";
 import { getDayOfWeek } from "@/utils/utils";
 import { LoadingSpinner } from "@/components/ui/myIsLoading";
 import { useToast } from "@/components/ui/use-toast";
+import ActivityMonitor from "@/components/Productivity/Productivity";
 
 // const renderKeyValuePair = (
 //   key: string,
@@ -303,21 +304,21 @@ function DataClient() {
             <InputComponent
               label="Memória RAM"
               id="cpu-arch"
-              value={data.inventory.inventoryGeneral.memory.total + " GB"}
+              value={data.inventory.inventoryGeneral.memory.total.toFixed(2) + " GB"}
               readOnly
               onClick={() => handleCopyContent("cpu-arch")}
             />
             <InputComponent
               label="Disco Total"
               id="storage-total"
-              value={data.inventory.inventoryGeneral.storage[0].total + " GB"}
+              value={data.inventory.inventoryGeneral.storage[0].total.toFixed(2) + " GB"}
               readOnly
               onClick={() => handleCopyContent("storage-total")}
             />
             <InputComponent
               label="Disco usado"
               id="storage-used"
-              value={data.inventory.inventoryGeneral.storage[0].used + " GB"}
+              value={data.inventory.inventoryGeneral.storage[0].used.toFixed(2) + " GB"}
               readOnly
               onClick={() => handleCopyContent("storage-used")}
             />
@@ -576,9 +577,10 @@ function DataClient() {
           </div>
         )}
         {activeTab === "Monitoramento" && (
-          <div className="grid grid-cols-[repeat(2,1fr)] gap-[15px_40px] items-center ">
-            <div className="text-center col-span-full text-5xl font-bold">
-              Monitoramento
+          <div className="grid grid-cols-[repeat(2,1fr)] gap-[15px_40px] items-center">
+            <div className="text-center col-span-full text-4xl font-bold mb-6">
+              <span onClick={() => handleTabClick("Monitoramento")} className="mr-8 cursor-pointer text-purple-400">Monitoramento</span>
+              <span onClick={() => handleTabClick("Produtividade")} className="cursor-pointer">Produtividade</span>
             </div>
             <WrapperCharts
               data={{
@@ -596,6 +598,18 @@ function DataClient() {
               }}
               id={data.uid}
             />
+          </div>
+        )}
+        {activeTab === "Produtividade" && (
+          <div className="w-full">
+            <div className="text-center col-span-full text-4xl font-bold mb-6">
+              <span onClick={() => handleTabClick("Monitoramento")} className="mr-8 cursor-pointer">Monitoramento</span>
+              <span onClick={() => handleTabClick("Produtividade")} className="cursor-pointer text-purple-400">Produtividade</span>
+            </div>
+          <ActivityMonitor id={data.uid}
+          hoursTotal={8}
+          // hoursTotal={data.inventory.inventoryGeneral.system.time_machine_on}
+          />
           </div>
         )}
         {activeTab === "Detalhes" && (

@@ -36,7 +36,7 @@ const AgentInfo: FC<AgentInventoryType> = ({
             <p>Núcleos Físicos: {inventoryGeneral.cpu.physical_cores}</p>
             <p>Núcleos Lógicos: {inventoryGeneral.cpu.logic_cores}</p>
             <p>Temperatura: {inventoryGeneral.cpu?.cpu_temp || "N/A"}°C</p>
-            <p>Uso de CPU: {inventoryGeneral.cpu.cpu_usage}%</p>
+            <p>Uso de CPU: {inventoryGeneral.cpu.cpu_usage.toFixed(2)}%</p>
           </div>
 
           <div className=" p-4 rounded-md text-left">
@@ -83,6 +83,10 @@ const AgentInfo: FC<AgentInventoryType> = ({
               {inventoryGeneral.system.data_install_so}
             </p>
             {/* <p>Usuário Atual: {inventoryGeneral.system.user_logged}</p> */}
+            <br />
+            <h3 className="text-2xl font-medium mb-2 text-center text-zinc-800 dark:text-slate-50">
+              Usuários
+            </h3>
             <table className="w-full border-collapse">
               <thead>
                 <tr>
@@ -135,7 +139,7 @@ const AgentInfo: FC<AgentInventoryType> = ({
                 <tr>
                   <th className="border p-2">Disco</th>
                   <th className="border p-2">Letra</th>
-                  <th className="border p-2">Identificador</th>
+                  {/* <th className="border p-2">Identificador</th> */}
                   <th className="border p-2">Tamanho (GB)</th>
                   <th className="border p-2">Espaço disponível (GB)</th>
                   <th className="border p-2">Status</th>
@@ -150,7 +154,7 @@ const AgentInfo: FC<AgentInventoryType> = ({
                     <td className="border p-2">
                       {drive?.letter?.split(":")[0]}
                     </td>
-                    <td className="border p-2">XXXX-XXXX</td>
+                    {/* <td className="border p-2">XXXX-XXXX</td> */}
                     <td className="border p-2">
                       {drive.total.toFixed(1) + " GB"}
                     </td>

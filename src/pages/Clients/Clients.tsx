@@ -250,7 +250,7 @@ const CombinedRowActions = ({row}: any) => {
   const open = Boolean(anchorEl);
 
   const handleTerminal = (clientId: string) => {
-    console.log(clientId);
+    // console.log(clientId);
     openModal({
       content: <BlackScreen clientId={clientId} />,
       // title: "Terminal Remoto",
@@ -274,28 +274,24 @@ const CombinedRowActions = ({row}: any) => {
         // if (loginResponse.status !== 200) {
         //     throw new Error('Login failed');
         // }
-  
-        const apiKey = "cce78ef8-6864-4d0d-9493-1ebd407300db:tFhx8N2Qa1HE4KKgGLIgmKHzuBHX8CkmxVKVtLKYVqdR7Gf3"
-        // const company = await requestWithToken.get("/company");
 
-        // if(company.data.domain == "aformula"){
-        //   apiKey = "2f85339c-0f49-4068-97d7-06f7ed90611b:TZXHrKaF1uLAI2jlGWnIiyvGOm6xEZ648g2emqaefHh5ZPG7"
-        // }
-  
-        
+        const inventoryValid = await requestWithToken.get(`/inventory/${deviceID}`)
+        if(inventoryValid.status === 200){
+          const apiKey = import.meta.env.VITE_API_KEY;
         // Lança o controle remoto
-        const controlResponse = await axios.get(`https://remote.infonova.com.br/api/RemoteControl/${deviceID}`, {
-            withCredentials: true,
-            headers: {
-              "X-Api-Key": apiKey
-            }
-        });
+        // const controlResponse = await axios.get(`https://remote.infonova.com.br/api/RemoteControl/${deviceID}`, {
+        const controlResponse = await axios.get(`http://localhost:5000/api/RemoteControl/${deviceID}`, {
+          withCredentials: true,
+          headers: {
+            "X-Api-Key": apiKey
+          }
+      });
 
-        
-        if (controlResponse.status !== 200) {
-          throw new Error('Failed to launch remote control');
+      
+      if (controlResponse.status !== 200) {
+        throw new Error('Failed to launch remote control');
       }
-  
+
       const url = controlResponse.data.split("Viewer")[1];
       
       // Armazena a URL no sessionStorage
@@ -303,8 +299,15 @@ const CombinedRowActions = ({row}: any) => {
       
       // Abre a nova aba sem precisar passar a URL como parâmetro
       window.open(`/remote-control`, "_blank");
+        }
+  
+        // const company = await requestWithToken.get("/company");
+
+        // if(company.data.domain == ""){
+        //   apiKey = ""
+        // }
     } catch (err: any) {
-      // console.log('err',err.response.data)
+      console.log('err',err)
       toast({
         title: "Erro",
         // className: "bg-success border-zinc-100",
