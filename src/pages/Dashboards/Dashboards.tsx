@@ -780,7 +780,8 @@ const Dashboard = () => {
       legend: {
         position: "bottom",
         labels: {
-          color: "white",
+          // color: "dark:white",
+          // classname: "text-white dark:text-black",
           font: {
             size: 14,
           },
@@ -915,11 +916,15 @@ const Dashboard = () => {
       scales: {
         x: {
           beginAtZero: true,
-          ticks: { color: "white", font: { size: 16 } },
+          ticks: {
+            //  color: "white",
+             font: { size: 16 } },
           grid: { color: "rgba(255, 255, 255, 0.1)" },
         },
         y: {
-          ticks: { color: "white", font: { size: 16 } },
+          ticks: {
+            //  color: "white",
+             font: { size: 16 } },
           grid: { color: "rgba(255, 255, 255, 0.1)" },
         },
       },
@@ -952,11 +957,15 @@ const Dashboard = () => {
     tension: 0.3,
     scales: {
       x: {
-        ticks: { color: "white", font: { size: 14 } },
+        ticks: {
+          //  color: "white",
+           font: { size: 14 } },
         grid: { color: "rgba(255, 255, 255, 0.1)" },
       },
       y: {
-        ticks: { color: "white", font: { size: 14 } },
+        ticks: {
+          //  color: "white",
+           font: { size: 14 } },
         grid: { color: "rgba(255, 255, 255, 0.1)" },
         // suggestedMin: 20, // Definindo o valor mínimo baseado nos dados
       },
@@ -1020,7 +1029,7 @@ const Dashboard = () => {
       legend: {
         position: "bottom",
         labels: {
-          color: "white",
+          // color: "white",
           font: {
             size: 14,
           },
@@ -1046,14 +1055,14 @@ const Dashboard = () => {
           // x: 43,
           // y: 7,
           // },
-          color: "white",
+          // color: "white",
           font: {
             size: 14,
           },
           stepSize: 2, // Ajuste este valor conforme necessário
         },
         pointLabels: {
-          color: "white",
+          // color: "white",
           font: {
             size: 16,
             // weight: "bold"
@@ -1067,7 +1076,7 @@ const Dashboard = () => {
       ...baseOptions.plugins,
       datalabels: {
         display: false,
-        color: "white",
+        // color: "white",
         font: {
           size: 14,
           weight: "bold",
@@ -1079,8 +1088,8 @@ const Dashboard = () => {
   };
 
   const ChartContainer = ({ title, children }: any) => (
-    <div className="bg-gray-800 shadow-md rounded-lg p-4 flex flex-col h-[600px]">
-      <h2 className="text-2xl font-semibold text-center mb-4 text-white">
+    <div className="bg-transparent shadow-md rounded-lg p-4 flex flex-col h-[600px]">
+      <h2 className="text-2xl font-semibold text-center mb-4 text-slate-700 dark:text-white">
         {title}
       </h2>
       <div className="flex-grow relative">

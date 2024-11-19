@@ -36,6 +36,7 @@ import { sendCommand } from "@/utils/utils-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
+import { MRT_Localization_PT_BR } from 'material-react-table/locales/pt-BR';
 // import ShowRemoteUrl from "../ShowRemoteUrl";
 
 type InventoryTypeEspecified = {
@@ -210,6 +211,7 @@ const DataTableAgents: React.FC = () => {
       sorting: [{id: 'createdAt', desc: true}],
       showColumnFilters: true,
     },
+    localization: MRT_Localization_PT_BR,
     muiPaginationProps: {
       shape: "rounded",
       rowsPerPageOptions: [10, 25, 50],
@@ -275,12 +277,12 @@ const CombinedRowActions = ({row}: any) => {
         //     throw new Error('Login failed');
         // }
 
-        const inventoryValid = await requestWithToken.get(`/inventory/${deviceID}`)
-        if(inventoryValid.status === 200){
+        // const inventoryValid = await requestWithToken.get(`/inventory/${deviceID}`)
+        // if(inventoryValid.status === 200){
           const apiKey = import.meta.env.VITE_API_KEY;
         // Lança o controle remoto
-        // const controlResponse = await axios.get(`https://remote.infonova.com.br/api/RemoteControl/${deviceID}`, {
-        const controlResponse = await axios.get(`http://localhost:5000/api/RemoteControl/${deviceID}`, {
+        // const controlResponse = await axios.get(`http://localhost:5000/api/RemoteControl/${deviceID}`, {
+        const controlResponse = await axios.get(`https://remote.infonova.com.br/api/RemoteControl/${deviceID}`, {
           withCredentials: true,
           headers: {
             "X-Api-Key": apiKey
@@ -299,7 +301,7 @@ const CombinedRowActions = ({row}: any) => {
       
       // Abre a nova aba sem precisar passar a URL como parâmetro
       window.open(`/remote-control`, "_blank");
-        }
+        // }
   
         // const company = await requestWithToken.get("/company");
 
@@ -352,9 +354,9 @@ const CombinedRowActions = ({row}: any) => {
       {/* Menu trigger button */}
       <button
   onClick={handleClick}
-  className="p-2 hover:bg-gray-600 rounded-full transition-colors"
+  className="p-2 hover:text-white hover:bg-gray-600 rounded-full transition-colors"
 >
-  <MoreHorizontal className="w-5 h-5 text-gray-200 transition-colors" />
+  <MoreHorizontal className="w-5 h-5 transition-color dark:text-gray-200 " />
 </button>
 
       {/* Menu */}
@@ -373,7 +375,7 @@ const CombinedRowActions = ({row}: any) => {
             }}
             // disabled={!row.original.online}
             disabled={true}
-            className="w-full px-4 py-2 flex items-center gap-3 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="w-full px-4 py-2 flex items-center gap-3 hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
           <input
             type="file"
@@ -385,7 +387,7 @@ const CombinedRowActions = ({row}: any) => {
             style={{ display: "none" }}
           />
 
-            <FileCode2 size={24} className="text-teal-400 text-" />
+            <FileCode2 size={24} className="text-teal-400" />
             <span className="text-base">Upload</span>
           </button>
 
@@ -396,7 +398,7 @@ const CombinedRowActions = ({row}: any) => {
               handleClose();
             }}
             disabled={!row.original.online}
-            className="w-full px-4 py-2 flex items-center gap-3 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="w-full px-4 py-2 flex items-center gap-3 hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <FileText size={24} className="text-indigo-500" />
             <span className="text-base">Scripts</span>

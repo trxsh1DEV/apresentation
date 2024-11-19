@@ -579,7 +579,7 @@ function DataClient() {
         {activeTab === "Monitoramento" && (
           <div className="grid grid-cols-[repeat(2,1fr)] gap-[15px_40px] items-center">
             <div className="text-center col-span-full text-4xl font-bold mb-6">
-              <span onClick={() => handleTabClick("Monitoramento")} className="mr-8 cursor-pointer text-purple-400">Monitoramento</span>
+              <span onClick={() => handleTabClick("Monitoramento")} className="mr-8 cursor-pointer dark:text-purple-400 text-green-500">Monitoramento</span>
               <span onClick={() => handleTabClick("Produtividade")} className="cursor-pointer">Produtividade</span>
             </div>
             <WrapperCharts
@@ -604,7 +604,7 @@ function DataClient() {
           <div className="w-full">
             <div className="text-center col-span-full text-4xl font-bold mb-6">
               <span onClick={() => handleTabClick("Monitoramento")} className="mr-8 cursor-pointer">Monitoramento</span>
-              <span onClick={() => handleTabClick("Produtividade")} className="cursor-pointer text-purple-400">Produtividade</span>
+              <span onClick={() => handleTabClick("Produtividade")} className="cursor-pointer dark:text-purple-400 text-green-500">Produtividade</span>
             </div>
           <ActivityMonitor id={data.uid}
           hoursTotal={8}

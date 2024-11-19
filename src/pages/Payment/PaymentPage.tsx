@@ -115,7 +115,7 @@ const PaymentPage: React.FC = () => {
             onClick={() => handlePlanSelect(plan)}
           >
             <div>
-              <h2 className="text-3xl font-bold mb-2 text-center">
+              <h2 className="text-3xl font-bold mb-2 text-center text-black dark:text-white">
                 Plano {plan.name}
               </h2>
               <p className="text-2xl font-bold mb-4 text-center">

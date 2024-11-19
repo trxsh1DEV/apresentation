@@ -76,7 +76,7 @@ const UserProfile: FC = () => {
     if (password) {
       try {
         const response = await requestWithToken.patch(
-          "/users/update-password/" + email,
+          "/users/update-password",
           { password }
         );
 
@@ -200,7 +200,8 @@ const UserProfile: FC = () => {
               <CardFooter>
                 <Button
                   type="submit"
-                  className="mx-auto text-lg"
+                  className="mx-auto text-lg text-white bg-green-500 hover:bg-green-600 dark:bg-secondary dark:hover:opacity-90"
+                  // className="mx-auto text-lg text-white bg-secondary-foreground hover:bg-green-600 dark:bg-primary-foreground dark:hover:opacity-90"
                   disabled={formState?.username === formState?.initialUsername}
                 >
                   Salvar alterações
@@ -235,7 +236,7 @@ const UserProfile: FC = () => {
               <CardFooter>
                 <Button
                   type="submit"
-                  className="mx-auto text-lg"
+                  className="mx-auto text-lg text-white bg-green-500 hover:bg-green-600 dark:bg-secondary dark:hover:opacity-90"
                   disabled={(formState?.password?.length || 0) <= 8}
                 >
                   Salvar Senha

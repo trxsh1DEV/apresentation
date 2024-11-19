@@ -336,7 +336,7 @@ const Charts = ({ data, historyData }: ChartsProps) => {
       legend: {
         // position: "bottom",
         labels: {
-          color: "white",
+          // color: "white",
           font: {
             size: 16,
           },
@@ -414,7 +414,7 @@ const Charts = ({ data, historyData }: ChartsProps) => {
         legend: {
           // position: "bottom",
           labels: {
-            color: "white",
+            // color: "white",
             font: {
               size: 16,
             },
@@ -440,6 +440,7 @@ const Charts = ({ data, historyData }: ChartsProps) => {
   const gaugeOptions = {
     minValue: 0,
     maxValue: 100,
+    textColor: "#888",
     // arcPadding: 0.08,
     // cornerRadius: 3,
     // arcsLength: [0.3, 0.5, 0.2],
@@ -457,7 +458,7 @@ const Charts = ({ data, historyData }: ChartsProps) => {
       {/* {error && <div>Erro: {error}</div>} */}
       {historyData && (
         <>
-          <div className="flex flex-wrap justify-between mb-6 ">
+          <div className="flex flex-wrap justify-between mb-6">
             <div>
               <p className="font-bold text-2xl">Temperatura CPU</p>
               <GaugeChart
@@ -566,14 +567,18 @@ const Charts = ({ data, historyData }: ChartsProps) => {
                 scales: {
                   x: {
                     ticks: {
-                      color: "white",
+                      // color: "white",
                       font: { size: 14 },
                     },
-                    grid: { color: "rgba(255, 255, 255, 0.1)" },
+                    grid: { color: "rgba(204, 204, 204, 0.4)" },
+                    
                   },
                   y: {
-                    ticks: { color: "white", font: { size: 14 } },
-                    grid: { color: "rgba(255, 255, 255, 0.1)" },
+                    ticks: {
+                      // color: "white",
+                      font: { size: 14 }
+                     },
+                    grid: { color: "rgba(204, 204, 204, 0.4)" },
                   },
                 },
                 elements: {
@@ -588,7 +593,7 @@ const Charts = ({ data, historyData }: ChartsProps) => {
                   legend: {
                     display: true,
                     labels: {
-                      color: "white",
+                      // color: "white",
                       font: {
                         size: 15,
                         // weight: "bold",

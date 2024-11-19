@@ -28,6 +28,8 @@ import Dashboard from "./pages/Dashboards/Dashboards";
 import Register from "./pages/Auth/Register";
 import MultiStepForm from "./pages/Auth/FormMultiStep";
 import RemoteControlIframe from "./pages/ShowRemoteUrl";
+import PrivacyPolicy from "./pages/Terms/Politica de Privacidade";
+import TermsOfUse from "./pages/Terms/Termo de Uso";
 
 export default function App() {
   const router = createBrowserRouter([
@@ -131,6 +133,14 @@ export default function App() {
         {
           path: "/register",
           element: <Register />,
+        },
+        {
+          path: "/terms-of-use",
+          element: <TermsOfUse />,
+        },
+        {
+          path: "/privacy-policy",
+          element: <PrivacyPolicy />,
         },
         // {
         //   path: "/register",

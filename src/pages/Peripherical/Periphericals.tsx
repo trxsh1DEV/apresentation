@@ -191,7 +191,7 @@ export default function TablePeriphericals() {
 
   return (
     <main className="flex justify-center">
-      <Button onClick={handleOpenModal} className="mt-14 text-2xl">
+      <Button onClick={handleOpenModal} className="mt-14 text-2xl text-white bg-green-500 hover:bg-green-600 dark:bg-secondary dark:hover:opacity-90">
         Adicionar
       </Button>
       {showModal && (
@@ -217,7 +217,7 @@ export default function TablePeriphericals() {
                       </FormLabel>
                       <FormControl>
                         <Input
-                          className="p-6"
+                          className="p-4"
                           {...field}
                           value={field.value ?? ""}
                         />
@@ -238,7 +238,7 @@ export default function TablePeriphericals() {
                       </FormLabel>
                       <FormControl>
                         <Input
-                          className="p-6"
+                          className="p-4"
                           type="number"
                           {...field}
                           min={0}
@@ -266,7 +266,7 @@ export default function TablePeriphericals() {
                       </FormLabel>
                       <FormControl>
                         <Input
-                          className="p-6"
+                          className="p-4"
                           {...field}
                           value={field.value ?? ""}
                           placeholder="Ex: Notebook ou Impressora"
@@ -290,7 +290,7 @@ export default function TablePeriphericals() {
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
-                        <FormControl className="p-6">
+                        <FormControl className="p-[1.8rem]">
                           <SelectTrigger>
                             <SelectValue placeholder="Selecione um departamento" />
                           </SelectTrigger>
@@ -320,7 +320,7 @@ export default function TablePeriphericals() {
                       </FormLabel>
                       <FormControl>
                         <Input
-                          className="p-6"
+                          className="p-4"
                           {...field}
                           value={field.value ?? ""}
                         />
@@ -341,7 +341,7 @@ export default function TablePeriphericals() {
                       </FormLabel>
                       <FormControl>
                         <Input
-                          className="p-6"
+                          className="p-4"
                           {...field}
                           value={field.value ?? ""}
                         />
@@ -364,7 +364,7 @@ export default function TablePeriphericals() {
                       </FormLabel>
                       <FormControl>
                         <Input
-                          className="p-6"
+                          className="p-4"
                           {...field}
                           value={field.value ?? ""}
                         />
@@ -385,7 +385,7 @@ export default function TablePeriphericals() {
                       </FormLabel>
                       <FormControl>
                         <Input
-                          className="p-6"
+                          className="p-4"
                           {...field}
                           value={field.value ?? ""}
                         />
@@ -408,7 +408,7 @@ export default function TablePeriphericals() {
                       </FormLabel>
                       <FormControl>
                         <Input
-                          className="p-6"
+                          className="p-4"
                           {...field}
                           value={field.value ?? ""}
                         />
@@ -424,12 +424,12 @@ export default function TablePeriphericals() {
                   name="date_buy"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel className="text-slate-200 text-xl tracking-[0.12rem]">
+                      <FormLabel className="text-slate-200 text-xl tracking-[0.12rem] ">
                         Data de Compra
                       </FormLabel>
                       <Popover modal={true}>
                         <PopoverTrigger asChild>
-                          <FormControl className="p-6">
+                          <FormControl className="p-[1.8rem]">
                             <Button
                               variant={"outline"}
                               className={cn(
@@ -486,7 +486,7 @@ export default function TablePeriphericals() {
                         }
                         value={field.value[0]} // Seleciona o primeiro valor
                       >
-                        <FormControl className="p-6">
+                        <FormControl className="p-4">
                           <SelectTrigger>
                             <SelectValue placeholder="Selecione uma categoria" />
                           </SelectTrigger>
@@ -524,7 +524,7 @@ export default function TablePeriphericals() {
                               Nenhum resultado encontrado.
                             </p>
                           }
-                          className="bg-background p-[5px]"
+                          className="bg-background p-[0.68rem]"
                         />
                       </FormControl>
                       <FormMessage />
@@ -543,7 +543,7 @@ export default function TablePeriphericals() {
                       </FormLabel>
                       <FormControl>
                         <Input
-                          className="p-6"
+                          className="p-4"
                           {...field}
                           value={field.value ?? ""}
                         />
@@ -581,7 +581,7 @@ export default function TablePeriphericals() {
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
-                        <FormControl className="p-6">
+                        <FormControl className="p-[1.8rem]">
                           <SelectTrigger>
                             <SelectValue placeholder="Selecione a situação" />
                           </SelectTrigger>
@@ -640,7 +640,7 @@ export default function TablePeriphericals() {
                 />
               </div>
 
-              <Button type="submit" disabled={mutation.isPending}>
+              <Button type="submit" disabled={mutation.isPending} className="text-xl text-white bg-green-500 hover:bg-green-600 dark:bg-secondary dark:hover:opacity-90">
                 {mutation.isPending ? "Salvando..." : "Salvar"}
               </Button>
             </form>

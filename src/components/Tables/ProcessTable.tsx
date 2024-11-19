@@ -12,6 +12,7 @@ import requestWithToken from "@/utils/request";
 import { UnexpectedError } from "@/data/error/UnexpectedError";
 import { sendCommand } from "@/utils/utils-react";
 import { LoadingSpinner } from "../ui/myIsLoading";
+import { MRT_Localization_PT_BR } from 'material-react-table/locales/pt-BR';
 
 // Dados dos processos
 interface ProcessItem {
@@ -151,6 +152,7 @@ const TableProcesses = ({ id }: { id: string }) => {
       // showProgressBars: isLoading,
     },
     initialState: { pagination: { pageSize: 25, pageIndex: 0 } },
+    localization: MRT_Localization_PT_BR,
   });
 
   if (error) return <div>Erro ao carregar os processos: {error.message}</div>;

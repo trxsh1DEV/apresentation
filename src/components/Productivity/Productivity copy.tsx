@@ -93,7 +93,7 @@ const ActivityMonitor: FC<ProductivityProps> = ({ id, hoursTotal }) => {
 
   return (
     <div className="space-y-8 w-full">
-      <Card className='dark:bg-gray-800'>
+      <Card className='bg-gray-800'>
         <CardHeader>
           <CardTitle>Top 10 Janelas Mais Ativas</CardTitle>
         </CardHeader>
@@ -110,7 +110,7 @@ const ActivityMonitor: FC<ProductivityProps> = ({ id, hoursTotal }) => {
                   dataKey="activity"
                   type="category"
                   width={250}
-                  tick={{ fontSize: 18, fill: '#888' }}
+                  tick={{ fontSize: 18, fill: '#fff' }}
                 />
                 <Tooltip 
                   content={<CustomTooltip />}
@@ -128,13 +128,13 @@ const ActivityMonitor: FC<ProductivityProps> = ({ id, hoursTotal }) => {
       </Card>
 
       <ScrollArea className='w-full max-h-[800px] overflow-y-auto'>
-        <Card className='dark:bg-gray-800 space-y-6'>
+        <Card className='bg-gray-800 space-y-6'>
           <CardHeader>
             <CardTitle>Detalhamento de Atividades</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
-              <TableHeader className='dark:bg-slate-700'>
+              <TableHeader className='bg-slate-700'>
                 <TableRow>
                   <TableHead>Aplicativo/Janela</TableHead>
                   <TableHead className="text-right">Quantidade de Acessos</TableHead>

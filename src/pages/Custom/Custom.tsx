@@ -250,11 +250,11 @@ const AddItemPage: React.FC = () => {
             <Input
               ref={customValueRef} // Atribui a referência ao input
               placeholder="Digite o valor que quer adicionar"
-              className="mb-4"
+              className="mb-4 ring-slate-300 dark:ring-slate-700"
             />
           </CardContent>
           <CardFooter>
-            <Button onClick={handleAddCustom} className="w-full text-lg">
+            <Button onClick={handleAddCustom} className="w-full text-lg text-white bg-green-500 hover:bg-green-600 dark:bg-secondary dark:hover:opacity-90">
               Adicionar Customização
             </Button>
           </CardFooter>
@@ -273,7 +273,7 @@ const AddItemPage: React.FC = () => {
           <CardFooter>
             <Button
               onClick={handleAddProhibitedSoftware}
-              className="w-full text-lg"
+              className="w-full text-lg text-white bg-green-500 hover:bg-green-600 dark:bg-secondary dark:hover:opacity-90"
             >
               Adicionar Software
             </Button>
@@ -290,20 +290,20 @@ const AddItemPage: React.FC = () => {
               ref={telegramChatIdRef}
               id="telegramChatId"
               placeholder="Ex: -12529385471"
-              className="my-2"
+              className="my-2 ring-slate-300 dark:ring-slate-700"
             />
             <Label htmlFor="telegramToken">Telegram Token</Label>
             <Input
               ref={telegramTokenRef}
               id="telegramToken"
               placeholder="Ex: 7505460897:AAHpRFILmlzefeJ_KzA2ywtZgpXx2uvRMLW"
-              className="mb-4 mt-2"
+              className="mb-4 mt-2 ring-slate-300 dark:ring-slate-700"
             />
           </CardContent>
           <CardFooter>
             <Button
               onClick={handleUpdateIntegration}
-              className="w-full text-lg"
+              className="w-full text-lg text-white bg-green-500 hover:bg-green-600 dark:bg-secondary dark:hover:opacity-90"
             >
               Atualizar Integração
             </Button>

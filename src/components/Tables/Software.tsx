@@ -35,6 +35,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { MRT_Localization_PT_BR } from 'material-react-table/locales/pt-BR';
 
 //example data type
 interface BaseSoftware {
@@ -374,6 +375,7 @@ const TableSoftwares = ({ id }: { id: string }) => {
     onRowSelectionChange: setRowSelection,
     state: { rowSelection, isLoading },
     initialState: { pagination: { pageSize: 25, pageIndex: 0 } },
+    localization: MRT_Localization_PT_BR,
     renderTopToolbarCustomActions: () => (
       <TooltipProvider
       // sx={{

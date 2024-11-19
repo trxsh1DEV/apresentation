@@ -19,8 +19,9 @@ import { requestWithToken } from "../../utils/request";
 import TablePeriphericals from "./Periphericals";
 import { Download, Pen, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { MRT_Localization_PT_BR } from 'material-react-table/locales/pt-BR';
 // import { Pen, RefreshCcw, Trash } from "lucide-react";
-// import { useDispatch } from "react-redux";
+
 
 type UserApiResponse = {
   data: Array<TypePeripherical>;
@@ -190,6 +191,7 @@ const Peripherical: FC = () => {
     ],
     rowCount: meta?.totalRowCount ?? 0,
     initialState: { showColumnFilters: true },
+    localization: MRT_Localization_PT_BR,
     state: {
       columnFilters,
       isLoading,
