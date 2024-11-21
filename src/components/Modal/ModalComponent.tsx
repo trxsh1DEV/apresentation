@@ -49,17 +49,17 @@ const Modal: FC = () => {
       </div>
     );
   }
-  console.log(typeof size, size, size ? size : 800);
+  // console.log(typeof size, size, size ? size : 800);
 
   return (
     <>
       <Dialog open={isOpen} onOpenChange={() => closeModal()}>
         <DialogContent
           aria-describedby="modal description"
-          className={`sm:max-w-[90%] ${sizeClasses[size]} max-h-[90vh] min-w-96 bg-zinc-900 text-white border-zinc-700`}
+          className={`${sizeClasses[size]} max-h-[90vh] bg-gray-100 min-w-96 dark:bg-zinc-900 dark:text-white border-zinc-700`}
         >
           <DialogHeader className="border-b border-zinc-700 pb-2">
-            <DialogTitle className="text-2xl font-bold border-none">
+            <DialogTitle className="text-2xl font-bold border-none text-center text-slate-700 dark:text-white">
               {title}
             </DialogTitle>
             <DialogDescription></DialogDescription>
@@ -78,7 +78,7 @@ const Modal: FC = () => {
           {/* <div className="mt-4 flex-grow overflow-auto max-h-[70vh]">
               {content}
             </div> */}
-          <ScrollArea className="mt-4 flex-grow overflow-auto max-h-[70vh]">
+          <ScrollArea className="mt-2 flex-grow overflow-auto max-h-[70vh] p-4">
             {content}
           </ScrollArea>
         </DialogContent>

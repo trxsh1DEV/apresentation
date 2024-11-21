@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
@@ -62,10 +62,19 @@ const MultiStepForm: React.FC = () => {
     defaultValues: {
       email: email || "",
       password: "",
-      nameCompany: "",
+      nameCompany: companyData?.name || "", // Set initial value here
       token: token || "",
     },
   });
+
+  useEffect(() => {
+    if (companyData) {
+      userForm.reset({
+        ...userForm.getValues(),
+        nameCompany: companyData.name
+      });
+    }
+  }, [companyData]);
 
   // Mutação para lidar com a requisição de confirmação
   const mutation = useMutation({
@@ -101,10 +110,10 @@ const MultiStepForm: React.FC = () => {
   // Submissão do formulário da empresa
   const handleCompanySubmit = async (data: CompanyFormData) => {
     try {
-      console.log("Dados da empresa:", data);
+      // console.log("Dados da empresa:", data);
       await axios.post(`${BASE_URL}/company`, data);
       setCompanyData(data);
-      console.log("companyData definido:", data);
+      // console.log("companyData definido:", data);
       setStep(2);
     } catch (error: any) {
       console.error("Erro ao cadastrar empresa:", error);
@@ -117,9 +126,9 @@ const MultiStepForm: React.FC = () => {
         <Form {...companyForm}>
           <form
             onSubmit={companyForm.handleSubmit(handleCompanySubmit)}
-            className="w-full"
+            className="w-full bg-gray-200 dark:bg-secondary"
           >
-            <h2 className="text-2xl mb-4 text-center">Cadastrar Empresa</h2>
+            <h2 className="text-2xl font-bold mb-4 text-center text-slate-700 dark:text-white">Cadastrar Empresa</h2>
 
             <FormField
               control={companyForm.control}
@@ -132,6 +141,7 @@ const MultiStepForm: React.FC = () => {
                       placeholder="Nome da Empresa"
                       {...field}
                       autoFocus={true}
+                      className="ring-0"
                     />
                   </FormControl>
                   <FormMessage />
@@ -146,14 +156,14 @@ const MultiStepForm: React.FC = () => {
                 <FormItem>
                   <FormLabel>Domínio</FormLabel>
                   <FormControl>
-                    <Input placeholder="example.com" {...field} />
+                    <Input placeholder="example.com" {...field} className="ring-0"/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <Button className="text-xl" type="submit">
+            <Button className="text-xl text-white bg-green-500 hover:bg-green-600 dark:bg-slate-600 dark:hover:opacity-90" type="submit">
               Próximo
             </Button>
           </form>
@@ -162,22 +172,22 @@ const MultiStepForm: React.FC = () => {
 
       {step === 2 && companyData && (
         <Form {...userForm}>
-          <form onSubmit={userForm.handleSubmit(onSubmit)} className="w-full">
-            <h2 className="text-2xl mb-4 text-center">Cadastrar Usuário</h2>
+          <form onSubmit={userForm.handleSubmit(onSubmit)} className="w-full bg-gray-200 dark:bg-secondary">
+            <h2 className="text-2xl font-bold mb-4 text-center text-slate-700 dark:text-white">Cadastrar Usuário</h2>
 
-            {/* <FormField
+            <FormField
               control={userForm.control}
               name="email"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>E-mail</FormLabel>
                   <FormControl>
-                    <Input placeholder="email@example.com" {...field} />
+                    <Input placeholder="email@example.com" {...field} readOnly className="bg-gray-300 dark:bg-slate-700 ring-0"/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
-            /> */}
+            />
 
             <FormField
               control={userForm.control}
@@ -188,9 +198,10 @@ const MultiStepForm: React.FC = () => {
                   <FormControl>
                     <Input
                       type="password"
-                      placeholder="Senha"
+                      placeholder="Digite sua senha"
                       {...field}
                       autoFocus={true}
+                      className="ring-0"
                     />
                   </FormControl>
                   <FormMessage />
@@ -205,18 +216,19 @@ const MultiStepForm: React.FC = () => {
                 <FormItem>
                   <FormLabel>Nome da empresa</FormLabel>
                   <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Nome da empresa"
-                      {...field}
-                    />
+                  <Input
+                    type="text"
+                    placeholder="Nome da empresa"
+                    {...field}
+                    readOnly className="bg-gray-300 ring-0 dark:bg-slate-700"
+                  />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <Button className="text-xl" type="submit">
+            <Button className="text-xl  text-white bg-green-500 hover:bg-green-600 dark:bg-slate-600 dark:hover:opacity-90" type="submit">
               Cadastrar Usuário
             </Button>
           </form>

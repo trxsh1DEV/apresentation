@@ -104,7 +104,7 @@ const LoginPage = () => {
             </div>
 
             <div className="text-right">
-              <a href="#" className="text-green-500 dark:text-purple-500 hover:text-green-600 dark:hover:text-purple-600 text-sm">
+              <a href="/forgot-password" className="text-green-500 dark:text-purple-500 hover:text-green-600 dark:hover:text-purple-600 text-sm">
                 Esqueci minha senha
               </a>
             </div>

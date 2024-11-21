@@ -30,6 +30,8 @@ import MultiStepForm from "./pages/Auth/FormMultiStep";
 import RemoteControlIframe from "./pages/ShowRemoteUrl";
 import PrivacyPolicy from "./pages/Terms/Politica de Privacidade";
 import TermsOfUse from "./pages/Terms/Termo de Uso";
+import { ResetPasswordForm } from "./components/Forms/ResetPasswordForm";
+import { ForgotPasswordForm } from "./components/Forms/ForgotPassword";
 
 export default function App() {
   const router = createBrowserRouter([
@@ -129,6 +131,14 @@ export default function App() {
         {
           path: "/confirm",
           element: <MultiStepForm />,
+        },
+        {
+          path: "/reset-password",
+          element: <ResetPasswordForm />,
+        },
+        {
+          path: "/forgot-password",
+          element: <ForgotPasswordForm />,
         },
         {
           path: "/register",

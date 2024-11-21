@@ -29,6 +29,9 @@ import {
 } from "@/components/ui/command";
 import { useDebounce } from "@uidotdev/usehooks";
 import { Label } from "@/components/ui/label";
+import { useSetAtom } from "jotai";
+import { openModalAtom } from "@/Context/ModalContext";
+import CreateUserRegistration from "@/components/Forms/CreateUserForm";
 
 interface App {
   name: string;
@@ -100,6 +103,17 @@ const AddItemPage: React.FC = () => {
   const telegramChatIdRef = useRef<HTMLInputElement>(null); // useRef para chatId
   const telegramTokenRef = useRef<HTMLInputElement>(null);
   const [prohibitedSoftware, setProhibitedSoftware] = useState<string>("");
+  const openModal = useSetAtom(openModalAtom);
+
+  const handleNewUser = () => {
+    // console.log(clientId);
+    openModal({
+      content: <CreateUserRegistration />,
+      title: "Criar novo usuário",
+      size: "medium",
+    });
+  };
+
   const { toast } = useToast();
 
   const handleSelectChange = (value: string) => {
@@ -226,7 +240,7 @@ const AddItemPage: React.FC = () => {
       </h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Card para Customização Geral */}
-        <Card className="flex flex-col text-center min-w-[400px]">
+        <Card className="flex flex-col text-center ">
           <CardHeader>
             <CardTitle>Customização Geral</CardTitle>
           </CardHeader>
@@ -280,7 +294,7 @@ const AddItemPage: React.FC = () => {
           </CardFooter>
         </Card>
 
-        <Card className="flex flex-col ">
+        <Card className="flex flex-col">
           <CardHeader>
             <CardTitle className="text-center">Integrações</CardTitle>
           </CardHeader>
@@ -310,19 +324,19 @@ const AddItemPage: React.FC = () => {
           </CardFooter>
         </Card>
         {/* Card para Futuras Customizações */}
-        {/* <Card className="flex flex-col text-center">
+        <Card className="flex flex-col text-center">
           <CardHeader>
-            <CardTitle>Futuras Customizações</CardTitle>
+            <CardTitle>Adicionar novo usuário</CardTitle>
           </CardHeader>
           <CardContent className="flex-grow">
-            <p>Espaço reservado para futuras opções de customização.</p>
+            <p></p>
           </CardContent>
           <CardFooter>
-            <Button className="w-full text-lg" disabled>
-              Em breve
+            <Button className="w-full text-lg text-white bg-green-500 hover:bg-green-600 dark:bg-secondary dark:hover:opacity-90" onClick={handleNewUser}>
+              Adicionar
             </Button>
           </CardFooter>
-        </Card> */}
+        </Card>
       </div>
     </div>
   );

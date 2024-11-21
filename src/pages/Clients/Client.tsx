@@ -245,8 +245,8 @@ function DataClient() {
             key={tab}
             className={`px-4 bg py-2 rounded text-xl font-semibold transition-all duration-300 hover:opacity-80 ${
               activeTab === tab
-                ? "dark:bg-purple-700 bg-green-500 text-white"
-                : ""
+                && "dark:bg-purple-700 bg-green-500 text-white"
+                // : ""
             }`}
             onClick={() => handleTabClick(tab)}
           >
