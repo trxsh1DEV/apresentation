@@ -64,7 +64,7 @@ const LoginPage = () => {
   };
 
   return (
-  <div className="flex min-h-screen w-full overflow-hidden">
+  <div className="flex h-[96vh] w-full overflow-hidden">
     {/* Left side - Login Form */}
     <div className="w-1/2 flex items-center justify-center p-8">
       <div className="w-full max-w-md space-y-8">

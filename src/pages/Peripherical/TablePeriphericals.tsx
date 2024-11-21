@@ -211,9 +211,9 @@ const Peripherical: FC = () => {
     muiPaginationProps: {
       shape: "rounded",
       SelectProps: { hiddenLabel: false },
-      rowsPerPageOptions: [10, 25, 50],
+      rowsPerPageOptions: [10, 25, 50, 100],
       variant: "outlined",
-      showRowsPerPage: false,
+      showRowsPerPage: true,
     },
     muiToolbarAlertBannerProps: isError
       ? { color: "error", children: "Error loading data" }

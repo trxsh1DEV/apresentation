@@ -1,4 +1,19 @@
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { useToast } from "@/components/ui/use-toast";
+import requestWithToken from "@/utils/request";
+import { logout } from "../Auth/token-methods";
 import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import {
   Card,
   CardContent,
@@ -8,208 +23,208 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/components/ui/use-toast";
-import requestWithToken from "@/utils/request";
-import { FC, useCallback, useEffect, useState } from "react";
-import { logout } from "../Auth/token-methods";
+import { useEffect } from "react";
 
-type UserProfileProps = {
-  username: string;
-  email: string;
-  company: string;
-  password?: string;
-  initialUsername: string;
-};
+const accountSchema = z.object({
+  username: z.string().min(3, "Username must be at least 3 characters"),
+  email: z.string().email(),
+  company: z.string(),
+});
 
-const UserProfile: FC = () => {
-  const [formState, setFormState] = useState<UserProfileProps | null>(null);
+const passwordSchema = z.object({
+  currentPassword: z
+    .string()
+    .min(8, "A senha deve conter no mínimo 8 caracteres")
+    .regex(
+      /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,}$/,
+      "A senha deve conter letras maiúsculas, minúsculas, números e caracteres especiais"
+    ),
+    newPassword: z
+    .string()
+    .min(8, "A senha deve conter no mínimo 8 caracteres")
+    .regex(
+      /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,}$/,
+      "A senha deve conter letras maiúsculas, minúsculas, números e caracteres especiais"
+    ),
+});
+
+type AccountFormData = z.infer<typeof accountSchema>;
+type PasswordFormData = z.infer<typeof passwordSchema>;
+
+const UserProfile = () => {
   const { toast } = useToast();
 
-  const fetchUser = useCallback(async () => {
-    try {
-      // const resultToken = await requestWithToken.get("/auth/profile");
-      const { data: user } = await requestWithToken.get(`users`);
+  const { data: userData, isLoading } = useQuery({
+    queryKey: ["user"],
+    queryFn: async () => {
+      const { data } = await requestWithToken.get(`users`);
+      return data;
+    },
+  });
+  // console.log(userData)
 
-      if (!user || !user.email || !user.company) {
-        return setFormState(null);
+  const accountForm = useForm<AccountFormData>({
+    resolver: zodResolver(accountSchema),
+    defaultValues: {
+      username: userData?.username || "",
+      email: userData?.email || "",
+      company: userData?.company?.name || "",
+    },
+  });
+
+    // Add this useEffect to update form values when userData is available
+    useEffect(() => {
+      if (userData) {
+        accountForm.reset({
+          username: userData.username,
+          email: userData.email,
+          company: userData.company?.name,
+        });
       }
+    }, [userData]);
 
-      setFormState({
-        email: user.email,
-        username: user.username || "",
-        company: user.company.name,
-        password: "",
-        initialUsername: user.username,
+  const passwordForm = useForm<PasswordFormData>({
+    resolver: zodResolver(passwordSchema),
+    defaultValues: {
+      currentPassword: "",
+      newPassword: "",
+    },
+  });
+
+  const updateProfileMutation = useMutation({
+    mutationFn: async (data: { username: string }) => {
+      return await requestWithToken.patch(`/users/${userData.email}`, data);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Sucesso",
+        className: "bg-success border-zinc-100",
+        variant: "destructive",
+        description: "Perfil atualizado com sucesso",
       });
-    } catch (error: any) {
-      console.error(
-        "Error fetching user:",
-        error?.response?.data?.errors?.[0] || error.message
-      );
-    }
-  }, []);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro",
+        variant: "destructive",
+        description: `Falha ao atualizar perfil: ${error.response?.data?.message || error.message}`,
+      });
+    },
+  });
 
-  useEffect(() => {
-    fetchUser();
-  }, [fetchUser]);
+  const updatePasswordMutation = useMutation({
+    mutationFn: async (data: { currentPassword: string; newPassword: string }) => {
+      return await requestWithToken.patch("/users/update-password", data);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Sucesso",
+        className: "bg-success border-zinc-100",
+        variant: "destructive",
+        description: "Senha atualizada com sucesso (Redirecionando...)",
+      });
+      setTimeout(logout, 1000);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro",
+        variant: "destructive",
+        description: `Falha ao atualizar senha: ${error.response?.data?.message || error.message}`,
+      });
+    },
+  });
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = event.target;
-    setFormState((prevState) =>
-      prevState
-        ? {
-            ...prevState,
-            [id]: value,
-          }
-        : null
-    );
-  };
-
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    if (!formState) return;
-
-    const { username, password, email, initialUsername } = formState;
-
-    if (password) {
-      try {
-        const response = await requestWithToken.patch(
-          "/users/update-password",
-          { password }
-        );
-
-        if (!response.data || response.status !== 200) {
-          throw Error("Ocorreu um erro ao atualizar a senha. Tente novamente.");
-          // return;
-        }
-        toast({
-          title: "Sucesso",
-          className: "bg-success border-zinc-100",
-          variant: "destructive",
-          description: `Senha atualizada com sucesso (Redirecionando...)`,
-        });
-
-        setFormState((prevState) =>
-          prevState
-            ? {
-                ...prevState,
-                password: "",
-              }
-            : null
-        );
-
-        // Timer de 1 segundo
-        setTimeout(() => {
-          logout();
-        }, 1000);
-      } catch (error: any) {
-        console.error(
-          "Erro ao atualizar senha:",
-          error.response.data.message[0]
-        );
-        toast({
-          title: "Erro",
-          // className: "bg-success border-zinc-100",
-          variant: "destructive",
-          description: `Falha ao atualizar senha do usuário. ${error.response?.data?.message[0] || error.message}`,
-        });
-      }
-    }
-
-    if (username && username !== initialUsername) {
-      try {
-        await requestWithToken.patch("/users/" + email, { username });
-        toast({
-          title: "Sucesso",
-          className: "bg-success border-zinc-100",
-          variant: "destructive",
-          description: `Perfil do usuário atualizado com sucesso`,
-        });
-      } catch (error) {
-        console.error("Erro ao atualizar perfil:", error);
-        // alert("Ocorreu um erro ao atualizar o perfil. Tente novamente.");
-        toast({
-          title: "Erro",
-          // className: "bg-success border-zinc-100",
-          variant: "destructive",
-          description: `Falha ao atualizar perfil do usuário`,
-        });
-      }
+  const onSubmitAccount = (data: AccountFormData) => {
+    if (data.username !== userData?.username) {
+      updateProfileMutation.mutate({ username: data.username });
     }
   };
+
+  const onSubmitPassword = (data: PasswordFormData) => {
+    updatePasswordMutation.mutate({ 
+      currentPassword: data.currentPassword,
+      newPassword: data.newPassword 
+    });
+  };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="flex items-center justify-center h-screen">
       <Tabs defaultValue="account" className="w-[600px]">
-        <h1 className="text-4xl text-center mb-6 font-bold">
-          Perfil do Usuário
-        </h1>
+        <h1 className="text-4xl text-center mb-6 font-bold">Perfil do Usuário</h1>
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="account">Conta</TabsTrigger>
           <TabsTrigger value="password">Senha</TabsTrigger>
         </TabsList>
+
         <TabsContent value="account">
-          <Card className="w-full">
+          <Card>
             <CardHeader>
               <CardTitle>Conta</CardTitle>
               <CardDescription>
-                Faça alterações na sua conta aqui. Clique em salvar quando
-                terminar.
+                Faça alterações na sua conta aqui. Clique em salvar quando terminar.
               </CardDescription>
             </CardHeader>
-            <form onSubmit={handleSubmit} className="w-full bg-transparent">
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label className="text-lg" htmlFor="username">
-                    Nome
-                  </Label>
-                  <Input
-                    id="username"
-                    className="ring-2 ring-slate-700 text-base" // isso agora deve funcionar
-                    value={formState?.username || ""}
-                    onChange={handleChange}
+            <Form {...accountForm}>
+              <form onSubmit={accountForm.handleSubmit(onSubmitAccount)} className="w-full bg-transparent">
+                <CardContent className="space-y-4">
+                  <FormField
+                    control={accountForm.control}
+                    name="username"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nome</FormLabel>
+                        <FormControl>
+                          <Input {...field} className="ring-2 ring-slate-700" autoFocus={true}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-lg" htmlFor="email">
-                    Email
-                  </Label>
-                  <Input
-                    disabled={true}
-                    id="email"
-                    className="ring-2 ring-slate-700 text-base" // isso agora deve funcionar
-                    value={formState?.email || ""}
-                    readOnly
+                  <FormField
+                    control={accountForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input {...field} disabled className="ring-2 ring-slate-700" />
+                        </FormControl>
+                      </FormItem>
+                    )}
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-lg" htmlFor="company">
-                    Empresa
-                  </Label>
-                  <Input
-                    id="company"
-                    disabled={true}
-                    className="ring-2 ring-slate-700 text-base" // isso agora deve funcionar
-                    value={formState?.company || ""}
-                    readOnly
+                  <FormField
+                    control={accountForm.control}
+                    name="company"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Empresa</FormLabel>
+                        <FormControl>
+                          <Input {...field} disabled className="ring-2 ring-slate-700" />
+                        </FormControl>
+                      </FormItem>
+                    )}
                   />
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button
-                  type="submit"
-                  className="mx-auto text-lg text-white bg-green-500 hover:bg-green-600 dark:bg-secondary dark:hover:opacity-90"
-                  // className="mx-auto text-lg text-white bg-secondary-foreground hover:bg-green-600 dark:bg-primary-foreground dark:hover:opacity-90"
-                  disabled={formState?.username === formState?.initialUsername}
-                >
-                  Salvar alterações
-                </Button>
-              </CardFooter>
-            </form>
+                </CardContent>
+                <CardFooter>
+                  <Button
+                    type="submit"
+                    className="mx-auto text-lg text-white bg-green-500 hover:bg-green-600 dark:bg-secondary dark:hover:opacity-90"
+                    disabled={updateProfileMutation.isPending}
+                  >
+                    {updateProfileMutation.isPending ? "Salvando..." : "Salvar alterações"}
+                  </Button>
+                </CardFooter>
+              </form>
+            </Form>
           </Card>
         </TabsContent>
+
         <TabsContent value="password">
           <Card>
             <CardHeader>
@@ -218,31 +233,57 @@ const UserProfile: FC = () => {
                 Altere sua senha aqui. Após salvar, você será desconectado.
               </CardDescription>
             </CardHeader>
-            <form onSubmit={handleSubmit} className="w-full bg-transparent">
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label className="text-lg" htmlFor="password">
-                    Nova senha
-                  </Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    className="text-lg ring-2 ring-slate-700"
-                    value={formState?.password || ""}
-                    onChange={handleChange}
+            <Form {...passwordForm}>
+              <form onSubmit={passwordForm.handleSubmit(onSubmitPassword)} className="w-full bg-transparent">
+                <CardContent className="space-y-4">
+                  <FormField
+                    control={passwordForm.control}
+                    name="currentPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Senha atual</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="Digite sua senha atual"
+                            {...field}
+                            className="ring-2 ring-slate-700"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button
-                  type="submit"
-                  className="mx-auto text-lg text-white bg-green-500 hover:bg-green-600 dark:bg-secondary dark:hover:opacity-90"
-                  disabled={(formState?.password?.length || 0) <= 8}
-                >
-                  Salvar Senha
-                </Button>
-              </CardFooter>
-            </form>
+                  <FormField
+                    control={passwordForm.control}
+                    name="newPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nova senha</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="Digite sua nova senha"
+                            {...field}
+                            className="ring-2 ring-slate-700"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </CardContent>
+                <CardFooter>
+                  <Button
+                    type="submit"
+                    className="mx-auto text-lg text-white bg-green-500 hover:bg-green-600 dark:bg-secondary dark:hover:opacity-90"
+                    disabled={updatePasswordMutation.isPending}
+                  >
+                    {updatePasswordMutation.isPending ? "Salvando..." : "Alterar Senha"}
+                  </Button>
+                </CardFooter>
+              </form>
+            </Form>
           </Card>
         </TabsContent>
       </Tabs>

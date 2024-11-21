@@ -101,7 +101,7 @@ const PaymentPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto mt-10 p-6">
+    <div className="max-w-5xl mx-auto p-2">
       <h1 className="text-3xl font-bold mb-6 text-center">Escolha seu Plano</h1>
 
       {/* Responsividade ajustada */}
@@ -109,13 +109,13 @@ const PaymentPage: React.FC = () => {
         {plans.map((plan) => (
           <div
             key={plan.name}
-            className={`p-6 rounded-lg shadow-lg cursor-pointer flex flex-col justify-between 
+            className={`px-6 p-4 rounded-lg shadow-lg cursor-pointer flex flex-col justify-between 
               ${selectedPlan?.name === plan.name ? "border-4 border-indigo-500" : "border border-gray-300"}`}
             style={{ minWidth: "250px", maxWidth: "300px" }} // Limita a largura do card
             onClick={() => handlePlanSelect(plan)}
           >
             <div>
-              <h2 className="text-3xl font-bold mb-2 text-center text-black dark:text-white">
+              <h2 className="text-3xl font-bold mb-2 text-center text-black dark:text-white p-0 ">
                 Plano {plan.name}
               </h2>
               <p className="text-2xl font-bold mb-4 text-center">
@@ -135,20 +135,21 @@ const PaymentPage: React.FC = () => {
               </ul>
             </div>
             <button
-              className={`w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none mt-auto
+              className={`w-full cursor-pointer bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none mt-auto
               ${selectedPlan?.name === plan.name ? "" : "opacity-50"}`}
-              disabled={selectedPlan?.name !== plan.name}
+              // disabled={selectedPlan?.name !== plan.name}
+              onClick={() => handlePlanSelect(plan)}
             >
-              Selecionar
+              {selectedPlan?.name === plan.name ? "Selecionado" : "Selecionar"}
             </button>
           </div>
         ))}
       </div>
 
       {selectedPlan && (
-        <div className="mt-6 p-6 rounded-lg shadow-lg">
-          <h2 className="text-2xl font-bold mb-4">
-            (Plano {selectedPlan.name}) Selecionado
+        <div className="mt-6 p-6 rounded-lg shadow-2xl dark:bg-slate-700">
+          <h2 className="text-2xl font-bold mb-4 text-slate-700 dark:text-white p-1">
+            Plano <span className="font-bold text-gray-800 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 bg-clip-text text-transparent py-0.5 ${className}">{selectedPlan.name}</span> Selecionado
           </h2>
 
           <div className="mb-4">
@@ -158,7 +159,8 @@ const PaymentPage: React.FC = () => {
             <input
               type="number"
               id="agentCount"
-              value={agentCount || ""}
+              value={selectedPlan?.name == "Free" ? 20 : agentCount || 1}
+              autoFocus={true}
               onChange={(e) =>
                 setAgentCount(
                   Math.max(

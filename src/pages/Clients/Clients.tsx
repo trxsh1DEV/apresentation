@@ -207,15 +207,15 @@ const DataTableAgents: React.FC = () => {
     ),
     paginationDisplayMode: "pages",
     initialState: {
-      pagination: { pageSize: 20, pageIndex: 0 },
+      pagination: { pageSize: 25, pageIndex: 0 },
       sorting: [{id: 'createdAt', desc: true}],
       showColumnFilters: true,
     },
     localization: MRT_Localization_PT_BR,
     muiPaginationProps: {
       shape: "rounded",
-      rowsPerPageOptions: [10, 25, 50],
-      showRowsPerPage: false,
+      rowsPerPageOptions: [10, 25, 50, 100],
+      showRowsPerPage: true,
       variant: "outlined",
     },
     enableRowActions: true,

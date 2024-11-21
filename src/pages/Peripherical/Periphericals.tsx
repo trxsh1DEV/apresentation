@@ -70,8 +70,8 @@ const formSchema = z.object({
   in_stock: z.boolean(),
   observation: z
     .string()
-    .min(10, {
-      message: "O campo deve ter mais de 10 caracteres",
+    .min(2, {
+      message: "O campo deve ter mais de 2 caracteres",
     })
     .max(300, {
       message: "O campo deve ter menos de 300 caracteres",
@@ -203,7 +203,7 @@ export default function TablePeriphericals() {
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-3 py-5 px-10 bg-gray-700 text-center w-full"
+              className="space-y-3 py-5 px-10 bg-gray-200 dark:bg-gray-700 text-center w-full"
             >
               <div className="grid grid-cols-2 gap-4">
                 {/* Campo Host */}
@@ -212,12 +212,12 @@ export default function TablePeriphericals() {
                   name="host"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-slate-200 text-xl tracking-[0.12rem]">
+                      <FormLabel className="text-slate-700 dark:text-slate-200 text-xl tracking-[0.12rem]">
                         Host
                       </FormLabel>
                       <FormControl>
                         <Input
-                          className="p-4"
+                          className="p-3 ring-0"
                           {...field}
                           value={field.value ?? ""}
                         />
@@ -233,12 +233,12 @@ export default function TablePeriphericals() {
                   name="purchase_price"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-slate-200 text-xl tracking-[0.12rem]">
+                      <FormLabel className="text-slate-700 dark:text-slate-200 text-xl tracking-[0.12rem]">
                         Preço de compra
                       </FormLabel>
                       <FormControl>
                         <Input
-                          className="p-4"
+                          className="p-3 ring-0"
                           type="number"
                           {...field}
                           min={0}
@@ -261,12 +261,12 @@ export default function TablePeriphericals() {
                   name="class"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-slate-200 text-xl tracking-[0.12rem]">
+                      <FormLabel className="text-slate-700 dark:text-slate-200 text-xl tracking-[0.12rem]">
                         Classe
                       </FormLabel>
                       <FormControl>
                         <Input
-                          className="p-4"
+                          className="p-3 ring-0"
                           {...field}
                           value={field.value ?? ""}
                           placeholder="Ex: Notebook ou Impressora"
@@ -283,14 +283,14 @@ export default function TablePeriphericals() {
                   name="department"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-slate-200 text-xl tracking-[0.12rem]">
+                      <FormLabel className="text-slate-700 dark:text-slate-200 text-xl tracking-[0.12rem]">
                         Departamento
                       </FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
-                        <FormControl className="p-[1.8rem]">
+                        <FormControl className="p-[1.6rem]">
                           <SelectTrigger>
                             <SelectValue placeholder="Selecione um departamento" />
                           </SelectTrigger>
@@ -315,12 +315,12 @@ export default function TablePeriphericals() {
                   name="person"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-slate-200 text-xl tracking-[0.12rem]">
+                      <FormLabel className="text-slate-700 dark:text-slate-200 text-xl tracking-[0.12rem]">
                         Pessoa Responsável
                       </FormLabel>
                       <FormControl>
                         <Input
-                          className="p-4"
+                          className="p-3 ring-0"
                           {...field}
                           value={field.value ?? ""}
                         />
@@ -336,12 +336,12 @@ export default function TablePeriphericals() {
                   name="manufacturer"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-slate-200 text-xl tracking-[0.12rem]">
+                      <FormLabel className="text-slate-700 dark:text-slate-200 text-xl tracking-[0.12rem]">
                         Fabricante
                       </FormLabel>
                       <FormControl>
                         <Input
-                          className="p-4"
+                          className="p-3 ring-0"
                           {...field}
                           value={field.value ?? ""}
                         />
@@ -359,12 +359,12 @@ export default function TablePeriphericals() {
                   name="sample"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-slate-200 text-xl tracking-[0.12rem]">
+                      <FormLabel className="text-slate-700 dark:text-slate-200 text-xl tracking-[0.12rem]">
                         Modelo/Versão
                       </FormLabel>
                       <FormControl>
                         <Input
-                          className="p-4"
+                          className="p-3 ring-0"
                           {...field}
                           value={field.value ?? ""}
                         />
@@ -380,12 +380,12 @@ export default function TablePeriphericals() {
                   name="nfe"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-slate-200 text-xl tracking-[0.12rem]">
+                      <FormLabel className="text-slate-700 dark:text-slate-200 text-xl tracking-[0.12rem]">
                         NF-e
                       </FormLabel>
                       <FormControl>
                         <Input
-                          className="p-4"
+                          className="p-3 ring-0"
                           {...field}
                           value={field.value ?? ""}
                         />
@@ -403,12 +403,12 @@ export default function TablePeriphericals() {
                   name="patrimony"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-slate-200 text-xl tracking-[0.12rem]">
+                      <FormLabel className="text-slate-700 dark:text-slate-200 text-xl tracking-[0.12rem]">
                         Patrimônio
                       </FormLabel>
                       <FormControl>
                         <Input
-                          className="p-4"
+                          className="p-3 ring-0"
                           {...field}
                           value={field.value ?? ""}
                         />
@@ -424,12 +424,12 @@ export default function TablePeriphericals() {
                   name="date_buy"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel className="text-slate-200 text-xl tracking-[0.12rem] ">
+                      <FormLabel className="text-slate-700 dark:text-slate-200 text-xl tracking-[0.12rem] ">
                         Data de Compra
                       </FormLabel>
                       <Popover modal={true}>
                         <PopoverTrigger asChild>
-                          <FormControl className="p-[1.8rem]">
+                          <FormControl className="p-[1.6rem]">
                             <Button
                               variant={"outline"}
                               className={cn(
@@ -477,7 +477,7 @@ export default function TablePeriphericals() {
                   name="category"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-slate-200 text-xl tracking-[0.12rem]">
+                      <FormLabel className="text-slate-700 dark:text-slate-200 text-xl tracking-[0.12rem]">
                         Categoria
                       </FormLabel>
                       <Select
@@ -486,7 +486,7 @@ export default function TablePeriphericals() {
                         }
                         value={field.value[0]} // Seleciona o primeiro valor
                       >
-                        <FormControl className="p-4">
+                        <FormControl className="p-3 ring-0">
                           <SelectTrigger>
                             <SelectValue placeholder="Selecione uma categoria" />
                           </SelectTrigger>
@@ -510,7 +510,7 @@ export default function TablePeriphericals() {
                   name="category"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-slate-200 text-xl tracking-[0.12rem]">
+                      <FormLabel className="text-slate-700 dark:text-slate-200 text-xl tracking-[0.12rem]">
                         Categoria(s)
                       </FormLabel>
                       <FormControl>
@@ -524,7 +524,7 @@ export default function TablePeriphericals() {
                               Nenhum resultado encontrado.
                             </p>
                           }
-                          className="bg-background p-[0.68rem]"
+                          className="bg-background p-[0.45rem]"
                         />
                       </FormControl>
                       <FormMessage />
@@ -538,12 +538,12 @@ export default function TablePeriphericals() {
                   name="local"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-slate-200 text-xl tracking-[0.12rem]">
+                      <FormLabel className="text-slate-700 dark:text-slate-200 text-xl tracking-[0.12rem]">
                         Local
                       </FormLabel>
                       <FormControl>
                         <Input
-                          className="p-4"
+                          className="p-3 ring-0"
                           {...field}
                           value={field.value ?? ""}
                         />
@@ -574,14 +574,14 @@ export default function TablePeriphericals() {
                   name="status"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-slate-200 text-xl tracking-[0.12rem]">
+                      <FormLabel className="text-slate-700 dark:text-slate-200 text-xl tracking-[0.12rem]">
                         Status / Situação
                       </FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
-                        <FormControl className="p-[1.8rem]">
+                        <FormControl className="p-[1.6rem]">
                           <SelectTrigger>
                             <SelectValue placeholder="Selecione a situação" />
                           </SelectTrigger>
@@ -602,7 +602,7 @@ export default function TablePeriphericals() {
                   name="in_stock"
                   render={({ field }) => (
                     <FormItem className="">
-                      <FormLabel className="text-slate-200 text-xl tracking-[0.12rem]">
+                      <FormLabel className="text-slate-700 dark:text-slate-200 text-xl tracking-[0.12rem]">
                         Em estoque?
                       </FormLabel>
                       <br />
@@ -610,6 +610,7 @@ export default function TablePeriphericals() {
                         <Switch
                           checked={field.value}
                           onCheckedChange={field.onChange}
+                          className="bg-secondary"
                         />
                       </FormControl>
                       <FormMessage />
@@ -624,7 +625,7 @@ export default function TablePeriphericals() {
                   name="observation"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-slate-200 text-xl tracking-[0.12rem]">
+                      <FormLabel className="text-slate-700 dark:text-slate-200 text-xl tracking-[0.12rem]">
                         Observações
                       </FormLabel>
                       <FormControl>

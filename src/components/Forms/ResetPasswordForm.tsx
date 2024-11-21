@@ -25,12 +25,12 @@ const resetPasswordSchema = z.object({
     .string()
     .min(8, "Password must be at least 8 characters")
     .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-      "Password must contain uppercase, lowercase and numbers"
+      /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,}$/,
+      "A senha deve conter mais de 8 caracteres, letras maiúsculas minúsculas, números e caracteres especiais"
     ),
   confirmPassword: z.string()
 }).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
+  message: "Senhas não coincidem",
   path: ["confirmPassword"],
 })
 
@@ -163,7 +163,7 @@ export function ResetPasswordForm() {
             className="text-lg text-white bg-green-500 hover:bg-green-600 dark:bg-slate-700 dark:hover:opacity-90"
             disabled={isPending}
           >
-            {isPending ? "Updating..." : "Update Password"}
+            {isPending ? "Atualizando..." : "Atualizar senha"}
           </Button>
         </form>
       </Form>
