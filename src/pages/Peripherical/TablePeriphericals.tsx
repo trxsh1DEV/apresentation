@@ -222,11 +222,11 @@ const Peripherical: FC = () => {
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
     defaultColumn: { maxSize: 150 },
-    displayColumnDefOptions: {
-      "mrt-row-actions": {
-        header: "Ações",
-      },
-    },
+    // displayColumnDefOptions: {
+    //   "mrt-row-actions": {
+    //     header: "Ações",
+    //   },
+    // },
     renderTopToolbarCustomActions: () => (
       // <TooltipProvider
       // sx={{

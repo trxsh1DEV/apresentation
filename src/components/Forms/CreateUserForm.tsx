@@ -55,7 +55,7 @@ export default function CreateUserRegistration() {
       toast({
         title: "Sucesso",
         description: "Usuário cadastrado com sucesso",
-        className: "bg-success",
+        className: "bg-success border-zinc-100",
       });
       form.reset();
     },

@@ -9,7 +9,7 @@ const Layout = () => {
     <div className="flex">
       {userIsLogged() && <Sidebar />}
       <ModeToggle />
-      <div className="flex-1 p-4 ml-14">
+      <div className="flex-1 px-4 ml-14">
         <Outlet />
       </div>
     </div>

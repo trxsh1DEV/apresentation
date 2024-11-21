@@ -125,12 +125,12 @@ const TableProcesses = ({ id }: { id: string }) => {
     },
     paginationDisplayMode: "pages",
     enableRowActions: true,
-    displayColumnDefOptions: {
-      "mrt-row-actions": {
-        header: "Ações",
-        size: 50,
-      },
-    },
+    // displayColumnDefOptions: {
+    //   "mrt-row-actions": {
+    //     header: "Ações",
+    //     size: 50,
+    //   },
+    // },
     positionActionsColumn: "last",
     renderRowActions: ({ row }) => (
       <div className="flex flex-nowrap gap-2">

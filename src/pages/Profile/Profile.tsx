@@ -179,7 +179,7 @@ const UserProfile = () => {
                       <FormItem>
                         <FormLabel>Nome</FormLabel>
                         <FormControl>
-                          <Input {...field} className="ring-2 ring-slate-700" autoFocus={true}
+                          <Input {...field} className="ring-slate-700 ring-0 bg-gray-200" autoFocus={true}
                           />
                         </FormControl>
                         <FormMessage />
@@ -193,7 +193,7 @@ const UserProfile = () => {
                       <FormItem>
                         <FormLabel>Email</FormLabel>
                         <FormControl>
-                          <Input {...field} disabled className="ring-2 ring-slate-700" />
+                          <Input {...field} disabled className="ring-slate-700 ring-0 bg-gray-200" />
                         </FormControl>
                       </FormItem>
                     )}
@@ -205,7 +205,7 @@ const UserProfile = () => {
                       <FormItem>
                         <FormLabel>Empresa</FormLabel>
                         <FormControl>
-                          <Input {...field} disabled className="ring-2 ring-slate-700" />
+                          <Input {...field} disabled className="ring-slate-700 ring-0 bg-gray-200" />
                         </FormControl>
                       </FormItem>
                     )}
@@ -247,7 +247,7 @@ const UserProfile = () => {
                             type="password"
                             placeholder="Digite sua senha atual"
                             {...field}
-                            className="ring-2 ring-slate-700"
+                            className="ring-slate-700 ring-0 bg-gray-200"
                           />
                         </FormControl>
                         <FormMessage />
@@ -265,7 +265,7 @@ const UserProfile = () => {
                             type="password"
                             placeholder="Digite sua nova senha"
                             {...field}
-                            className="ring-2 ring-slate-700"
+                            className="ring-slate-700 ring-0 bg-gray-200"
                           />
                         </FormControl>
                         <FormMessage />
