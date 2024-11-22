@@ -25,8 +25,9 @@ import {
   ScreenShare,
   Download,
   MoreHorizontal,
+  Trash2,
 } from "lucide-react";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { ErrorBoundary } from "react-error-boundary";
 import { ErrorFallback } from "@/data/error/ErrorFallback";
 import { UnexpectedError } from "@/data/error/UnexpectedError";
@@ -37,6 +38,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { MRT_Localization_PT_BR } from 'material-react-table/locales/pt-BR';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 // import ShowRemoteUrl from "../ShowRemoteUrl";
 
 type InventoryTypeEspecified = {
@@ -241,90 +243,85 @@ const DataTableAgents: React.FC = () => {
   );
 };
 
-const CombinedRowActions = ({row}: any) => {
+const deleteClient = async (clientId: string): Promise<void> => {
+  try{
+    const response = await requestWithToken.delete(`/clients/${clientId}`);
+    if (response?.status !== 200) {
+      throw new Error('Failed to delete client');
+    }
+  } catch (error: any) {
+    throw new Error(error.response.data.message || error.message);
+  }
+};
+
+const CombinedRowActions = ({ row }: any) => {
   const [anchorEl, setAnchorEl] = useState(null);
-    const fileInputRef = useRef<any>();
+  const fileInputRef = useRef<any>();
   const openModal = useSetAtom(openModalAtom);
   const navigate = useNavigate();
   const { toast } = useToast();
-
+  const queryClient = useQueryClient();
 
   const open = Boolean(anchorEl);
 
   const handleTerminal = (clientId: string) => {
-    // console.log(clientId);
     openModal({
       content: <BlackScreen clientId={clientId} />,
-      // title: "Terminal Remoto",
       independenceMode: true,
     });
   };
 
   const loginAndLaunchRemoteControl = async (_email: string, _password: string, deviceID: string) => {
     try {
-        // Faz login
-        // const loginResponse = await axios.post("http://localhost:5000/api/Login/", 
-        //     { email, password },
-        //     {
-        //         withCredentials: true,
-        //         headers: {
-        //             "Content-Type": "application/json",
-        //         }
-        //     }
-        // );
-  
-        // if (loginResponse.status !== 200) {
-        //     throw new Error('Login failed');
-        // }
-
-        // const inventoryValid = await requestWithToken.get(`/inventory/${deviceID}`)
-        // if(inventoryValid.status === 200){
-          const apiKey = import.meta.env.VITE_API_KEY;
-        // Lança o controle remoto
-        // const controlResponse = await axios.get(`http://localhost:5000/api/RemoteControl/${deviceID}`, {
-        const controlResponse = await axios.get(`https://remote.infonova.com.br/api/RemoteControl/${deviceID}`, {
-          withCredentials: true,
-          headers: {
-            "X-Api-Key": apiKey
-          }
+      const apiKey = import.meta.env.VITE_API_KEY;
+      const controlResponse = await axios.get(`https://remote.infonova.com.br/api/RemoteControl/${deviceID}`, {
+        withCredentials: true,
+        headers: {
+          "X-Api-Key": apiKey
+        }
       });
 
-      
       if (controlResponse.status !== 200) {
         throw new Error('Failed to launch remote control');
       }
 
       const url = controlResponse.data.split("Viewer")[1];
-      
-      // Armazena a URL no sessionStorage
       sessionStorage.setItem("remoteControlUrl", url);
-      
-      // Abre a nova aba sem precisar passar a URL como parâmetro
       window.open(`/remote-control`, "_blank");
-        // }
-  
-        // const company = await requestWithToken.get("/company");
-
-        // if(company.data.domain == ""){
-        //   apiKey = ""
-        // }
     } catch (err: any) {
-      console.log('err',err)
       toast({
         title: "Erro",
-        // className: "bg-success border-zinc-100",
         variant: "destructive",
         description: `Erro ao realizar conexão com o dispositivo. Erro: "${err.response.data || err.message}"`,
       });
     }
   };
-  
-  
+
+  const { mutate: deleteClientMutation } = useMutation({
+    mutationFn: deleteClient,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["agent-table-data"] });
+      toast({
+        title: "Sucesso",
+        className: "bg-success border-zinc-100",
+        variant: "destructive",
+        description: "Cliente deletado com sucesso",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro",
+        variant: "destructive",
+        description: `Erro ao deletar cliente. Erro: "${error.message}"`,
+      });
+    },
+  });
+
   const handleClick = (event: any) => {
     setAnchorEl(event.currentTarget);
   };
 
-    const uploadBatFile = async (clientId: string, file: any) => {
+  const uploadBatFile = async (clientId: string, file: any) => {
     const formData = new FormData();
     formData.append("clientId", clientId);
     formData.append("file", file);
@@ -332,7 +329,7 @@ const CombinedRowActions = ({row}: any) => {
     try {
       await requestWithToken.post("/sockets/send-file", formData, {
         headers: {
-          "Content-Type": "multipart/form-data", // Define o cabeçalho correto para a requisição multipart/form-data
+          "Content-Type": "multipart/form-data",
         },
       });
       alert("Upload do arquivo .bat concluído com sucesso!");
@@ -340,26 +337,23 @@ const CombinedRowActions = ({row}: any) => {
       console.error("Erro ao fazer upload do arquivo .bat:", error);
       alert(error.response.data.message);
     } finally {
-      // Limpa o valor do elemento input
       fileInputRef.current.value = "";
     }
   };
-  
+
   const handleClose = () => {
     setAnchorEl(null);
   };
 
   return (
     <div className="relative flex items-center">
-      {/* Menu trigger button */}
       <button
-  onClick={handleClick}
-  className="p-2 hover:text-white hover:bg-gray-600 rounded-full transition-colors"
->
-  <MoreHorizontal className="w-5 h-5 transition-color dark:text-gray-200 " />
-</button>
+        onClick={handleClick}
+        className="p-2 hover:text-white hover:bg-gray-600 rounded-full transition-colors"
+      >
+        <MoreHorizontal className="w-5 h-5 transition-color dark:text-gray-200 " />
+      </button>
 
-      {/* Menu */}
       <Menu
         anchorEl={anchorEl}
         open={open}
@@ -367,31 +361,27 @@ const CombinedRowActions = ({row}: any) => {
         className="mt-2"
       >
         <div className="py-1 min-w-32 rounded-md shadow-lg">
-          {/* Upload MenuItem */}
           <button
             onClick={() => {
               fileInputRef.current.click();
               handleClose();
             }}
-            // disabled={!row.original.online}
             disabled={true}
             className="w-full px-4 py-2 flex items-center gap-3 hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-          <input
-            type="file"
-            accept=".bat"
-            ref={fileInputRef}
-            onChange={(e: any) =>
-              uploadBatFile(row.id, e?.target?.files[0])
-            }
-            style={{ display: "none" }}
-          />
-
+            <input
+              type="file"
+              accept=".bat"
+              ref={fileInputRef}
+              onChange={(e: any) =>
+                uploadBatFile(row.id, e?.target?.files[0])
+              }
+              style={{ display: "none" }}
+            />
             <FileCode2 size={24} className="text-teal-400" />
             <span className="text-base">Upload</span>
           </button>
 
-          {/* Delete MenuItem */}
           <button
             onClick={() => {
               navigate(`/remote-commands/${row.id}`);
@@ -403,65 +393,82 @@ const CombinedRowActions = ({row}: any) => {
             <FileText size={24} className="text-indigo-500" />
             <span className="text-base">Scripts</span>
           </button>
+
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button
+                className="w-full px-4 py-2 flex items-center gap-3 hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <Trash2 size={24} className="text-red-500" />
+                <span className="text-base">Deletar</span>
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  Tem certeza que deseja remover este cliente?
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  Esta ação não pode ser desfeita. Isso irá deletar permanentemente este cliente!
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={() => deleteClientMutation(row.id)}>
+                  Excluir Cliente
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </Menu>
 
-    <Tooltip
-      title={row.original.online ? "Atualizar Inventário" : "Agent Offline"}
-    >
-      <span>
-        <IconButton
-          color="secondary"
-          onClick={() => sendCommand(row.id, "get_inventory")}
-          disabled={!row.original.online}
-        >
-          <Package size={32} />
-        </IconButton>
-      </span>
-    </Tooltip>
+      <Tooltip title={row.original.online ? "Atualizar Inventário" : "Agent Offline"}>
+        <span>
+          <IconButton
+            color="secondary"
+            onClick={() => sendCommand(row.id, "get_inventory")}
+            disabled={!row.original.online}
+          >
+            <Package size={32} />
+          </IconButton>
+        </span>
+      </Tooltip>
 
-    <Tooltip
-      title={
-        row.original.online ? "Terminal Remoto" : "Agent Offline"
-      }
-    >
-      <span>
-        <IconButton
-          color="info"
-          onClick={() => handleTerminal(row.id)}
-          disabled={!row.original.online}
-        >
-          <Code2 size={32} />
-        </IconButton>
-      </span>
-    </Tooltip>
+      <Tooltip title={row.original.online ? "Terminal Remoto" : "Agent Offline"}>
+        <span>
+          <IconButton
+            color="info"
+            onClick={() => handleTerminal(row.id)}
+            disabled={!row.original.online}
+          >
+            <Code2 size={32} />
+          </IconButton>
+        </span>
+      </Tooltip>
 
-    <Tooltip
-      title={
-        row.original.online ? "Acesso remoto" : "Agent Offline"
-      }
-    >
-      <span>
-        <IconButton
-          color="success"
-          onClick={() => loginAndLaunchRemoteControl("", "", row.id)}
-          disabled={!row.original.online}
-        >
-          <ScreenShare size={32} />
-        </IconButton>
-      </span>
-    </Tooltip>
+      <Tooltip title={row.original.online ? "Acesso remoto" : "Agent Offline"}>
+        <span>
+          <IconButton
+            color="success"
+            onClick={() => loginAndLaunchRemoteControl("", "", row.id)}
+            disabled={!row.original.online}
+          >
+            <ScreenShare size={32} />
+          </IconButton>
+        </span>
+      </Tooltip>
 
-    <Tooltip title="Mais detalhes">
-      <Link to={`/agent/${row.id}`}>
-        <IconButton color="default">
-          <Eye size={32} />
-        </IconButton>
-      </Link>
-    </Tooltip>
-  </div>
-  )
-}
+      <Tooltip title="Mais detalhes">
+        <Link to={`/agent/${row.id}`}>
+          <IconButton color="default">
+            <Eye size={32} />
+          </IconButton>
+        </Link>
+      </Tooltip>
+    </div>
+  );
+};
 
 export default function TableAgents() {
   return (

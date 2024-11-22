@@ -87,6 +87,7 @@ export default function CreateUserRegistration() {
                   type="email"
                   className="p-3 ring-slate-300 dark:ring-slate-700"
                   {...field} 
+                  autoFocus={true}
                 />
               </FormControl>
               <FormMessage />

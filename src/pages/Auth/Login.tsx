@@ -64,7 +64,7 @@ const LoginPage = () => {
   };
 
   return (
-  <div className="flex h-[96vh] w-full overflow-hidden">
+  <div className="flex h-screen w-full overflow-hidden">
     {/* Left side - Login Form */}
     <div className="w-1/2 flex items-center justify-center p-8">
       <div className="w-full max-w-md space-y-8">
@@ -139,7 +139,7 @@ const LoginPage = () => {
       {/* Right side - Content */}
       <div className="w-1/2 bg-green-500 dark:bg-purple-500 flex items-center justify-center p-8 text-white">
         <div className="max-w-2xl space-y-8">
-        <div className="flex items-center justify-center space-x-2 mb-24">
+        <div className="flex items-center justify-center space-x-2 mb-20">
             <img 
               src="/icon.svg" 
               alt="Agente Track Logo" 
@@ -155,7 +155,7 @@ const LoginPage = () => {
             Monitore hardware, software, licenças, abas ativas e muito mais. 
             Tome decisões baseadas em dados com relatórios detalhados e alertas automáticos.
           </p>
-          <ul className="space-y-6 text-lg opacity-90">
+          <ul className="space-y-4 text-lg opacity-90">
             <li>✓ Inventário automático de hardware e software</li>
             <li>✓ Gestão de licenciamento e conformidade</li>
             <li>✓ Monitoramento e dashboards</li>
