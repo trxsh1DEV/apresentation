@@ -116,6 +116,7 @@ const MultiStepForm: React.FC = () => {
       // console.log("companyData definido:", data);
       setStep(2);
     } catch (error: any) {
+      alert(`Erro ao cadastrar empresa: ${error.response?.data?.message || error.message}`);
       console.error("Erro ao cadastrar empresa:", error);
     }
   };

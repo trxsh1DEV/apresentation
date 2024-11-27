@@ -405,7 +405,7 @@ const CombinedRowActions = ({ row }: any) => {
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>
+                <AlertDialogTitle className="text-slate-700 dark:text-white">
                   Tem certeza que deseja remover este cliente?
                 </AlertDialogTitle>
                 <AlertDialogDescription>

@@ -179,7 +179,7 @@ const UserProfile = () => {
                       <FormItem>
                         <FormLabel>Nome</FormLabel>
                         <FormControl>
-                          <Input {...field} className="ring-slate-700 ring-0 bg-gray-200" autoFocus={true}
+                          <Input {...field} className="ring-slate-300 dark:ring-slate-700" autoFocus={true}
                           />
                         </FormControl>
                         <FormMessage />
@@ -193,7 +193,7 @@ const UserProfile = () => {
                       <FormItem>
                         <FormLabel>Email</FormLabel>
                         <FormControl>
-                          <Input {...field} disabled className="ring-slate-700 ring-0 bg-gray-200" />
+                          <Input {...field} disabled className="ring-slate-300 dark:ring-slate-700" />
                         </FormControl>
                       </FormItem>
                     )}
@@ -205,7 +205,7 @@ const UserProfile = () => {
                       <FormItem>
                         <FormLabel>Empresa</FormLabel>
                         <FormControl>
-                          <Input {...field} disabled className="ring-slate-700 ring-0 bg-gray-200" />
+                          <Input {...field} disabled className="ring-slate-300 dark:ring-slate-700" />
                         </FormControl>
                       </FormItem>
                     )}
@@ -247,7 +247,7 @@ const UserProfile = () => {
                             type="password"
                             placeholder="Digite sua senha atual"
                             {...field}
-                            className="ring-slate-700 ring-0 bg-gray-200"
+                            className="ring-slate-300 dark:ring-slate-700"
                           />
                         </FormControl>
                         <FormMessage />
@@ -265,7 +265,7 @@ const UserProfile = () => {
                             type="password"
                             placeholder="Digite sua nova senha"
                             {...field}
-                            className="ring-slate-700 ring-0 bg-gray-200"
+                            className="ring-slate-300 dark:ring-slate-700"
                           />
                         </FormControl>
                         <FormMessage />

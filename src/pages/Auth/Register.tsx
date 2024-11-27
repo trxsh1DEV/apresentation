@@ -37,7 +37,7 @@ const Register: React.FC = () => {
           <Input
             type="email"
             value={email}
-            className="ring-slate-300 px-4 py-3 dark:ring-slate-200 dark:text-slate-600 mb-4"
+            className="ring-slate-300 px-4 py-3 dark:ring-slate-200 dark:text-white mb-4"
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Ex: name@company.com"
             autoFocus={true}
