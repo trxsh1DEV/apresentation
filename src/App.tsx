@@ -32,6 +32,7 @@ import PrivacyPolicy from "./pages/Terms/Politica de Privacidade";
 import TermsOfUse from "./pages/Terms/Termo de Uso";
 import { ResetPasswordForm } from "./components/Forms/ResetPasswordForm";
 import { ForgotPasswordForm } from "./components/Forms/ForgotPassword";
+import SoftwareLicenses from "./pages/Software/SoftwareLicenses";
 
 export default function App() {
   const router = createBrowserRouter([
@@ -105,6 +106,10 @@ export default function App() {
             {
               path: "/download",
               element: <DownloadPage />,
+            },
+            {
+              path: "/softwares/licenses",
+              element: <SoftwareLicenses />,
             },
             {
               path: "/custom",

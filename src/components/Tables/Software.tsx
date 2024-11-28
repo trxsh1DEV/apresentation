@@ -487,7 +487,7 @@ const TableSoftwares = ({ id }: { id: string }) => {
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>
+            <AlertDialogTitle className="text-slate-700 dark:text-white text-center">
                 Tem certeza que deseja remover esse app?
               </AlertDialogTitle>
               <AlertDialogDescription>
