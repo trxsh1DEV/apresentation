@@ -406,16 +406,16 @@ const CombinedRowActions = ({ row }: any) => {
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle className="text-slate-700 dark:text-white">
-                  Tem certeza que deseja remover este cliente?
+                  Tem certeza que deseja remover este Agente?
                 </AlertDialogTitle>
                 <AlertDialogDescription>
-                  Esta ação não pode ser desfeita. Isso irá deletar permanentemente este cliente!
+                  Esta ação não pode ser desfeita. Isso irá deletar permanentemente este Agente!
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancelar</AlertDialogCancel>
                 <AlertDialogAction onClick={() => deleteClientMutation(row.id)}>
-                  Excluir Cliente
+                  Excluir Agente
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

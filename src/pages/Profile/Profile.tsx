@@ -25,6 +25,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEffect } from "react";
+import { LoadingSpinner } from "@/components/ui/myIsLoading";
+import { ModeToggle } from "@/components/customerComponents/mode-toggle";
 
 const accountSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
@@ -144,15 +146,19 @@ const UserProfile = () => {
   const onSubmitPassword = (data: PasswordFormData) => {
     updatePasswordMutation.mutate({ 
       currentPassword: data.currentPassword,
-      newPassword: data.newPassword 
+      newPassword: data.newPassword
     });
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div className="w-full fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <LoadingSpinner className="w-24 h-24" />
+  </div>;
   }
 
   return (
+    <>
+    <ModeToggle />
     <div className="flex items-center justify-center h-screen">
       <Tabs defaultValue="account" className="w-[600px]">
         <h1 className="text-4xl text-center mb-6 font-bold">Perfil do Usuário</h1>
@@ -288,6 +294,7 @@ const UserProfile = () => {
         </TabsContent>
       </Tabs>
     </div>
+    </>
   );
 };
 
