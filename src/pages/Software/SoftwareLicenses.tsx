@@ -1,4 +1,3 @@
-// SoftwareLicenses.tsx
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { deleteSoftware, fetchSoftwares } from "../../hooks/useSoftwares";
 import { Button } from "@/components/ui/button";
@@ -6,23 +5,30 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useSetAtom } from "jotai";
 import { openModalAtom } from "@/Context/ModalContext";
 import CreateSoftwareForm, { FormValues } from "./CreateSoftwareLicenseForm";
-import { Edit, PlusCircle, Trash2 } from "lucide-react";
+import { Edit, FileText, PlusCircle, Trash2 } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import requestWithToken from "@/utils/request";
+
+
+const handleDownloadFile = async (refId: string) => {
+  const res = await requestWithToken.get(`/files/${refId}?downloaded=true`);
+  window.open(res.data.downloadUrl, "_blank");
+};
 
 export default function SoftwareLicenses() {
   const openModal = useSetAtom(openModalAtom);
   const queryClient = useQueryClient();
 
   const { data: softwares } = useQuery({
-    queryKey: ["softwares"], 
+    queryKey: ["softwares-licenses"], 
     queryFn: fetchSoftwares
   });
 
   const deleteMutation = useMutation({
     mutationFn: deleteSoftware,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["softwares"] });
+      queryClient.invalidateQueries({ queryKey: ["softwares-licenses"] });
       toast({
         title: "Sucesso",
         description: "Software removido com sucesso",
@@ -43,7 +49,6 @@ export default function SoftwareLicenses() {
     });
   };
 
-
   const handleEdit = (software: FormValues & { name: string }) => {
     openModal({
       content: <CreateSoftwareForm initialData={software} isEditing />,
@@ -53,7 +58,7 @@ export default function SoftwareLicenses() {
   };
 
   return (
-    <main className="flex flex-col p-6 w-full">
+    <section className="flex flex-col p-6 w-full">
       <Button 
         onClick={() => handleOpenModal()} 
         className="self-end mb-4 text-xl text-white bg-green-500 hover:bg-green-600"
@@ -83,17 +88,31 @@ export default function SoftwareLicenses() {
                   <Button
                     variant="ghost"
                     size="sm"
+                    onClick={() => handleDownloadFile(software?.file || "")}
+                    className="mr-2 text-blue-500 hover:text-blue-700"
+                    disabled={!software?.file}
+                    title="Visualizar arquivo"
+                  >
+                    <FileText className="h-7 w-7" />
+                  </Button> 
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={() => handleEdit(software)}
                     className="mr-2 text-green-500 hover:text-green-700"
+                    title="Editar Licença"
                   >
                     <Edit className="h-7 w-7" />
                   </Button>
+
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button
                         variant="ghost"
                         size="sm"
                         className="text-red-500 hover:text-red-700"
+                        title="Remover Licença"
                       >
                         <Trash2 className="h-7 w-7" />
                       </Button>
@@ -119,6 +138,6 @@ export default function SoftwareLicenses() {
           </TableBody>
         </Table>
       </div>
-    </main>
+    </section>
   );
 }

@@ -7,8 +7,13 @@ export const fetchSoftwares = async () => {
   return data;
 };
 
-export const createSoftware = async (software: FormValues) => {
-  const { data } = await requestWithToken.post("/software-licenses", software);
+export const createSoftware = async (formData: FormData) => {
+  console.log(formData)
+  const { data } = await requestWithToken.post("/software-licenses", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
   return data;
 };
 
@@ -17,11 +22,15 @@ export const deleteSoftware = async (name: string) => {
   return data;
 };
 
+
 export const updateSoftware = async (software: FormValues, nameOld: string) => {
   const { data } = await requestWithToken.put(`/software-licenses/${nameOld}`, {
     name: software.name,
     total_licenses: software.total_licenses,
-    used_licenses: software.used_licenses
+    used_licenses: software.used_licenses,
+    provider: software.provider,
+    due_date: software.due_date,
+    file: software?.file || null,
   });
   return data;
 };
