@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import * as z from "zod";
 import { queryClient } from "../../queryClient";
 import { createPeripherical } from "../../hooks/usePeriphericals";
@@ -11,32 +11,25 @@ import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from "@/components/ui/select";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { ptBR } from "date-fns/locale";
 import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
 import MultipleSelector, { Option } from "@/components/ui/select-multiple";
 import { Textarea } from "@/components/ui/textarea";
+import requestWithToken from "@/utils/request";
+import { CustomDataCompanie } from "@/utils/types/types";
+import { UnexpectedError } from "@/data/error/UnexpectedError";
 
 const formSchema = z.object({
   host: z.string().optional(),
@@ -55,14 +48,14 @@ const formSchema = z.object({
       z.object({
         label: z.string(),
         value: z.string(),
-        disable: z.boolean().optional(),
+        disable: z.boolean().optional()
       })
     )
     .min(1, "Selecione ao menos uma categoria"),
   patrimony: z.string().optional(),
   date_buy: z
     .date({
-      required_error: "A data de compra é obrigatória.",
+      required_error: "A data de compra é obrigatória."
     })
     .optional(),
   local: z.string().optional(),
@@ -71,12 +64,12 @@ const formSchema = z.object({
   observation: z
     .string()
     .min(2, {
-      message: "O campo deve ter mais de 2 caracteres",
+      message: "O campo deve ter mais de 2 caracteres"
     })
     .max(300, {
-      message: "O campo deve ter menos de 300 caracteres",
+      message: "O campo deve ter menos de 300 caracteres"
     })
-    .optional(),
+    .optional()
   // authors: z.array(
   //   z.object({
   //     value: z.string(),
@@ -105,7 +98,7 @@ const OPTIONS_CATEGORY: Option[] = [
   { label: "Software e Licenças", value: "Software e Licenças" },
   {
     label: "Nobreaks e Estabilizadores",
-    value: "Nobreaks e Estabilizadores",
+    value: "Nobreaks e Estabilizadores"
   },
   // {
   //   label: "Projetores e Telas de Projeção",
@@ -114,17 +107,30 @@ const OPTIONS_CATEGORY: Option[] = [
   // },
   {
     label: "Equipamentos de Videoconferência",
-    value: "Equipamentos de Videoconferência",
+    value: "Equipamentos de Videoconferência"
   },
   { label: "Telefonia IP", value: "Telefonia IP" },
   { label: "Cabos e Adaptadores", value: "Cabos e Adaptadores" },
   { label: "Dispositivos Móveis", value: "Dispositivos Móveis" },
-  { label: "Outros", value: "Outros" },
+  { label: "Outros", value: "Outros" }
 ];
 
 export default function TablePeriphericals() {
   const [showModal, setShowModal] = useState(false);
   const { toast } = useToast();
+
+  const { data: companieData } = useQuery<CustomDataCompanie>({
+    queryKey: ["company-data"],
+    queryFn: async () => {
+      try {
+        const response = await requestWithToken.get(`/company`);
+        return response.data;
+      } catch (error: any) {
+        throw new UnexpectedError("Falha ao buscar os dados: " + (error.response?.data?.message || error.message));
+      }
+    },
+    retry: 1
+  });
 
   const form = useForm<FormPropsPeripherical>({
     resolver: zodResolver(formSchema),
@@ -135,7 +141,7 @@ export default function TablePeriphericals() {
       category: [],
       // authors: [],
       // class: "",
-      in_stock: false,
+      in_stock: false
       // date_buy: undefined,
       // host: "",
       // local: "",
@@ -144,7 +150,7 @@ export default function TablePeriphericals() {
       // patrimony: "",
       // person: "",
       // sample: "",
-    },
+    }
   });
 
   const mutation = useMutation({
@@ -157,7 +163,7 @@ export default function TablePeriphericals() {
         title: "Sucesso",
         className: "bg-success border-zinc-100",
         variant: "destructive",
-        description: `Item adicionado com sucesso`,
+        description: `Item adicionado com sucesso`
         // description: (
         //   <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
         //     <code className="text-white">{JSON.stringify(data, null, 2)}</code>
@@ -172,9 +178,9 @@ export default function TablePeriphericals() {
       toast({
         title: "Falha",
         variant: "destructive",
-        description: `Item não foi criado: ${err.response.data.message[0] || err.message}`,
+        description: `Item não foi criado: ${err.response.data.message[0] || err.message}`
       });
-    },
+    }
   });
 
   const onSubmit = async (data: FormPropsPeripherical) => {
@@ -191,15 +197,14 @@ export default function TablePeriphericals() {
 
   return (
     <main className="flex justify-center">
-      <Button onClick={handleOpenModal} className="mt-14 text-2xl text-white bg-green-500 hover:bg-green-600 dark:bg-secondary dark:hover:opacity-90">
-        Adicionar
+      <Button
+        onClick={handleOpenModal}
+        className="mt-14 text-2xl text-white bg-green-500 hover:bg-green-600 dark:bg-secondary dark:hover:opacity-90"
+      >
+        Adicionar lore
       </Button>
       {showModal && (
-        <Modal
-          onClose={closeModal}
-          isOpen={showModal}
-          title="Adicionar equipamento"
-        >
+        <Modal onClose={closeModal} isOpen={showModal} title="Adicionar equipamento">
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
@@ -216,11 +221,7 @@ export default function TablePeriphericals() {
                         Host
                       </FormLabel>
                       <FormControl>
-                        <Input
-                          className="p-3 ring-0"
-                          {...field}
-                          value={field.value ?? ""}
-                        />
+                        <Input className="p-3 ring-0" {...field} value={field.value ?? ""} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -243,9 +244,7 @@ export default function TablePeriphericals() {
                           {...field}
                           min={0}
                           value={field.value ?? ""}
-                          onChange={(e) =>
-                            field.onChange(parseFloat(e.target.value) || 0)
-                          }
+                          onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                         />
                       </FormControl>
                       <FormMessage />
@@ -286,20 +285,21 @@ export default function TablePeriphericals() {
                       <FormLabel className="text-slate-700 dark:text-slate-200 text-xl tracking-[0.12rem]">
                         Departamento
                       </FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl className="p-[1.6rem]">
                           <SelectTrigger>
                             <SelectValue placeholder="Selecione um departamento" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="TI">TI</SelectItem>
-                          <SelectItem value="Administração">
-                            Administração
-                          </SelectItem>
+                          <SelectGroup>
+                            <SelectLabel>Departamentos</SelectLabel>
+                            {companieData?.custom?.department?.map((department) => (
+                              <SelectItem key={department} value={department}>
+                                {department}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -319,11 +319,7 @@ export default function TablePeriphericals() {
                         Pessoa Responsável
                       </FormLabel>
                       <FormControl>
-                        <Input
-                          className="p-3 ring-0"
-                          {...field}
-                          value={field.value ?? ""}
-                        />
+                        <Input className="p-3 ring-0" {...field} value={field.value ?? ""} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -340,11 +336,7 @@ export default function TablePeriphericals() {
                         Fabricante
                       </FormLabel>
                       <FormControl>
-                        <Input
-                          className="p-3 ring-0"
-                          {...field}
-                          value={field.value ?? ""}
-                        />
+                        <Input className="p-3 ring-0" {...field} value={field.value ?? ""} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -363,11 +355,7 @@ export default function TablePeriphericals() {
                         Modelo/Versão
                       </FormLabel>
                       <FormControl>
-                        <Input
-                          className="p-3 ring-0"
-                          {...field}
-                          value={field.value ?? ""}
-                        />
+                        <Input className="p-3 ring-0" {...field} value={field.value ?? ""} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -384,11 +372,7 @@ export default function TablePeriphericals() {
                         NF-e
                       </FormLabel>
                       <FormControl>
-                        <Input
-                          className="p-3 ring-0"
-                          {...field}
-                          value={field.value ?? ""}
-                        />
+                        <Input className="p-3 ring-0" {...field} value={field.value ?? ""} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -407,11 +391,7 @@ export default function TablePeriphericals() {
                         Patrimônio
                       </FormLabel>
                       <FormControl>
-                        <Input
-                          className="p-3 ring-0"
-                          {...field}
-                          value={field.value ?? ""}
-                        />
+                        <Input className="p-3 ring-0" {...field} value={field.value ?? ""} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -432,16 +412,13 @@ export default function TablePeriphericals() {
                           <FormControl className="p-[1.6rem]">
                             <Button
                               variant={"outline"}
-                              className={cn(
-                                "pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
+                              className={cn("pl-3 text-left font-normal", !field.value && "text-muted-foreground")}
                             >
                               {field.value ? (
                                 new Intl.DateTimeFormat("pt-BR", {
                                   year: "numeric",
                                   month: "long",
-                                  day: "numeric",
+                                  day: "numeric"
                                 }).format(new Date(field.value))
                               ) : (
                                 <span>Escolha uma data</span>
@@ -455,9 +432,7 @@ export default function TablePeriphericals() {
                             mode="single"
                             selected={field.value}
                             onSelect={field.onChange}
-                            disabled={(date) =>
-                              date > new Date() || date < new Date("1900-01-01")
-                            }
+                            disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
                             locale={ptBR}
                             // initialFocus
                           />
@@ -541,13 +516,23 @@ export default function TablePeriphericals() {
                       <FormLabel className="text-slate-700 dark:text-slate-200 text-xl tracking-[0.12rem]">
                         Local
                       </FormLabel>
-                      <FormControl>
-                        <Input
-                          className="p-3 ring-0"
-                          {...field}
-                          value={field.value ?? ""}
-                        />
-                      </FormControl>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl className="p-[1.6rem]">
+                          <SelectTrigger>
+                            <SelectValue placeholder="Localizado no(a)" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectLabel>Locais</SelectLabel>
+                            {companieData?.custom?.local?.map((local) => (
+                              <SelectItem key={local} value={local}>
+                                {local}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -577,10 +562,7 @@ export default function TablePeriphericals() {
                       <FormLabel className="text-slate-700 dark:text-slate-200 text-xl tracking-[0.12rem]">
                         Status / Situação
                       </FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl className="p-[1.6rem]">
                           <SelectTrigger>
                             <SelectValue placeholder="Selecione a situação" />
@@ -607,11 +589,7 @@ export default function TablePeriphericals() {
                       </FormLabel>
                       <br />
                       <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          className="bg-secondary"
-                        />
+                        <Switch checked={field.value} onCheckedChange={field.onChange} className="bg-secondary" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -641,7 +619,11 @@ export default function TablePeriphericals() {
                 />
               </div>
 
-              <Button type="submit" disabled={mutation.isPending} className="text-xl text-white bg-green-500 hover:bg-green-600 dark:bg-secondary dark:hover:opacity-90">
+              <Button
+                type="submit"
+                disabled={mutation.isPending}
+                className="text-xl text-white bg-green-500 hover:bg-green-600 dark:bg-secondary dark:hover:opacity-90"
+              >
                 {mutation.isPending ? "Salvando..." : "Salvar"}
               </Button>
             </form>
