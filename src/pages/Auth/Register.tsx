@@ -6,20 +6,29 @@ import { LoadingSpinner } from "@/components/ui/myIsLoading";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/components/ui/use-toast";
 
 const Register: React.FC = () => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   const sendMagicLink = async () => {
     setLoading(true);
     try {
       await axios.post(`${BASE_URL}/auth/magic-link`, { email });
-      alert("Link de confirmação de cadastro enviado para o e-mail informado!");
+      toast({
+        title: "Sucesso",
+        className: "bg-success border-zinc-100",
+        variant: "destructive",
+        description: "Link de confirmação de cadastro enviado para o e-mail informado!"
+      });
     } catch (error) {
-      alert(
-        "Erro ao enviar link de confirmação de registro! Revise seu e-mail"
-      );
+      toast({
+        title: "Falha",
+        variant: "destructive",
+        description: "Erro ao enviar link de confirmação de registro! Revise seu e-mail"
+      });
     } finally {
       setLoading(false);
     }
@@ -54,7 +63,7 @@ const Register: React.FC = () => {
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 };
 
 export default Register;

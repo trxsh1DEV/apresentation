@@ -201,7 +201,7 @@ export default function TablePeriphericals() {
         onClick={handleOpenModal}
         className="mt-14 text-2xl text-white bg-green-500 hover:bg-green-600 dark:bg-secondary dark:hover:opacity-90"
       >
-        Adicionar lore
+        Adicionar
       </Button>
       {showModal && (
         <Modal onClose={closeModal} isOpen={showModal} title="Adicionar equipamento">
