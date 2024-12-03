@@ -137,7 +137,6 @@ const Peripherical: FC = () => {
     pageIndex: 0,
     pageSize: 25
   });
-  const openModal = useSetAtom(openModalAtom);
   // const { toast } = useToast();
   const {
     data: { data = [], meta } = {},
@@ -318,6 +317,15 @@ const Peripherical: FC = () => {
     )
   });
 
+  return (
+    // <div>
+      <MaterialReactTable table={table} />
+  );
+};
+
+export const TablePeripherals = () => {
+  const openModal = useSetAtom(openModalAtom);
+
   const handleOpenModal = () => {
     openModal({
       content: <FormPeripherals />,
@@ -327,9 +335,8 @@ const Peripherical: FC = () => {
   };
 
   return (
-    <div>
-      <MaterialReactTable table={table} />
-      {/* <TablePeriphericals /> */}
+    <section className="w-full">
+      <Peripherical />
       <div className="flex justify-center mb-4">
         <Button
           onClick={handleOpenModal}
@@ -338,14 +345,6 @@ const Peripherical: FC = () => {
           Adicionar
         </Button>
       </div>
-    </div>
-  );
-};
-
-export const TablePeripherals = () => {
-  return (
-    <section className="w-full">
-      <Peripherical />
     </section>
   );
 };
