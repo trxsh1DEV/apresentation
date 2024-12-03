@@ -1,27 +1,38 @@
 import { useMemo, useState, FC } from "react";
-// import { IconButton, Tooltip } from "@mui/material";
 import {
-  MRT_ActionMenuItem,
-  // MRT_ActionMenuItem,
   MRT_ColumnFiltersState,
   MRT_PaginationState,
   MRT_SortingState,
   MaterialReactTable,
   useMaterialReactTable,
-  type MRT_ColumnDef,
+  type MRT_ColumnDef
 } from "material-react-table";
 import { TypePeripherical } from "../../utils/types/types";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { csvConfig, formatDateString } from "../../utils/utils";
 import { download, generateCsv } from "export-to-csv";
 import { requestWithToken } from "../../utils/request";
-// import { ArrowsClockwise, Pen, Trash } from "phosphor-react";
-import TablePeriphericals from "./Periphericals";
-import { Download, Pen, Trash } from "lucide-react";
+import { Download, MoreHorizontal, Pen, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { MRT_Localization_PT_BR } from 'material-react-table/locales/pt-BR';
-// import { Pen, RefreshCcw, Trash } from "lucide-react";
-
+import { MRT_Localization_PT_BR } from "material-react-table/locales/pt-BR";
+import { openModalAtom } from "@/Context/ModalContext";
+import { useSetAtom } from "jotai";
+import FormPeripherals from "./FormPeripherals";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/components/ui/use-toast";
+// import { queryClient } from "@/queryClient";
+import { deletePeripherical } from "@/hooks/usePeriphericals";
+import { IconButton, Menu, MenuItem } from "@mui/material";
 
 type UserApiResponse = {
   data: Array<TypePeripherical>;
@@ -30,39 +41,111 @@ type UserApiResponse = {
   };
 };
 
-// const transformDataForCsv = (data: TypePeripherical[]) => {
-//   return data.map((item) => ({
-//     ...item,
-//     category: item.category.join(", "), // Transforma o array em string
-//   }));
-// };
+const CombinedRowActions = ({ row }: any) => {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const openModal = useSetAtom(openModalAtom);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-const Peripherical: FC = () => {
-  const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>(
-    []
-  );
-  const [sorting, setSorting] = useState<MRT_SortingState>([
-    { id: "createdAt", desc: true },
-  ]);
-  const [pagination, setPagination] = useState<MRT_PaginationState>({
-    pageIndex: 0,
-    pageSize: 25,
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event: any) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleEdit = (item: any) => {
+    openModal({
+      content: <FormPeripherals initialData={item} isEditing />,
+      title: "Editar Equipamento",
+      size: "medium"
+    });
+    handleClose();
+  };
+
+  const deleteMutation = useMutation({
+    mutationFn: deletePeripherical,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["table-stock-data"] });
+      toast({
+        title: "Sucesso",
+        description: "Periférico removido com sucesso",
+        variant: "success"
+      });
+    }
   });
 
+  const handleDelete = (id: string) => {
+    deleteMutation.mutate(id);
+    handleClose();
+  };
+
+  return (
+    <div className="relative flex items-center">
+      <IconButton
+        onClick={handleClick}
+        className="p-2 hover:text-white hover:bg-gray-600 rounded-full transition-colors"
+      >
+        <MoreHorizontal className="w-5 h-5 transition-color dark:text-gray-200 " />
+      </IconButton>
+
+      <Menu anchorEl={anchorEl} open={open} onClose={handleClose} className="mt-2">
+        <div className="py-1 min-w-32 rounded-md shadow-lg">
+          <MenuItem
+            onClick={() => handleEdit(row.original)}
+            className="w-full px-4 py-2 flex items-center gap-3 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+          >
+            <Pen size={24} className="text-teal-400" />
+            <span className="text-base">Editar</span>
+          </MenuItem>
+
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <MenuItem className="w-full px-4 py-2 flex items-center gap-3 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                <Trash size={24} className="text-red-500" />
+                <span className="text-base">Deletar</span>
+              </MenuItem>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="text-slate-700 dark:text-white text-center">
+                  Tem certeza que deseja remover este periférico?
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  Esta ação não pode ser desfeita. Isso irá deletar permanentemente este periférico.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={() => handleDelete(row.original?._id || row.id)}>Excluir</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      </Menu>
+    </div>
+  );
+};
+
+const Peripherical: FC = () => {
+  const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>([]);
+  const [sorting, setSorting] = useState<MRT_SortingState>([{ id: "createdAt", desc: true }]);
+  const [pagination, setPagination] = useState<MRT_PaginationState>({
+    pageIndex: 0,
+    pageSize: 25
+  });
+  const openModal = useSetAtom(openModalAtom);
+  // const { toast } = useToast();
   const {
     data: { data = [], meta } = {},
     isError,
     isRefetching,
-    isLoading,
-    // refetch,
+    isLoading
   } = useQuery<UserApiResponse>({
-    queryKey: [
-      "table-stock-data",
-      columnFilters,
-      pagination.pageIndex,
-      pagination.pageSize,
-      sorting,
-    ],
+    queryKey: ["table-stock-data"],
     queryFn: async () => {
       const params = new URLSearchParams();
       params.append("start", `${pagination.pageIndex * pagination.pageSize}`);
@@ -72,7 +155,7 @@ const Peripherical: FC = () => {
 
       try {
         const response = await requestWithToken.get("/equipament", {
-          params,
+          params
         });
         return response.data;
       } catch (error) {
@@ -80,76 +163,98 @@ const Peripherical: FC = () => {
         throw error;
       }
     },
-    placeholderData: keepPreviousData,
+    placeholderData: keepPreviousData
   });
 
   const handleExportData = () => {
     if (!data || data.length <= 0) return;
 
-    // Transforma os dados antes de gerar o CSV
-    const transformedData = data.map(
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      ({ createdAt, _id, updatedAt, __v, ...rest }) => ({
-        ...rest,
-        category: rest.category.join(", "), // Transforma o array em string
-      })
-    );
+    const transformedData = data.map(({ createdAt, _id, updatedAt, __v, ...rest }) => ({
+      ...rest,
+      category: rest.category.join(", ")
+    }));
 
-    const csv = generateCsv(csvConfig)(transformedData); // Gera o CSV com os dados transformados
-    download(csvConfig)(csv); // Faz o download do arquivo
+    const csv = generateCsv(csvConfig)(transformedData);
+    download(csvConfig)(csv);
   };
+
+  // const handleEdit = (item: TypePeripherical) => {
+  //   console.log(item);
+  //   openModal({
+  //     content: <FormPeripherals initialData={item} isEditing />,
+  //     title: "Editar Equipamento",
+  //     size: "medium"
+  //   });
+  // };
+
+  // const handleDelete = (id: string) => {
+  //   deleteMutation.mutate(id);
+  // };
+
+  // Adicione a mutação para deletar periféricos
+  // const deleteMutation = useMutation({
+  //   mutationFn: deletePeripherical,
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ["table-stock-data"] });
+  //     toast({
+  //       title: "Sucesso",
+  //       description: "Periférico removido com sucesso",
+  //       variant: "success"
+  //     });
+  //   }
+  // });
 
   const columns = useMemo<MRT_ColumnDef<TypePeripherical>[]>(
     () => [
       {
         accessorKey: "status",
         header: "Situação",
-        enableSorting: false,
+        enableSorting: false
       },
       { accessorKey: "host", header: "Host" },
       {
         accessorKey: "class",
         header: "Classe",
         enableColumnFilter: false,
-        enableSorting: false,
+        enableSorting: false
       },
       {
         accessorKey: "sample",
         header: "Modelo/Versão",
         enableColumnFilter: false,
-        enableSorting: false,
+        enableSorting: false
       },
       { accessorKey: "manufacturer", header: "Fabricante" },
       { accessorKey: "department", header: "Departamento" },
+      { accessorKey: "local", header: "Local" },
       {
         accessorKey: "person",
         header: "Pessoa",
-        enableSorting: false,
+        enableSorting: false
       },
       {
         accessorKey: "category",
         header: "Categoria",
         Cell: ({ cell }: any) => {
           const value = cell.getValue()?.join(", ");
-          // return value?.length > 29 ? value?.slice(0, 29) + "..." : value;
           return (
             <div className="truncate" title={value}>
               {value}
             </div>
           );
-        },
+        }
       },
       {
         accessorKey: "in_stock",
         header: "Em estoque",
         Cell: ({ cell }: any) => (cell.getValue() ? "Sim" : "Não"),
-        enableColumnFilter: false,
+        enableColumnFilter: false
       },
       {
         accessorKey: "createdAt",
         header: "Data",
         Cell: ({ cell }: any) => formatDateString(cell.getValue()),
-        enableColumnFilter: false,
+        enableColumnFilter: false
       },
       {
         accessorKey: "observation",
@@ -163,8 +268,8 @@ const Peripherical: FC = () => {
               {value}
             </div>
           );
-        },
-      },
+        }
+      }
     ],
     []
   );
@@ -172,23 +277,9 @@ const Peripherical: FC = () => {
   const table = useMaterialReactTable({
     columns,
     data,
+    getRowId: (row) => row._id || "",
     enableRowActions: true,
-    renderRowActionMenuItems: ({ table }) => [
-      <MRT_ActionMenuItem
-        icon={<Pen />}
-        key="edit"
-        label="Edit"
-        onClick={() => console.info("Edit")}
-        table={table}
-      />,
-      <MRT_ActionMenuItem
-        icon={<Trash />}
-        key="delete"
-        label="Delete"
-        onClick={() => console.info("Delete")}
-        table={table}
-      />,
-    ],
+    renderRowActions: ({ row }) => <CombinedRowActions row={row} />,
     rowCount: meta?.totalRowCount ?? 0,
     initialState: { showColumnFilters: true },
     localization: MRT_Localization_PT_BR,
@@ -198,7 +289,7 @@ const Peripherical: FC = () => {
       pagination,
       showAlertBanner: isError,
       showSkeletons: isRefetching,
-      sorting,
+      sorting
     },
     manualFiltering: true,
     manualPagination: true,
@@ -213,53 +304,40 @@ const Peripherical: FC = () => {
       SelectProps: { hiddenLabel: false },
       rowsPerPageOptions: [10, 25, 50, 100],
       variant: "outlined",
-      showRowsPerPage: true,
+      showRowsPerPage: true
     },
-    muiToolbarAlertBannerProps: isError
-      ? { color: "error", children: "Error loading data" }
-      : undefined,
+    muiToolbarAlertBannerProps: isError ? { color: "error", children: "Error loading data" } : undefined,
     onColumnFiltersChange: setColumnFilters,
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
     defaultColumn: { maxSize: 150 },
-    // displayColumnDefOptions: {
-    //   "mrt-row-actions": {
-    //     header: "Ações",
-    //   },
-    // },
     renderTopToolbarCustomActions: () => (
-      // <TooltipProvider
-      // sx={{
-      //   display: 'flex',
-      //   gap: '16px',
-      //   padding: '8px',
-      //   flexWrap: 'wrap',
-      // }}
-      // >
-      //         <Tooltip>
-      //     <TooltipTrigger asChild className="ml-2">
-      //       <Button variant="outline" size="icon" onClick={handleExportData}>
-      //         <Download />
-      //       </Button>
-      //     </TooltipTrigger>
-      //     <TooltipContent>
-      //       <p>Exportar tudo</p>
-      //     </TooltipContent>
-      //   </Tooltip>
-      // </TooltipProvider>
-            <Button variant="outline" size="icon" onClick={handleExportData}>
-      <Download />
-    </Button>
-    ),
+      <Button variant="outline" size="icon" onClick={handleExportData}>
+        <Download />
+      </Button>
+    )
   });
+
+  const handleOpenModal = () => {
+    openModal({
+      content: <FormPeripherals />,
+      title: "Adicionar Equipamento",
+      size: "medium"
+    });
+  };
 
   return (
     <main>
-      {/* <h1 onClick={() => handleExportData()}>Equipamentos</h1> */}
-      {/* <ScrollArea> */}
       <MaterialReactTable table={table} />
-      {/* </ScrollArea> */}
-      <TablePeriphericals />
+      {/* <TablePeriphericals /> */}
+      <div className="flex justify-center mb-4">
+        <Button
+          onClick={handleOpenModal}
+          className="mt-14 text-2xl text-white bg-green-500 hover:bg-green-600 dark:bg-secondary dark:hover:opacity-90"
+        >
+          Adicionar
+        </Button>
+      </div>
     </main>
   );
 };

@@ -7,9 +7,18 @@ import { openModalAtom } from "@/Context/ModalContext";
 import CreateSoftwareForm, { FormValues } from "./CreateSoftwareLicenseForm";
 import { Edit, FileText, PlusCircle, Trash2 } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from "@/components/ui/alert-dialog";
 import requestWithToken from "@/utils/request";
-
 
 const handleDownloadFile = async (refId: string) => {
   const res = await requestWithToken.get(`/files/${refId}?downloaded=true`);
@@ -21,7 +30,7 @@ export default function SoftwareLicenses() {
   const queryClient = useQueryClient();
 
   const { data: softwares } = useQuery({
-    queryKey: ["softwares-licenses"], 
+    queryKey: ["softwares-licenses"],
     queryFn: fetchSoftwares
   });
 
@@ -32,20 +41,20 @@ export default function SoftwareLicenses() {
       toast({
         title: "Sucesso",
         description: "Software removido com sucesso",
-        variant: "success",
+        variant: "success"
       });
-    },
+    }
   });
 
   const handleDelete = (id: string) => {
-      deleteMutation.mutate(id);
+    deleteMutation.mutate(id);
   };
 
   const handleOpenModal = () => {
     openModal({
       content: <CreateSoftwareForm />,
       title: "Adicionar Licença",
-      size: "medium",
+      size: "medium"
     });
   };
 
@@ -53,19 +62,16 @@ export default function SoftwareLicenses() {
     openModal({
       content: <CreateSoftwareForm initialData={software} isEditing />,
       title: "Editar Licença",
-      size: "medium",
+      size: "medium"
     });
   };
 
   return (
     <section className="flex flex-col p-6 w-full">
-      <Button 
-        onClick={() => handleOpenModal()} 
-        className="self-end mb-4 text-xl text-white bg-green-500 hover:bg-green-600"
-      >
+      <Button onClick={handleOpenModal} className="self-end mb-4 text-xl text-white bg-green-500 hover:bg-green-600">
         <PlusCircle className="mr-2 h-6 w-6" /> Adicionar
       </Button>
-      
+
       <div className="w-full overflow-x-auto">
         <Table>
           <TableHeader>
@@ -83,7 +89,9 @@ export default function SoftwareLicenses() {
                 <TableCell className="text-lg">{software.name}</TableCell>
                 <TableCell className="text-lg">{software.total_licenses}</TableCell>
                 <TableCell className="text-lg">{software.used_licenses}</TableCell>
-                <TableCell className="text-lg">{software.total_licenses >= software.used_licenses ? "OK" : "Alerta"}</TableCell>
+                <TableCell className="text-lg">
+                  {software.total_licenses >= software.used_licenses ? "OK" : "Alerta"}
+                </TableCell>
                 <TableCell className="text-right">
                   <Button
                     variant="ghost"
@@ -94,7 +102,7 @@ export default function SoftwareLicenses() {
                     title="Visualizar arquivo"
                   >
                     <FileText className="h-7 w-7" />
-                  </Button> 
+                  </Button>
 
                   <Button
                     variant="ghost"
@@ -119,7 +127,7 @@ export default function SoftwareLicenses() {
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                      <AlertDialogTitle className="text-slate-700 dark:text-white text-center">
+                        <AlertDialogTitle className="text-slate-700 dark:text-white text-center">
                           Tem certeza que deseja remover esta licença?
                         </AlertDialogTitle>
                         <AlertDialogDescription>

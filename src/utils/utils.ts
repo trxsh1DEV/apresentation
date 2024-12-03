@@ -1,6 +1,5 @@
 import { mkConfig } from "export-to-csv";
 
-// 23/09/2024 17:42:05
 export const formatDateString = (dateString: string | Date) => {
   if (!dateString) return;
   return new Date(dateString).toLocaleString().replace(/,/g, "");

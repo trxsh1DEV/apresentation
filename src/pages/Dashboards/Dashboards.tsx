@@ -17,18 +17,13 @@ import {
   RadialLinearScale,
   Tooltip,
   Legend,
-  Title,
+  Title
 } from "chart.js";
 import { useQuery } from "@tanstack/react-query";
 import requestWithToken from "@/utils/request";
 import { UnexpectedError } from "@/data/error/UnexpectedError";
 import { LoadingSpinner } from "@/components/ui/myIsLoading";
-import {
-  containsString,
-  countByCpu,
-  countByField,
-  countByManufacturers,
-} from "@/utils/utils";
+import { containsString, countByCpu, countByField, countByManufacturers } from "@/utils/utils";
 import { FC, useEffect, useRef } from "react";
 
 ChartJS.register(
@@ -86,7 +81,7 @@ const ChartWrapper: FC<ChartWrapperProps> = ({ type, data, options }) => {
         chartInstance.current = new ChartJS(ctx, {
           type,
           data,
-          options,
+          options
         } as ChartConfiguration);
       }
     }
@@ -145,7 +140,7 @@ const mapToGeneralCategories = (
     "Streaming e Gravação": "Mídia e Streaming",
     "Controle de Versão": "Desenvolvimento e IDEs",
     "Emulador Mobile": "Entretenimento",
-    "Acesso Remoto": "Ferramentas de TI",
+    "Acesso Remoto": "Ferramentas de TI"
   };
 
   // Mapeia a contagem de softwares para categorias gerais
@@ -153,8 +148,7 @@ const mapToGeneralCategories = (
     (acc, softwareName) => {
       const specificCategory = softwareCategories[softwareName] || "Outros";
       const generalCategory = categoryMapping[specificCategory] || "Outros";
-      acc[generalCategory] =
-        (acc[generalCategory] || 0) + softwareCount[softwareName];
+      acc[generalCategory] = (acc[generalCategory] || 0) + softwareCount[softwareName];
       return acc;
     },
     {} as { [key: string]: number }
@@ -216,7 +210,7 @@ function groupMemorySize(memorys: MemoryRam[]): GroupedSizesMemory {
         count: 0,
         total: 0,
         memoryTypes: [],
-        percentPerMemoryType: {},
+        percentPerMemoryType: {}
       };
     }
 
@@ -240,9 +234,7 @@ function groupMemorySize(memorys: MemoryRam[]): GroupedSizesMemory {
     const totalSize = groups[key].total;
     for (const type of groups[key].memoryTypes) {
       const typeSize = groups[key].percentPerMemoryType[type];
-      groups[key].percentPerMemoryType[type] = Number(
-        ((typeSize / totalSize) * 100).toFixed(2)
-      ); // Calcula a porcentagem
+      groups[key].percentPerMemoryType[type] = Number(((typeSize / totalSize) * 100).toFixed(2)); // Calcula a porcentagem
     }
   }
 
@@ -262,7 +254,7 @@ function groupMemorySize(memorys: MemoryRam[]): GroupedSizesMemory {
         return acc;
       },
       {} as { [key: string]: { [type: string]: number } }
-    ), // Certifique-se de que o tipo está correto aqui
+    ) // Certifique-se de que o tipo está correto aqui
   };
 }
 
@@ -306,7 +298,7 @@ function groupDiskSizes(disks: Disk[]): GroupedSizes {
   return {
     labels: sortedKeys,
     data: sortedKeys.map((key) => groups[key].count),
-    totalSizes: sortedKeys.map((key) => groups[key].total.toFixed(2)),
+    totalSizes: sortedKeys.map((key) => groups[key].total.toFixed(2))
   };
 }
 
@@ -331,12 +323,9 @@ const useDashboardData = () => {
         const result = await requestWithToken.get(`/clients/dashboard/all`);
         return result.data;
       } catch (error: any) {
-        throw new UnexpectedError(
-          "Falha ao buscar os dados: " +
-            (error.response?.data?.message || error.message)
-        );
+        throw new UnexpectedError("Falha ao buscar os dados: " + (error.response?.data?.message || error.message));
       }
-    },
+    }
     // onError: (error: any) => {
     //   console.error('Erro ao buscar os dados do agente:', error.message);
     // },
@@ -360,9 +349,7 @@ const countMachineTypes = (data: Array<{ typeMachine: string }>) => {
 };
 
 // Função para formatar horas e meses
-const formatHoursMonth = (
-  hoursOnMonthData: { hoursOnMonth: string[] }[]
-): [string[], number[]] => {
+const formatHoursMonth = (hoursOnMonthData: { hoursOnMonth: string[] }[]): [string[], number[]] => {
   const totals: { [key: string]: number } = {}; // Objeto para acumular horas
   const labels: string[] = [];
   const data: number[] = [];
@@ -397,16 +384,25 @@ const Dashboard = () => {
 
   if (isLoading) {
     return (
-      <div>
-        <LoadingSpinner />
+      <div className="w-full fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+        <LoadingSpinner className="w-24 h-24" />
       </div>
     );
   }
 
   if (isError) {
-    return <div>Erro ao carregar os dados</div>;
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <h1 className="text-4xl text-center">Erro ao tentar carregar dados do Dashboard</h1>
+      </div>
+    );
   }
-  if (!historyData || historyData.length < 1) return;
+  if (!historyData || historyData.length < 1)
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <h1 className="text-4xl text-center">Não há dados suficientes para exibir</h1>
+      </div>
+    );
   //   if (!isLoading && !isError && historyData) {
   const {
     machineTypes,
@@ -417,7 +413,7 @@ const Dashboard = () => {
     memoryTotal,
     hoursOnMonthData,
     combinedCategories,
-    softwareCount,
+    softwareCount
   } = historyData.reduce(
     (acc: any, item: any) => {
       // Populando machineTypes, brandManufactures e hoursOnMonthData
@@ -429,17 +425,17 @@ const Dashboard = () => {
           .replace(/^Microsoft\s+/, "")
           .split(" ")
           .slice(0, 3)
-          .join(" "),
+          .join(" ")
         // .trim(),
       });
       acc.cpuModelName.push({ cpuModel: item.cpuModel });
       // acc.diskTotal.push({
       //   diskTotal: item.diskTotal[0],
-      // });      
+      // });
       acc.diskTotal.push(...item.diskTotal.map((disk: number) => ({ diskTotal: disk })));
       acc.memoryTotal.push({
         memoryTotal: item.memoryTotal,
-        memoryType: item.memoryType,
+        memoryType: item.memoryType
       });
 
       // Processando categorySoftwares para combinedCategories e softwareCount
@@ -463,17 +459,14 @@ const Dashboard = () => {
       memoryTotal: [],
       cpuModelName: [],
       combinedCategories: {} as { [key: string]: string },
-      softwareCount: {} as { [key: string]: number },
+      softwareCount: {} as { [key: string]: number }
     }
   );
   // console.log(diskTotal)
   const groupedData = groupDiskSizes(diskTotal);
-  console.log(groupedData)
+  console.log(groupedData);
 
-  const generalCategories = mapToGeneralCategories(
-    softwareCount,
-    combinedCategories
-  );
+  const generalCategories = mapToGeneralCategories(softwareCount, combinedCategories);
 
   const groupedMemoryData = groupMemorySize(memoryTotal);
 
@@ -523,30 +516,22 @@ const Dashboard = () => {
     );
 
   const machineCounts = countMachineTypes(machineTypes);
-  const brandCounts = countByManufacturers(
-    brandManufactures,
-    Object.keys(brandManufactures[0])[0] || "manufacturer",
-    [
-      "DELL",
-      "ASUS",
-      "ACER",
-      "MACHINIST",
-      "SAMSUNG",
-      "LENOVO",
-      "ELSA",
-      "MAXSUN",
-      "GIGABYTE",
-      "ASROCK",
-      "MSI",
-      "SUPERFRAME",
-      "BIOSTAR",
-    ]
-  );
-  const cpuModelCounts = countByCpu(
-    cpuModelName,
-    Object.keys(cpuModelName[0])[0] || "cpuModel",
-    ["Intel", "AMD"]
-  );
+  const brandCounts = countByManufacturers(brandManufactures, Object.keys(brandManufactures[0])[0] || "manufacturer", [
+    "DELL",
+    "ASUS",
+    "ACER",
+    "MACHINIST",
+    "SAMSUNG",
+    "LENOVO",
+    "ELSA",
+    "MAXSUN",
+    "GIGABYTE",
+    "ASROCK",
+    "MSI",
+    "SUPERFRAME",
+    "BIOSTAR"
+  ]);
+  const cpuModelCounts = countByCpu(cpuModelName, Object.keys(cpuModelName[0])[0] || "cpuModel", ["Intel", "AMD"]);
 
   // const cpuModelCounts = {
   //   branchsCpu: {
@@ -574,9 +559,9 @@ const Dashboard = () => {
         data: groupedData.data,
         backgroundColor: "rgba(54, 162, 235, 0.2)",
         borderColor: ["rgba(54, 162, 235, 1)"],
-        borderWidth: 1,
-      },
-    ],
+        borderWidth: 1
+      }
+    ]
   };
 
   const memoryTotalChart = {
@@ -587,9 +572,9 @@ const Dashboard = () => {
         data: groupedMemoryData.data,
         backgroundColor: "rgba(54, 162, 235, 0.2)",
         borderColor: ["rgba(54, 162, 235, 1)"],
-        borderWidth: 1,
-      },
-    ],
+        borderWidth: 1
+      }
+    ]
   };
 
   // Dados estáticos de e
@@ -601,21 +586,15 @@ const Dashboard = () => {
           //   machineCounts?.desktop,
           //   machineCounts?.notebook,
           //   machineCounts?.servidor,
-          machineCounts?.desktop && machineCounts?.desktop > 0
-            ? machineCounts?.desktop
-            : null,
-          machineCounts?.notebook && machineCounts?.notebook > 0
-            ? machineCounts?.notebook
-            : null,
-          machineCounts?.servidor && machineCounts?.servidor > 0
-            ? machineCounts?.servidor
-            : null,
+          machineCounts?.desktop && machineCounts?.desktop > 0 ? machineCounts?.desktop : null,
+          machineCounts?.notebook && machineCounts?.notebook > 0 ? machineCounts?.notebook : null,
+          machineCounts?.servidor && machineCounts?.servidor > 0 ? machineCounts?.servidor : null
         ], // Quantidade de Desktops e Notebooks
         backgroundColor: ["#007bff", "#28a745", "#fffb00"], // Cores para Desktop e Notebook
         // borderColor: ["#007bff", "#28a745", "#fffb00"],
-        borderWidth: 1,
-      },
-    ],
+        borderWidth: 1
+      }
+    ]
   };
 
   const barData = {
@@ -624,16 +603,16 @@ const Dashboard = () => {
       {
         label: "Inventariados",
         data: [20, 15, 10, 5, 7], // Quantidade de itens inventariados
-        backgroundColor: "#4caf50", // Cor para inventariados (verde)
+        backgroundColor: "#4caf50" // Cor para inventariados (verde)
         // borderColor: ["rgb(54, 235, 78, 1)"],
       },
       {
         label: "Em Estoque",
         data: [8, 3, 5, 2, 4], // Quantidade de itens em estoque
-        backgroundColor: "#2196f3", // Cor para em estoque (azul)
+        backgroundColor: "#2196f3" // Cor para em estoque (azul)
         // borderColor: ["rgba(54, 162, 235, 1)"],
-      },
-    ],
+      }
+    ]
   };
 
   const lineData = {
@@ -644,10 +623,10 @@ const Dashboard = () => {
         data: dataHoursMonth,
         // fill: true,
         backgroundColor: "rgba(75, 192, 192, 0.2)",
-        borderColor: "rgba(75, 192, 192, 1)",
+        borderColor: "rgba(75, 192, 192, 1)"
         // tension: 0.5,
-      },
-    ],
+      }
+    ]
   };
 
   const brandChart = {
@@ -655,19 +634,10 @@ const Dashboard = () => {
     datasets: [
       {
         data: Object.values(brandCounts),
-        backgroundColor: [
-          "#007bff",
-          "#ff4d4f",
-          "#20c997",
-          "#e83e8c",
-          "#fd7e14",
-          "#ffc107",
-          "#28a745",
-          "#6610f2",
-        ],
-        borderWidth: 1,
-      },
-    ],
+        backgroundColor: ["#007bff", "#ff4d4f", "#20c997", "#e83e8c", "#fd7e14", "#ffc107", "#28a745", "#6610f2"],
+        borderWidth: 1
+      }
+    ]
   };
 
   const soData = countByField(SystemOperation, "so");
@@ -682,17 +652,10 @@ const Dashboard = () => {
     datasets: [
       {
         data: Object.values(soData),
-        backgroundColor: [
-          "#20c997",
-          "#0dcaf0",
-          "#6f42c1",
-          "#ff4d4f",
-          "#28a745",
-          "#ffc107",
-        ],
-        borderWidth: 1,
-      },
-    ],
+        backgroundColor: ["#20c997", "#0dcaf0", "#6f42c1", "#ff4d4f", "#28a745", "#ffc107"],
+        borderWidth: 1
+      }
+    ]
   };
 
   const cpuBranchChart: any = {
@@ -703,35 +666,32 @@ const Dashboard = () => {
         data: Object.values(cpuModelCounts.branchsCpu),
         backgroundColor: ["rgba(54, 162, 235, 0.2)", "rgba(255, 99, 132, 0.2)"],
         borderColor: ["rgba(54, 162, 235, 1)", "rgba(255, 99, 132, 1)"],
-        borderWidth: 1,
-      },
-    ],
+        borderWidth: 1
+      }
+    ]
   };
 
   const cpuNameRankChart = {
-    labels: [
-      ...Object.keys(cpuModelCounts.nameCpu.AMD),
-      ...Object.keys(cpuModelCounts.nameCpu.Intel),
-    ],
+    labels: [...Object.keys(cpuModelCounts.nameCpu.AMD), ...Object.keys(cpuModelCounts.nameCpu.Intel)],
     datasets: [
       {
         label: "AMD",
         data: Object.values(cpuModelCounts.nameCpu.AMD),
         backgroundColor: "rgba(255, 99, 132, 0.2)",
         borderColor: "rgba(255, 99, 132, 1)",
-        borderWidth: 1,
+        borderWidth: 1
       },
       {
         label: "Intel",
         data: [
           ...Array(Object.keys(cpuModelCounts.nameCpu.AMD).length).fill(0),
-          ...Object.values(cpuModelCounts.nameCpu.Intel),
+          ...Object.values(cpuModelCounts.nameCpu.Intel)
         ],
         backgroundColor: "rgba(54, 162, 235, 0.2)",
         borderColor: "rgba(54, 162, 235, 1)",
-        borderWidth: 1,
-      },
-    ],
+        borderWidth: 1
+      }
+    ]
   };
 
   const softwareData = {
@@ -745,9 +705,9 @@ const Dashboard = () => {
         pointBackgroundColor: "rgb(0, 123, 255)",
         pointBorderColor: "#fff",
         pointHoverBackgroundColor: "#fff",
-        pointHoverBorderColor: "rgb(0, 123, 255)",
-      },
-    ],
+        pointHoverBorderColor: "rgb(0, 123, 255)"
+      }
+    ]
   };
 
   const categorySoftwareData = {
@@ -766,11 +726,11 @@ const Dashboard = () => {
           "#e83e8c",
           "#fd7e14",
           "#17a2b8",
-          "#0dcaf0",
+          "#0dcaf0"
         ],
-        borderWidth: 1,
-      },
-    ],
+        borderWidth: 1
+      }
+    ]
   };
 
   const baseOptions: any = {
@@ -783,10 +743,10 @@ const Dashboard = () => {
           // color: "dark:white",
           // classname: "text-white dark:text-black",
           font: {
-            size: 14,
-          },
+            size: 14
+          }
           // padding: 20,
-        },
+        }
       },
       // tooltip: {
       //   callbacks: {
@@ -805,20 +765,17 @@ const Dashboard = () => {
         color: "white",
         font: {
           weight: "bold",
-          size: 16,
+          size: 16
         },
         formatter: (value: number, context: any) => {
-          const total = context.dataset.data.reduce(
-            (sum: number, dataValue: number) => sum + dataValue,
-            0
-          );
+          const total = context.dataset.data.reduce((sum: number, dataValue: number) => sum + dataValue, 0);
           if (value > 0) {
             return ((value / total) * 100).toFixed(2) + "%";
           }
           return ""; // Retorna uma string vazia se o valor for 0 ou menor
           // return ((value / total) * 100).toFixed(2) + "%";
-        },
-      },
+        }
+      }
     },
     layout: {
       // padding: {
@@ -827,7 +784,7 @@ const Dashboard = () => {
       //   left: 10,
       //   right: 10,
       // },
-    },
+    }
   };
 
   const doughnutOptions: any = {
@@ -835,17 +792,14 @@ const Dashboard = () => {
     tooltip: {
       callbacks: {
         label: (tooltipItem: any) => {
-          const total = tooltipItem.dataset.data.reduce(
-            (sum: number, value: number) => sum + value,
-            0
-          );
+          const total = tooltipItem.dataset.data.reduce((sum: number, value: number) => sum + value, 0);
           const value = tooltipItem.raw;
           const percentage = ((value / total) * 100).toFixed(2) + "%";
           return `${tooltipItem.label}: ${percentage}`;
-        },
-      },
+        }
+      }
     },
-    cutout: "40%",
+    cutout: "40%"
   };
 
   const barOptionsDisk = (title: string, display: boolean) => {
@@ -862,9 +816,9 @@ const Dashboard = () => {
         x: {
           title: {
             display: true,
-            text: `Tamanho do ${title} (GB)`,
-          },
-        },
+            text: `Tamanho do ${title} (GB)`
+          }
+        }
       },
       plugins: {
         ...baseOptions.plugins,
@@ -880,10 +834,8 @@ const Dashboard = () => {
               // console.log(totalSize);
 
               const memoryGroup = context.label; // ex: '4-8' ou '8-16'
-              const memoryTypes =
-                groupedMemoryData.memoryTypes[context.dataIndex];
-              const percentPerMemoryType =
-                groupedMemoryData.percentPerMemoryType[memoryGroup];
+              const memoryTypes = groupedMemoryData.memoryTypes[context.dataIndex];
+              const percentPerMemoryType = groupedMemoryData.percentPerMemoryType[memoryGroup];
 
               // Iniciando o array de linhas com a primeira linha
               const lines = [`${label}: ${value} (Total: ${totalSize} GB)`];
@@ -896,14 +848,14 @@ const Dashboard = () => {
                 });
 
               return lines;
-            },
-          },
+            }
+          }
         },
         title: {
           display,
-          text: `Distribuição de Tamanhos de ${title}`,
-        },
-      },
+          text: `Distribuição de Tamanhos de ${title}`
+        }
+      }
     };
   };
 
@@ -918,22 +870,24 @@ const Dashboard = () => {
           beginAtZero: true,
           ticks: {
             //  color: "white",
-             font: { size: 16 } },
-          grid: { color: "rgba(255, 255, 255, 0.1)" },
+            font: { size: 16 }
+          },
+          grid: { color: "rgba(255, 255, 255, 0.1)" }
         },
         y: {
           ticks: {
             //  color: "white",
-             font: { size: 16 } },
-          grid: { color: "rgba(255, 255, 255, 0.1)" },
-        },
+            font: { size: 16 }
+          },
+          grid: { color: "rgba(255, 255, 255, 0.1)" }
+        }
       },
       plugins: {
         ...baseOptions.plugins,
         legend: {
           ...baseOptions.plugins.legend,
-          display: display,
-        },
+          display: display
+        }
         // position: "top",
         // tooltip: {
         //   callbacks: {
@@ -948,7 +902,7 @@ const Dashboard = () => {
         //     },
         //   },
         // },
-      },
+      }
     };
   };
 
@@ -959,24 +913,26 @@ const Dashboard = () => {
       x: {
         ticks: {
           //  color: "white",
-           font: { size: 14 } },
-        grid: { color: "rgba(255, 255, 255, 0.1)" },
+          font: { size: 14 }
+        },
+        grid: { color: "rgba(255, 255, 255, 0.1)" }
       },
       y: {
         ticks: {
           //  color: "white",
-           font: { size: 14 } },
-        grid: { color: "rgba(255, 255, 255, 0.1)" },
+          font: { size: 14 }
+        },
+        grid: { color: "rgba(255, 255, 255, 0.1)" }
         // suggestedMin: 20, // Definindo o valor mínimo baseado nos dados
-      },
+      }
     },
     elements: {
       point: {
-        radius: 5,
+        radius: 5
       },
       line: {
         // tension: 0.2,
-      },
+      }
     },
     plugins: {
       ...baseOptions.plugins,
@@ -985,10 +941,10 @@ const Dashboard = () => {
         labels: {
           color: "white",
           font: {
-            size: 15,
+            size: 15
             // weight: "bold",
-          },
-        },
+          }
+        }
       },
       datalabels: {
         // ...baseOptions.plugins.datalabels,
@@ -1001,12 +957,12 @@ const Dashboard = () => {
         textStrokeWidth: 3, // Largura do contorno
         font: {
           size: 16,
-          weight: "bold",
-        },
+          weight: "bold"
+        }
       },
       // Adiciona o plugin de datalabels sem sobrescrever a chave plugins
-      datalabelsPlugin: ChartDataLabels,
-    },
+      datalabelsPlugin: ChartDataLabels
+    }
   };
 
   const polarOptions = {
@@ -1014,15 +970,15 @@ const Dashboard = () => {
     scales: {
       r: {
         ticks: {
-          display: false, // Remover números no gráfico para ficar mais limpo
+          display: false // Remover números no gráfico para ficar mais limpo
         },
         grid: {
-          color: "rgba(255, 255, 255, 0.1)", // Ajuste no grid
+          color: "rgba(255, 255, 255, 0.1)" // Ajuste no grid
         },
         angleLines: {
-          color: "rgba(255, 255, 255, 0.2)", // Cor das linhas de divisão
-        },
-      },
+          color: "rgba(255, 255, 255, 0.2)" // Cor das linhas de divisão
+        }
+      }
     },
     plugins: {
       ...baseOptions.plugins,
@@ -1031,11 +987,11 @@ const Dashboard = () => {
         labels: {
           // color: "white",
           font: {
-            size: 14,
-          },
-        },
-      },
-    },
+            size: 14
+          }
+        }
+      }
+    }
   };
 
   const radarOptions: any = {
@@ -1044,10 +1000,10 @@ const Dashboard = () => {
     scales: {
       r: {
         angleLines: {
-          color: "rgba(255, 255, 255, 0.1)",
+          color: "rgba(255, 255, 255, 0.1)"
         },
         grid: {
-          color: "rgba(255, 255, 255, 0.1)",
+          color: "rgba(255, 255, 255, 0.1)"
         },
         ticks: {
           backdropColor: "transparent",
@@ -1057,20 +1013,20 @@ const Dashboard = () => {
           // },
           // color: "white",
           font: {
-            size: 14,
+            size: 14
           },
-          stepSize: 2, // Ajuste este valor conforme necessário
+          stepSize: 2 // Ajuste este valor conforme necessário
         },
         pointLabels: {
           // color: "white",
           font: {
-            size: 16,
+            size: 16
             // weight: "bold"
-          },
+          }
         },
-        suggestedMin: 1,
+        suggestedMin: 1
         // suggestedMax: 14, // Ajuste este valor conforme necessário
-      },
+      }
     },
     plugins: {
       ...baseOptions.plugins,
@@ -1079,23 +1035,19 @@ const Dashboard = () => {
         // color: "white",
         font: {
           size: 14,
-          weight: "bold",
-        },
+          weight: "bold"
+        }
         // padding: 12, // Aumenta o espaçamento dos rótulos de dados
         // formatter: (value) => value.toString(),
-      },
-    },
+      }
+    }
   };
 
   const ChartContainer = ({ title, children }: any) => (
     <div className="bg-transparent shadow-md rounded-lg p-4 flex flex-col h-[600px]">
-      <h2 className="text-2xl font-semibold text-center mb-4 text-slate-700 dark:text-white">
-        {title}
-      </h2>
+      <h2 className="text-2xl font-semibold text-center mb-4 text-slate-700 dark:text-white">{title}</h2>
       <div className="flex-grow relative">
-        <div className="absolute inset-0 flex items-center justify-center">
-          {children}
-        </div>
+        <div className="absolute inset-0 flex items-center justify-center">{children}</div>
       </div>
     </div>
   );
@@ -1103,19 +1055,11 @@ const Dashboard = () => {
   return (
     <div className="p-8 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
       <ChartContainer title="Processadores">
-        <ChartWrapper
-          type="bar"
-          data={cpuBranchChart}
-          options={barOptions("x", false)}
-        />
+        <ChartWrapper type="bar" data={cpuBranchChart} options={barOptions("x", false)} />
       </ChartContainer>
 
       <ChartContainer title="Modelos de Processador">
-        <ChartWrapper
-          type="bar"
-          data={cpuNameRankChart}
-          options={barOptions("y")}
-        />
+        <ChartWrapper type="bar" data={cpuNameRankChart} options={barOptions("y")} />
       </ChartContainer>
 
       <ChartContainer title="Equipamentos Não Inventariados">
@@ -1127,34 +1071,18 @@ const Dashboard = () => {
       </ChartContainer>
 
       <ChartContainer title="Computadores por Categoria">
-        <ChartWrapper
-          type="doughnut"
-          data={pieData}
-          options={doughnutOptions}
-        />
+        <ChartWrapper type="doughnut" data={pieData} options={doughnutOptions} />
       </ChartContainer>
 
       <ChartContainer title="Computadores por Sistema">
-        <ChartWrapper
-          type="doughnut"
-          data={systemOperationData}
-          options={doughnutOptions}
-        />
+        <ChartWrapper type="doughnut" data={systemOperationData} options={doughnutOptions} />
       </ChartContainer>
 
       <ChartContainer title="Computadores por Fabricante">
-        <ChartWrapper
-          type="polarArea"
-          data={brandChart}
-          options={polarOptions}
-        />
+        <ChartWrapper type="polarArea" data={brandChart} options={polarOptions} />
       </ChartContainer>
       <ChartContainer title="Softwares por Categoria">
-        <ChartWrapper
-          type="doughnut"
-          data={categorySoftwareData}
-          options={doughnutOptions}
-        />
+        <ChartWrapper type="doughnut" data={categorySoftwareData} options={doughnutOptions} />
       </ChartContainer>
 
       <ChartContainer title="Principais Softwares">
@@ -1162,19 +1090,11 @@ const Dashboard = () => {
       </ChartContainer>
 
       <ChartContainer title="Armazenamento">
-        <ChartWrapper
-          type="bar"
-          data={diskTotalChart}
-          options={barOptionsDisk("Disco", true)}
-        />
+        <ChartWrapper type="bar" data={diskTotalChart} options={barOptionsDisk("Disco", true)} />
       </ChartContainer>
 
       <ChartContainer title="Memória RAM">
-        <ChartWrapper
-          type="bar"
-          data={memoryTotalChart}
-          options={barOptionsDisk("Memória", false)}
-        />
+        <ChartWrapper type="bar" data={memoryTotalChart} options={barOptionsDisk("Memória", false)} />
       </ChartContainer>
     </div>
   );

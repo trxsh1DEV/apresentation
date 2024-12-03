@@ -1,9 +1,5 @@
 import React, { Suspense, useMemo, useRef, useState } from "react";
-import {
-  MaterialReactTable,
-  useMaterialReactTable,
-  type MRT_ColumnDef,
-} from "material-react-table";
+import { MaterialReactTable, useMaterialReactTable, type MRT_ColumnDef } from "material-react-table";
 import { IconButton, Menu, Tooltip } from "@mui/material";
 import { useSetAtom } from "jotai";
 import { csvConfig, formatDateString } from "../../utils/utils";
@@ -25,7 +21,7 @@ import {
   ScreenShare,
   Download,
   MoreHorizontal,
-  Trash2,
+  Trash2
 } from "lucide-react";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { ErrorBoundary } from "react-error-boundary";
@@ -37,8 +33,18 @@ import { sendCommand } from "@/utils/utils-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
-import { MRT_Localization_PT_BR } from 'material-react-table/locales/pt-BR';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { MRT_Localization_PT_BR } from "material-react-table/locales/pt-BR";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from "@/components/ui/alert-dialog";
 // import ShowRemoteUrl from "../ShowRemoteUrl";
 
 type InventoryTypeEspecified = {
@@ -64,13 +70,10 @@ const DataTableAgents: React.FC = () => {
         const response = await requestWithToken.get("/clients");
         return response.data;
       } catch (error: any) {
-        throw new UnexpectedError(
-          "Falha ao buscar os dados: " +
-            (error.response?.data?.message || error.message)
-        ); // Ou retorne um valor padrão que você gostaria de usar em caso de erro
+        throw new UnexpectedError("Falha ao buscar os dados: " + (error.response?.data?.message || error.message)); // Ou retorne um valor padrão que você gostaria de usar em caso de erro
       }
     },
-    retry: 1,
+    retry: 1
   });
 
   const handleExportData = () => {
@@ -79,17 +82,7 @@ const DataTableAgents: React.FC = () => {
 
     // Mapeie os clientes para o formato adequado antes de gerar o CSV
     const clientsData = clients.map(
-      ({
-        createdAt,
-        diskTotal,
-        hostname,
-        memoryTotal,
-        online,
-        so,
-        typeMachine,
-        uid,
-        userLogged,
-      }) => ({
+      ({ createdAt, diskTotal, hostname, memoryTotal, online, so, typeMachine, uid, userLogged }) => ({
         // patrimony: client.custom.patrimony,
         uid,
         hostname,
@@ -99,7 +92,7 @@ const DataTableAgents: React.FC = () => {
         Tipo: typeMachine,
         "Data de inclusão": formatDateString(createdAt),
         RAM: memoryTotal,
-        "Armazenamento (GB)": diskTotal,
+        "Armazenamento (GB)": diskTotal
       })
     );
 
@@ -111,11 +104,11 @@ const DataTableAgents: React.FC = () => {
     () => [
       {
         accessorKey: "hostname",
-        header: "Hostname",
+        header: "Hostname"
       },
       {
         accessorKey: "so",
-        header: "SO",
+        header: "SO"
       },
       // {
       //   accessorKey: "uid",
@@ -123,18 +116,18 @@ const DataTableAgents: React.FC = () => {
       // },
       {
         accessorKey: "typeMachine",
-        header: "Categoria",
+        header: "Categoria"
       },
       {
         accessorKey: "userLogged",
         header: "Usuário",
         grow: false, //don't allow this column to grow to fill in remaining space - new in v2.8
-        size: 50, //small column
+        size: 50 //small column
       },
       {
         accessorFn: (row) => row.diskTotal,
         header: "Armazenamento",
-        Cell: ({ cell }: any) => cell.getValue().toFixed(2) + " GB",
+        Cell: ({ cell }: any) => cell.getValue().toFixed(2) + " GB"
       },
       // {
       //   accessorKey: "inventory.custom.patrimony",
@@ -147,13 +140,13 @@ const DataTableAgents: React.FC = () => {
       {
         accessorKey: "createdAt",
         header: "Data de inclusão",
-        Cell: ({ cell }: any) => formatDateString(cell.getValue()),
+        Cell: ({ cell }: any) => formatDateString(cell.getValue())
       },
       {
         accessorKey: "memoryTotal",
         header: "RAM",
-        Cell: ({ cell }: any) => cell.getValue().toFixed(2) + " GB",
-      },
+        Cell: ({ cell }: any) => cell.getValue().toFixed(2) + " GB"
+      }
     ],
     []
   );
@@ -161,11 +154,11 @@ const DataTableAgents: React.FC = () => {
   // const handleCommandsPresets = (clientId: string) => {
   //   navigate(`/remote-commands/${clientId}`);
   // };
-  
+
   // const handleAccessRemote = async (clientId: string) => {
   //   try {
   //     const result = await axios.post(
-  //       "http://localhost:3333/sockets/remote-connection", 
+  //       "http://localhost:3333/sockets/remote-connection",
   //       { clientId },
   //       {
   //         headers: {
@@ -174,7 +167,7 @@ const DataTableAgents: React.FC = () => {
   //       },
   //     );
   //     console.log(result.data);
-      
+
   //     // Aqui você pode redirecionar para a interface do Guacamole
   //     // ou abrir em uma nova janela usando o token recebido
   //   } catch (err: any) {
@@ -190,7 +183,11 @@ const DataTableAgents: React.FC = () => {
     columnFilterDisplayMode: "popover",
     renderEmptyRowsFallback: () => (
       <div className="w-full text-center text-2xl font-semibold my-10 overflow-hidden">
-        Nenhum agente foi encontrado, baixe seu primeiro agente abaixo<br /><a className="text-green-500 dark:text-purple-500 hover:underline" href="/download">Download</a>
+        Nenhum agente foi encontrado, baixe seu primeiro agente abaixo
+        <br />
+        <a className="text-green-500 dark:text-purple-500 hover:underline" href="/download">
+          Download
+        </a>
       </div>
     ),
     renderTopToolbarCustomActions: () => (
@@ -199,26 +196,26 @@ const DataTableAgents: React.FC = () => {
           display: "flex",
           gap: "16px",
           padding: "8px",
-          flexWrap: "wrap",
+          flexWrap: "wrap"
         }}
       >
-            <Button variant="outline" size="icon" onClick={handleExportData}>
-              <Download />
-            </Button>
+        <Button variant="outline" size="icon" onClick={handleExportData}>
+          <Download />
+        </Button>
       </div>
     ),
     paginationDisplayMode: "pages",
     initialState: {
       pagination: { pageSize: 25, pageIndex: 0 },
-      sorting: [{id: 'createdAt', desc: true}],
-      showColumnFilters: true,
+      sorting: [{ id: "createdAt", desc: true }],
+      showColumnFilters: true
     },
     localization: MRT_Localization_PT_BR,
     muiPaginationProps: {
       shape: "rounded",
       rowsPerPageOptions: [10, 25, 50, 100],
       showRowsPerPage: true,
-      variant: "outlined",
+      variant: "outlined"
     },
     enableRowActions: true,
     getRowId: (row) => row.uid,
@@ -228,9 +225,7 @@ const DataTableAgents: React.FC = () => {
     //     // size: 300, //make actions column wider
     //   },
     // },
-    renderRowActions: ({ row }) => (
-      <CombinedRowActions row={row} />
-    ),
+    renderRowActions: ({ row }) => <CombinedRowActions row={row} />
   });
 
   return (
@@ -244,10 +239,10 @@ const DataTableAgents: React.FC = () => {
 };
 
 const deleteClient = async (clientId: string): Promise<void> => {
-  try{
+  try {
     const response = await requestWithToken.delete(`/clients/${clientId}`);
     if (response?.status !== 200) {
-      throw new Error('Failed to delete client');
+      throw new Error("Failed to delete client");
     }
   } catch (error: any) {
     throw new Error(error.response.data.message || error.message);
@@ -267,7 +262,7 @@ const CombinedRowActions = ({ row }: any) => {
   const handleTerminal = (clientId: string) => {
     openModal({
       content: <BlackScreen clientId={clientId} />,
-      independenceMode: true,
+      independenceMode: true
     });
   };
 
@@ -282,7 +277,7 @@ const CombinedRowActions = ({ row }: any) => {
       });
 
       if (controlResponse.status !== 200) {
-        throw new Error('Failed to launch remote control');
+        throw new Error("Failed to launch remote control");
       }
 
       const url = controlResponse.data.split("Viewer")[1];
@@ -292,7 +287,7 @@ const CombinedRowActions = ({ row }: any) => {
       toast({
         title: "Erro",
         variant: "destructive",
-        description: `Erro ao realizar conexão com o dispositivo. Erro: "${err.response.data || err.message}"`,
+        description: `Erro ao realizar conexão com o dispositivo. Erro: "${err.response.data || err.message}"`
       });
     }
   };
@@ -305,16 +300,16 @@ const CombinedRowActions = ({ row }: any) => {
         title: "Sucesso",
         className: "bg-success border-zinc-100",
         variant: "destructive",
-        description: "Cliente deletado com sucesso",
+        description: "Cliente deletado com sucesso"
       });
     },
     onError: (error: any) => {
       toast({
         title: "Erro",
         variant: "destructive",
-        description: `Erro ao deletar cliente. Erro: "${error.message}"`,
+        description: `Erro ao deletar cliente. Erro: "${error.message}"`
       });
-    },
+    }
   });
 
   const handleClick = (event: any) => {
@@ -329,8 +324,8 @@ const CombinedRowActions = ({ row }: any) => {
     try {
       await requestWithToken.post("/sockets/send-file", formData, {
         headers: {
-          "Content-Type": "multipart/form-data",
-        },
+          "Content-Type": "multipart/form-data"
+        }
       });
       alert("Upload do arquivo .bat concluído com sucesso!");
     } catch (error: any) {
@@ -347,19 +342,11 @@ const CombinedRowActions = ({ row }: any) => {
 
   return (
     <div className="relative flex items-center">
-      <button
-        onClick={handleClick}
-        className="p-2 hover:text-white hover:bg-gray-600 rounded-full transition-colors"
-      >
+      <button onClick={handleClick} className="p-2 hover:text-white hover:bg-gray-600 rounded-full transition-colors">
         <MoreHorizontal className="w-5 h-5 transition-color dark:text-gray-200 " />
       </button>
 
-      <Menu
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-        className="mt-2"
-      >
+      <Menu anchorEl={anchorEl} open={open} onClose={handleClose} className="mt-2">
         <div className="py-1 min-w-32 rounded-md shadow-lg">
           <button
             onClick={() => {
@@ -373,9 +360,7 @@ const CombinedRowActions = ({ row }: any) => {
               type="file"
               accept=".bat"
               ref={fileInputRef}
-              onChange={(e: any) =>
-                uploadBatFile(row.id, e?.target?.files[0])
-              }
+              onChange={(e: any) => uploadBatFile(row.id, e?.target?.files[0])}
               style={{ display: "none" }}
             />
             <FileCode2 size={24} className="text-teal-400" />
@@ -396,9 +381,7 @@ const CombinedRowActions = ({ row }: any) => {
 
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <button
-                className="w-full px-4 py-2 flex items-center gap-3 hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
+              <button className="w-full px-4 py-2 flex items-center gap-3 hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                 <Trash2 size={24} className="text-red-500" />
                 <span className="text-base">Deletar</span>
               </button>
@@ -409,14 +392,13 @@ const CombinedRowActions = ({ row }: any) => {
                   Tem certeza que deseja remover este Agente?
                 </AlertDialogTitle>
                 <AlertDialogDescription>
-                  Esta ação não pode ser desfeita. Isso irá deletar permanentemente este Agente!
+                  Esta ação não pode ser desfeita. Isso irá deletar permanentemente este Agente, mas não irá desinstalar
+                  o agente do dispositivo em questão!
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                <AlertDialogAction onClick={() => deleteClientMutation(row.id)}>
-                  Excluir Agente
-                </AlertDialogAction>
+                <AlertDialogAction onClick={() => deleteClientMutation(row.id)}>Excluir Agente</AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
@@ -437,11 +419,7 @@ const CombinedRowActions = ({ row }: any) => {
 
       <Tooltip title={row.original.online ? "Terminal Remoto" : "Agent Offline"}>
         <span>
-          <IconButton
-            color="info"
-            onClick={() => handleTerminal(row.id)}
-            disabled={!row.original.online}
-          >
+          <IconButton color="info" onClick={() => handleTerminal(row.id)} disabled={!row.original.online}>
             <Code2 size={32} />
           </IconButton>
         </span>
@@ -472,10 +450,7 @@ const CombinedRowActions = ({ row }: any) => {
 
 export default function TableAgents() {
   return (
-    <ErrorBoundary
-      FallbackComponent={ErrorFallback || "Ocorreu um erro no servidor"}
-      onReset={() => location.reload()}
-    >
+    <ErrorBoundary FallbackComponent={ErrorFallback || "Ocorreu um erro no servidor"} onReset={() => location.reload()}>
       <Suspense
         fallback={
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">

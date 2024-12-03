@@ -1,22 +1,15 @@
-import { useEffect, useRef, useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { useMutation } from "@tanstack/react-query"
-import { useToast } from "@/components/ui/use-toast"
-import { LoadingSpinner } from "@/components/ui/myIsLoading"
-import requestWithToken from "@/utils/request"
+import { useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useMutation } from "@tanstack/react-query";
+import { useToast } from "@/components/ui/use-toast";
+import { LoadingSpinner } from "@/components/ui/myIsLoading";
+import requestWithToken from "@/utils/request";
 
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 type Plan = {
   name: string;
@@ -35,8 +28,8 @@ const plans: Plan[] = [
       "Comandos e scripts remotos",
       "Inventário de dispositivos",
       "Controle de estoque",
-      "Acesso total ao painel",
-    ],
+      "Acesso total ao painel"
+    ]
   },
   {
     name: "Starter",
@@ -53,8 +46,8 @@ const plans: Plan[] = [
       "Gerenciamento total de softwares",
       "Blacklist de Softwares",
       "Suporte para implementação",
-      "Exportação de Relatórios",
-    ],
+      "Exportação de Relatórios"
+    ]
   },
   {
     name: "Enterprise",
@@ -71,22 +64,20 @@ const plans: Plan[] = [
       "Mensageria e Campanhas Informativas",
       "API para integrações",
       "Gerenciamento Multiempresa",
-      "Análise de maturidade",
-    ],
-  },
+      "Análise de maturidade"
+    ]
+  }
 ];
 
 const subscriptionSchema = z.object({
   planName: z.string().min(1, "Selecione um plano"),
-  agentCount: z.number()
-    .min(1, "Mínimo de 1 agente")
-    .max(10000, "Máximo de 10000 agentes")
-})
+  agentCount: z.number().min(1, "Mínimo de 1 agente").max(10000, "Máximo de 10000 agentes")
+});
 
-type SubscriptionInput = z.infer<typeof subscriptionSchema>
+type SubscriptionInput = z.infer<typeof subscriptionSchema>;
 
 export default function PaymentPage() {
-  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null)
+  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const hasExistingPlan = useRef(false);
   const { toast } = useToast();
   // const inputRef = useRef<HTMLInputElement>(null);
@@ -95,20 +86,19 @@ export default function PaymentPage() {
     resolver: zodResolver(subscriptionSchema),
     defaultValues: {
       planName: "",
-      agentCount: 1,
-    },
-  })
+      agentCount: 1
+    }
+  });
 
   useEffect(() => {
     const fetchCompanyData = async () => {
       try {
         const response = await requestWithToken.get("/company");
         const { plan, quantityAgents } = response.data;
-        const existingPlan = plans.find(planItem => planItem.name === plan);
-        console.log('oi', existingPlan)
+        const existingPlan = plans.find((planItem) => planItem.name === plan);
         if (existingPlan) {
           handlePlanSelect(existingPlan, quantityAgents);
-          if(quantityAgents > 0 && plan !== "Free") {
+          if (quantityAgents > 0 && plan !== "Free") {
             hasExistingPlan.current = true;
           }
         }
@@ -150,7 +140,7 @@ export default function PaymentPage() {
         toast({
           title: "Sucesso",
           className: "bg-success border-zinc-100",
-          description: "Plano gratuito ativado com sucesso",
+          description: "Plano gratuito ativado com sucesso"
         });
       }
     },
@@ -158,9 +148,9 @@ export default function PaymentPage() {
       toast({
         title: "Erro",
         variant: "destructive",
-        description: `Falha ao processar assinatura: ${error.message}`,
+        description: `Falha ao processar assinatura: ${error.message}`
       });
-    },
+    }
   });
 
   const handlePlanSelect = (plan: Plan, qtdeAgents: number | null = null) => {
@@ -183,7 +173,7 @@ export default function PaymentPage() {
 
   const onSubmit = (data: SubscriptionInput) => {
     subscribe(data);
-  }
+  };
 
   return (
     <div className="max-w-5xl mx-auto p-2">
@@ -199,9 +189,7 @@ export default function PaymentPage() {
             onClick={() => handlePlanSelect(plan)}
           >
             <div>
-              <h2 className="text-3xl font-bold text-center text-black dark:text-white p-0 mb-2">
-                Plano {plan.name}
-              </h2>
+              <h2 className="text-3xl font-bold text-center text-black dark:text-white p-0 mb-2">Plano {plan.name}</h2>
               <p className="text-2xl font-bold text-center mb-3">
                 {plan.price === 0 ? "GRÁTIS" : `R$ ${plan.price.toString().replace(".", ",")}`}
               </p>
@@ -227,9 +215,16 @@ export default function PaymentPage() {
 
       {selectedPlan && (
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="w-full bg-white mt-6 p-6 rounded-lg shadow-2xl dark:bg-slate-800">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="w-full bg-white mt-6 p-6 rounded-lg shadow-2xl dark:bg-slate-800"
+          >
             <h2 className="text-2xl font-bold mb-4 text-slate-700 dark:text-white p-1">
-              Plano <span className="font-bold text-gray-800 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 bg-clip-text text-transparent py-0.5">{selectedPlan.name}</span> Selecionado
+              Plano{" "}
+              <span className="font-bold text-gray-800 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 bg-clip-text text-transparent py-0.5">
+                {selectedPlan.name}
+              </span>{" "}
+              Selecionado
             </h2>
 
             <FormField
@@ -241,21 +236,21 @@ export default function PaymentPage() {
                     Quantidade de Agentes (máx: {selectedPlan.agentLimit})
                   </FormLabel>
                   <FormControl>
-                  <Input
-                    type="number"
-                    min={1}
-                    max={selectedPlan.agentLimit}
-                    {...field}
-                    ref={field.ref} // Use field.ref instead of inputRef
-                    onChange={(e) => {
-                      const value = Number(e.target.value);
-                      field.onChange(selectedPlan.name === "Free" ? 20 : value);
-                    }}
-                    value={selectedPlan.name === "Free" ? 20 : field.value}
-                    disabled={selectedPlan.name === "Free"}
-                    className="dark:text-white mt-1 block w-full rounded-md border-gray-300 shadow-sm ring-0 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                    autoFocus={true}
-                  />
+                    <Input
+                      type="number"
+                      min={1}
+                      max={selectedPlan.agentLimit}
+                      {...field}
+                      ref={field.ref} // Use field.ref instead of inputRef
+                      onChange={(e) => {
+                        const value = Number(e.target.value);
+                        field.onChange(selectedPlan.name === "Free" ? 20 : value);
+                      }}
+                      value={selectedPlan.name === "Free" ? 20 : field.value}
+                      disabled={selectedPlan.name === "Free"}
+                      className="dark:text-white mt-1 block w-full rounded-md border-gray-300 shadow-sm ring-0 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                      autoFocus={true}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
