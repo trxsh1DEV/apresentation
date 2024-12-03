@@ -327,7 +327,7 @@ const Peripherical: FC = () => {
   };
 
   return (
-    <main>
+    <div>
       <MaterialReactTable table={table} />
       {/* <TablePeriphericals /> */}
       <div className="flex justify-center mb-4">
@@ -338,15 +338,15 @@ const Peripherical: FC = () => {
           Adicionar
         </Button>
       </div>
-    </main>
+    </div>
   );
 };
 
 export const TablePeripherals = () => {
   return (
-    <main className="w-full">
+    <section className="w-full">
       <Peripherical />
-    </main>
+    </section>
   );
 };
 export default TablePeripherals;

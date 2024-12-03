@@ -192,11 +192,10 @@ export default function FormPeripherals({ initialData, isEditing }: createPeriph
   };
 
   return (
-    // <div className="flex justify-center">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-3 py-5 px-10 bg-gray-200 dark:bg-gray-700 text-center w-full"
+          className="space-y-3 bg-transparent dark:bg-transparent text-center w-full"
         >
           <div className="grid grid-cols-2 gap-4">
             <FormField
@@ -206,7 +205,7 @@ export default function FormPeripherals({ initialData, isEditing }: createPeriph
                 <FormItem>
                   <FormLabel className="text-slate-700 dark:text-slate-200 text-xl tracking-[0.12rem]">Host</FormLabel>
                   <FormControl>
-                    <Input className="p-3 ring-0" {...field} value={field.value ?? ""} />
+                    <Input className="p-3 ring-slate-300 dark:ring-slate-700" {...field} value={field.value ?? ""} autoFocus={true}/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -223,7 +222,7 @@ export default function FormPeripherals({ initialData, isEditing }: createPeriph
                   </FormLabel>
                   <FormControl>
                     <Input
-                      className="p-3 ring-0"
+                      className="p-3 ring-slate-300 dark:ring-slate-700"
                       type="number"
                       {...field}
                       min={0}
@@ -248,7 +247,7 @@ export default function FormPeripherals({ initialData, isEditing }: createPeriph
                   </FormLabel>
                   <FormControl>
                     <Input
-                      className="p-3 ring-0"
+                      className="p-3 ring-slate-300 dark:ring-slate-700"
                       {...field}
                       value={field.value ?? ""}
                       placeholder="Ex: Notebook ou Impressora"
@@ -300,7 +299,7 @@ export default function FormPeripherals({ initialData, isEditing }: createPeriph
                     Pessoa Responsável
                   </FormLabel>
                   <FormControl>
-                    <Input className="p-3 ring-0" {...field} value={field.value ?? ""} />
+                    <Input className="p-3 ring-slate-300 dark:ring-slate-700" {...field} value={field.value ?? ""} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -316,7 +315,7 @@ export default function FormPeripherals({ initialData, isEditing }: createPeriph
                     Fabricante
                   </FormLabel>
                   <FormControl>
-                    <Input className="p-3 ring-0" {...field} value={field.value ?? ""} />
+                    <Input className="p-3 ring-slate-300 dark:ring-slate-700" {...field} value={field.value ?? ""} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -334,7 +333,7 @@ export default function FormPeripherals({ initialData, isEditing }: createPeriph
                     Modelo/Versão
                   </FormLabel>
                   <FormControl>
-                    <Input className="p-3 ring-0" {...field} value={field.value ?? ""} />
+                    <Input className="p-3 ring-slate-300 dark:ring-slate-700" {...field} value={field.value ?? ""} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -348,7 +347,7 @@ export default function FormPeripherals({ initialData, isEditing }: createPeriph
                 <FormItem>
                   <FormLabel className="text-slate-700 dark:text-slate-200 text-xl tracking-[0.12rem]">NF-e</FormLabel>
                   <FormControl>
-                    <Input className="p-3 ring-0" {...field} value={field.value ?? ""} />
+                    <Input className="p-3 ring-slate-300 dark:ring-slate-700" {...field} value={field.value ?? ""} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -366,7 +365,7 @@ export default function FormPeripherals({ initialData, isEditing }: createPeriph
                     Patrimônio
                   </FormLabel>
                   <FormControl>
-                    <Input className="p-3 ring-0" {...field} value={field.value ?? ""} />
+                    <Input className="p-3 ring-slate-300 dark:ring-slate-700" {...field} value={field.value ?? ""} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -540,15 +539,14 @@ export default function FormPeripherals({ initialData, isEditing }: createPeriph
             />
           </div>
 
-          <Button
-            type="submit"
-            disabled={mutation.isPending}
-            className="text-xl text-white bg-green-500 hover:bg-green-600 dark:bg-secondary dark:hover:opacity-90"
-          >
-            {mutation.isPending ? "Salvando..." : "Salvar"}
-          </Button>
-        </form>
-      </Form>
-    // </div>
+        <Button
+          type="submit"
+          disabled={mutation.isPending}
+          className="text-xl text-white bg-green-500 hover:bg-green-600 dark:bg-secondary dark:hover:opacity-90"
+        >
+          {mutation.isPending ? "Salvando..." : "Salvar"}
+        </Button>
+      </form>
+    </Form>
   );
 }

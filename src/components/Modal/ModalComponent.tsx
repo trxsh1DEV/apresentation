@@ -7,7 +7,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-// import { Button } from "@/components/ui/button";
 import "./style.css";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { DialogDescription } from "@radix-ui/react-dialog";
@@ -37,48 +36,24 @@ const Modal: FC = () => {
     return (
       <div className="modal-container">
         {content}
-        {/* <div className="backdrop" onClick={() => closeModal()} />
-          <div className="content">
-            <div className="close-button" onClick={() => closeModal()}>
-              <X size={40} />
-            </div>
-            {title && <h2 className="text-center">{title}</h2>}
-            div{content}
-            {(onConfirm || onCancel) && renderModalActions()}
-          </div> */}
       </div>
     );
   }
-  // console.log(typeof size, size, size ? size : 800);
 
   return (
     <>
       <Dialog open={isOpen} onOpenChange={() => closeModal()}>
         <DialogContent
           aria-describedby="modal description"
-          className={`${sizeClasses[size]} max-h-[90vh] bg-gray-100 min-w-96 dark:bg-zinc-900 dark:text-white border-zinc-700`}
+          className={`${sizeClasses[size]} max-h-[90vh] bg-gray-100 min-w-96 dark:bg-zinc-900 dark:text-white border-zinc-700 overflow-hidden`}
         >
           <DialogHeader className="border-b border-zinc-700 pb-2">
             <DialogTitle className="text-2xl font-bold border-none text-center text-slate-700 dark:text-white">
               {title}
             </DialogTitle>
             <DialogDescription></DialogDescription>
-            {/* <Button
-            variant="ghost"
-            className="absolute right-4 top-4 rounded-full p-1 hover:bg-zinc-700"
-            onClick={() => closeModal()}
-          >
-            <X className="h-5 w-5" />
-          </Button> */}
           </DialogHeader>
-          <div id="modal-description" className="sr-only">
-            Descrição do modal para leitores de tela.
-          </div>
-          {/* <div className="mt-4 flex-grow overflow-hidden">{content}</div> */}
-          {/* <div className="mt-4 flex-grow overflow-auto max-h-[70vh]">
-              {content}
-            </div> */}
-          <ScrollArea className="mt-2 flex-grow overflow-auto max-h-[70vh] p-4">
+          <ScrollArea className="mt-2 flex-grow overflow-hidden max-h-[70vh] p-4">
             {content}
           </ScrollArea>
         </DialogContent>
@@ -107,8 +82,6 @@ const Modal: FC = () => {
           </div>
         )}
       </Dialog>
-      {/* {!independenceMode && (
-      )} */}
     </>
   );
 };
