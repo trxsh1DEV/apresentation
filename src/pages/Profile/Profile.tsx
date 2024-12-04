@@ -58,7 +58,7 @@ const UserProfile = () => {
   const { toast } = useToast();
 
   const { data: userData, isLoading } = useQuery({
-    queryKey: ["user"],
+    queryKey: ["user-profile"],
     queryFn: async () => {
       const { data } = await requestWithToken.get(`users`);
       return data;
@@ -75,16 +75,15 @@ const UserProfile = () => {
     },
   });
 
-    // Add this useEffect to update form values when userData is available
-    useEffect(() => {
-      if (userData) {
-        accountForm.reset({
-          username: userData.username,
-          email: userData.email,
-          company: userData.company?.name,
-        });
-      }
-    }, [userData]);
+  useEffect(() => {
+    if (userData) {
+      accountForm.reset({
+        username: userData.username,
+        email: userData.email,
+        company: userData.company?.name,
+      });
+    }
+  }, [userData]);
 
   const passwordForm = useForm<PasswordFormData>({
     resolver: zodResolver(passwordSchema),

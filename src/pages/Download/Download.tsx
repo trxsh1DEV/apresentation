@@ -14,7 +14,7 @@ type TypeCompany = {
 
 const DownloadPage = () => {
   const { data: company, error: userError, isPending: isUserLoading } = useQuery<TypeCompany | null>({
-    queryKey: ["user"],
+    queryKey: ["user-download"],
     queryFn: async (): Promise<TypeCompany | null> => {
       const { data: user } = await requestWithToken.get(`users`);
 

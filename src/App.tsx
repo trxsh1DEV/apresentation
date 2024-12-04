@@ -5,7 +5,6 @@ import Client from "./pages/Clients/Client";
 import { TablePeripherals } from "./pages/Peripherical/TablePeriphericals";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./queryClient";
-import CompareHardware from "./pages/Performance/CompareHardware";
 import Modal from "./components/Modal/ModalComponent";
 import AlertTrigger from "./pages/Triggers/Trigger";
 import Layout from "./pages/Layout/Layout";
@@ -33,6 +32,8 @@ import TermsOfUse from "./pages/Terms/Termo de Uso";
 import { ResetPasswordForm } from "./components/Forms/ResetPasswordForm";
 import { ForgotPasswordForm } from "./components/Forms/ForgotPassword";
 import SoftwareLicenses from "./pages/Software/SoftwareLicenses";
+import SoftwareTable from "./pages/Softwares/Softwares";
+// import "./pages/Performance/style.css"
 
 export default function App() {
   const router = createBrowserRouter([
@@ -67,9 +68,17 @@ export default function App() {
               path: "/payment-failure",
               element: <PaymentFailurePage />,
             },
+            // {
+            //   path: "/performance",
+            //   element: <CompareHardware />,
+            // },
             {
-              path: "/performance",
-              element: <CompareHardware />,
+              path: "/softwares/licenses",
+              element: <SoftwareLicenses />,
+            },
+            {
+              path: "/softwares",
+              element: <SoftwareTable />,
             },
             {
               path: "/stock",

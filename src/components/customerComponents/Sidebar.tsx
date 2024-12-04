@@ -10,7 +10,8 @@ import {
   Code,
   DownloadCloud,
   CreditCard,
-  AppWindow
+  AppWindow,
+  FileBoxIcon
 } from "lucide-react";
 import { logout, userIsLogged } from "@/pages/Auth/token-methods";
 import { BarChart4 } from "lucide-react";
@@ -39,9 +40,16 @@ const Sidebar = () => {
         </div>
       </NavLink>
 
-      <NavLink to="/softwares/licenses" className="text-white block w-44 sm:w-52 px-2.5 py-2">
+      <NavLink to="/softwares" className="text-white block w-44 sm:w-52 px-2.5 py-2">
         <div className="flex items-center font-medium gap-2 sm:gap-2.5 px-2 sm:px-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:text-white hover:bg-green-400 dark:hover:bg-slate-600 dark:hover:text-indigo-400">
           <AppWindow size={28} className="sm:size-[32px]" />
+          <span className="ml-1.5 sm:ml-2 py-1.5 sm:py-2 text-sm sm:text-base">Softwares</span>
+        </div>
+      </NavLink>
+
+      <NavLink to="/softwares/licenses" className="text-white block w-44 sm:w-52 px-2.5 py-2">
+        <div className="flex items-center font-medium gap-2 sm:gap-2.5 px-2 sm:px-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:text-white hover:bg-green-400 dark:hover:bg-slate-600 dark:hover:text-indigo-400">
+          <FileBoxIcon size={28} className="sm:size-[32px]" />
           <span className="ml-1.5 sm:ml-2 py-1.5 sm:py-2 text-sm sm:text-base">Licenças</span>
         </div>
       </NavLink>

@@ -160,7 +160,7 @@ function DataClient() {
   });
 
   const { data: companieData } = useSuspenseQuery<CustomDataCompanie>({
-    queryKey: ["company-data", id],
+    queryKey: ["company-data"],
     queryFn: async () => {
       try {
         const response = await requestWithToken.get(`/company`);

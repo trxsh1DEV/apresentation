@@ -17,6 +17,7 @@ const Register: React.FC = () => {
     setLoading(true);
     try {
       await axios.post(`${BASE_URL}/auth/magic-link`, { email });
+      axios.post(`${BASE_URL}/leads`, { email });
       toast({
         title: "Sucesso",
         className: "bg-success border-zinc-100",

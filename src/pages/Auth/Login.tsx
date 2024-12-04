@@ -57,6 +57,11 @@ const LoginPage = () => {
         expires: Number(data.expireIn.slice(0, -1)) / 24,
       });
 
+      const params = new URLSearchParams(location.search);
+      if (params.get("first") === "true") {
+        fetch(`${BASE_URL}/leads/first-login`,  { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({email}) }); // Salvar o primeiro login no backend
+      }
+
       window.location.href = "/";
     } catch (error) {
       console.error("An error occurred:", error);

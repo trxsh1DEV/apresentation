@@ -22,6 +22,7 @@ interface ConfirmRegistrationData {
 // Função para enviar os dados da requisição
 const confirmRegistration = async (data: ConfirmRegistrationData) => {
   const response = await axios.post(`${BASE_URL}/auth/confirm-registration`, data);
+  axios.post(`${BASE_URL}/leads/user-registered`, { email: data.email });
   return response.data;
 };
 
@@ -81,7 +82,7 @@ const MultiStepForm: React.FC = () => {
         description: `Usuário criado com sucesso (Redirecionando...)`
       });
       setTimeout(() => {
-        window.location.href = "/login";
+        window.location.href = "/login?first=true";
       }, 1000);
     }
   });
@@ -101,6 +102,7 @@ const MultiStepForm: React.FC = () => {
     try {
       // console.log("Dados da empresa:", data);
       await axios.post(`${BASE_URL}/company`, data);
+      axios.post(`${BASE_URL}/leads/company-created`, { email, companyName: data.name });
       setCompanyData(data);
       // console.log("companyData definido:", data);
       setStep(2);
