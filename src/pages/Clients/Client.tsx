@@ -230,7 +230,7 @@ function DataClient() {
   // if (isError) return <div>Error loading data</div>;
 
   return (
-    <main className="w-full">
+    <main className="w-full py-2">
       <div className="flex justify-center space-x-1 mb-5">
         {[
           "Geral",

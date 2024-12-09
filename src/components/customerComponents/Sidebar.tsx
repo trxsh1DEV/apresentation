@@ -7,18 +7,20 @@ import {
   MessageCircle,
   Siren,
   MonitorSmartphone,
-  Code,
+  // Code,
   DownloadCloud,
   CreditCard,
   AppWindow,
-  FileBoxIcon
+  FileBoxIcon,
+  Network
 } from "lucide-react";
 import { logout, userIsLogged } from "@/pages/Auth/token-methods";
 import { BarChart4 } from "lucide-react";
+import "./scroll.css"
 
 const Sidebar = () => {
   return (
-    <nav className="fixed top-0 bottom-0 left-0 h-full w-[60px] sm:w-[70px] text-gray-800 bg-slate-400 dark:bg-slate-900 pt-5 mr-12 sm:mr-16 transition-all duration-300 ease-in-out overflow-hidden hover:w-44 sm:hover:w-52 z-20">
+    <nav className="fixed top-0 bottom-0 left-0 h-full w-[60px] sm:w-[70px] text-gray-800 bg-slate-400 dark:bg-slate-900 pt-5 mr-12 sm:mr-16 transition-all duration-300 ease-in-out overflow-x-hidden hover:w-44 sm:hover:w-52 z-20">
       {/* <NavLink to="/" className="text-white block w-44 sm:w-52 px-2.5 py-2">
         <div className="flex items-center font-medium gap-2 sm:gap-2.5 px-2 sm:px-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:text-white hover:bg-green-400 dark:hover:bg-slate-600 dark:hover:text-indigo-400">
           <Home size={28} className="sm:size-[32px]" />
@@ -61,6 +63,13 @@ const Sidebar = () => {
         </div>
       </NavLink>
 
+      <NavLink to="/distribution" className="text-white block w-44 sm:w-52 px-2.5 py-2">
+        <div className="flex items-center font-medium gap-2 sm:gap-2.5 px-2 sm:px-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:text-white hover:bg-green-400 dark:hover:bg-slate-600 dark:hover:text-indigo-400">
+          <Network size={28} className="sm:size-[32px]" />
+          <span className="ml-1.5 sm:ml-2 py-1.5 sm:py-2 text-sm sm:text-base">Distribuição</span>
+        </div>
+      </NavLink>
+
       <NavLink to="/stock" className="text-white block w-44 sm:w-52 px-2.5 py-2">
         <div className="flex items-center font-medium gap-2 sm:gap-2.5 px-2 sm:px-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:text-white hover:bg-green-400 dark:hover:bg-slate-600 dark:hover:text-indigo-400">
           <MonitorSmartphone size={28} className="sm:size-[32px]" />
@@ -68,12 +77,12 @@ const Sidebar = () => {
         </div>
       </NavLink>
 
-      <NavLink to="/development" className="text-white block w-44 sm:w-52 px-2.5 py-2">
+      {/* <NavLink to="/development" className="text-white block w-44 sm:w-52 px-2.5 py-2">
         <div className="flex items-center font-medium gap-2 sm:gap-2.5 px-2 sm:px-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:text-white hover:bg-green-400 dark:hover:bg-slate-600 dark:hover:text-indigo-400">
           <Code size={28} className="sm:size-[32px]" />
           <span className="ml-1.5 sm:ml-2 py-1.5 sm:py-2 text-sm sm:text-base">API</span>
         </div>
-      </NavLink>
+      </NavLink> */}
 
       <NavLink to="https://wa.me/5511969642568" target="_blank" className="text-white block w-44 sm:w-52 px-2.5 py-2">
         <div className="flex items-center font-medium gap-2 sm:gap-2.5 px-2 sm:px-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:text-white hover:bg-green-400 dark:hover:bg-slate-600 dark:hover:text-indigo-400">

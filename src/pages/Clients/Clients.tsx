@@ -64,7 +64,7 @@ type InventoryTypeEspecified = {
 const DataTableAgents: React.FC = () => {
   // const [clients, setClients] = useState<InventoryTypeEspecified[] | null>([]);
   const { data: clients } = useSuspenseQuery<InventoryTypeEspecified[] | null>({
-    queryKey: ["agent-table-data"],
+    queryKey: ["devices"],
     queryFn: async () => {
       try {
         const response = await requestWithToken.get("/clients");
@@ -295,7 +295,7 @@ const CombinedRowActions = ({ row }: any) => {
   const { mutate: deleteClientMutation } = useMutation({
     mutationFn: deleteClient,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["agent-table-data"] });
+      queryClient.invalidateQueries({ queryKey: ["devices"] });
       toast({
         title: "Sucesso",
         className: "bg-success border-zinc-100",
@@ -316,10 +316,13 @@ const CombinedRowActions = ({ row }: any) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const uploadBatFile = async (clientId: string, file: any) => {
+  const uploadBatFile = async (clientId: string, file: File, parameters: string) => {
+    if (!file) return;
+
     const formData = new FormData();
     formData.append("clientId", clientId);
     formData.append("file", file);
+    formData.append('parameters', parameters);
 
     try {
       await requestWithToken.post("/sockets/send-file", formData, {
@@ -327,12 +330,22 @@ const CombinedRowActions = ({ row }: any) => {
           "Content-Type": "multipart/form-data"
         }
       });
-      alert("Upload do arquivo .bat concluído com sucesso!");
+      toast({
+        title: "Sucesso",
+        variant: "success",
+        description: "Upload do arquivo concluído com sucesso!"
+      });
     } catch (error: any) {
-      console.error("Erro ao fazer upload do arquivo .bat:", error);
-      alert(error.response.data.message);
+      console.error("Erro ao fazer upload do arquivo:", error);
+      toast({
+        title: "Erro",
+        // variant: "",
+        description: error.response?.data?.message || "Erro ao fazer upload"
+      });
     } finally {
-      fileInputRef.current.value = "";
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   };
 
@@ -348,24 +361,28 @@ const CombinedRowActions = ({ row }: any) => {
 
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose} className="mt-2">
         <div className="py-1 min-w-32 rounded-md shadow-lg">
-          <button
-            onClick={() => {
-              fileInputRef.current.click();
-              handleClose();
-            }}
-            disabled={true}
-            className="w-full px-4 py-2 flex items-center gap-3 hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          <label
+            title="Permite arquivos .bat | .ps1 | .exe"
+            className={`w-full px-4 py-2 flex items-center gap-3 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer ${!row.original.online ? 'disabled opacity-50 cursor-not-allowed' : ''
+              }`}
           >
             <input
+              disabled={!row.original.online}
               type="file"
-              accept=".bat"
+              accept=".bat,.ps1,.exe"
               ref={fileInputRef}
-              onChange={(e: any) => uploadBatFile(row.id, e?.target?.files[0])}
               style={{ display: "none" }}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  const parameters = prompt("Digite os parâmetros do arquivo (Opcional)", "");
+                  uploadBatFile(row.original.uid, file, parameters || "");
+                }
+              }}
             />
             <FileCode2 size={24} className="text-teal-400" />
             <span className="text-base">Upload</span>
-          </button>
+          </label>
 
           <button
             onClick={() => {

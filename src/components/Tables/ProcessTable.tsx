@@ -19,6 +19,7 @@ interface ProcessItem {
   name: string;
   pid: number;
   exe: string;
+  group: string; // New field
 }
 
 const useProcessData = (id: string) => {
@@ -27,7 +28,20 @@ const useProcessData = (id: string) => {
     queryFn: async () => {
       try {
         const result = await requestWithToken.get(`/process/${id}`);
-        return result.data.processes.apps;
+        
+        // Add type assertion for processes structure
+        const processes = result.data.processes as Record<string, ProcessItem[]>;
+        
+        // Transform with proper typing
+        const flatProcesses = Object.entries(processes).flatMap(
+          ([group, items]) =>
+            items.map((item: ProcessItem) => ({
+              ...item,
+              group
+            }))
+        );
+        
+        return flatProcesses;
       } catch (error: any) {
         throw new UnexpectedError(
           "Falha ao buscar os dados: " +
@@ -37,6 +51,8 @@ const useProcessData = (id: string) => {
     },
   });
 };
+
+// In your table columns definition, add the new group column:
 
 const TableProcesses = ({ id }: { id: string }) => {
   const queryClient = useQueryClient();
@@ -87,6 +103,11 @@ const TableProcesses = ({ id }: { id: string }) => {
         size: 100,
       },
       {
+        accessorKey: "group",
+        header: "Grupo",
+        // size: 100,
+      },
+      {
         accessorKey: "exe",
         header: "Caminho do Executável",
         size: 300,
@@ -99,6 +120,7 @@ const TableProcesses = ({ id }: { id: string }) => {
     []
   );
 
+  
   const handleCommandAsync = (pid: number) => {
     killMutation.mutate(pid);
   };

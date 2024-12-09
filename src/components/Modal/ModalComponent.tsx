@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/dialog";
 import "./style.css";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { DialogDescription } from "@radix-ui/react-dialog";
 
 const sizeClasses = {
   small: "max-w-[400px]",
@@ -45,15 +44,15 @@ const Modal: FC = () => {
       <Dialog open={isOpen} onOpenChange={() => closeModal()}>
         <DialogContent
           aria-describedby="modal description"
-          className={`${sizeClasses[size]} max-h-[90vh] bg-gray-100 min-w-96 dark:bg-zinc-900 dark:text-white border-zinc-700 overflow-hidden`}
+          className={`${sizeClasses[size]} max-h-[99vh] bg-gray-100 dark:bg-zinc-900 dark:text-white border-zinc-700 overflow-hidden p-4`}
         >
-          <DialogHeader className="border-b border-zinc-700 pb-2">
+          <DialogHeader className="border-b border-zinc-700">
             <DialogTitle className="text-2xl font-bold border-none text-center text-slate-700 dark:text-white">
               {title}
             </DialogTitle>
-            <DialogDescription></DialogDescription>
+            {/* <DialogDescription></DialogDescription> */}
           </DialogHeader>
-          <ScrollArea className="mt-2 flex-grow overflow-hidden max-h-[70vh] p-4">
+          <ScrollArea className="flex-grow overflow-hidden">
             {content}
           </ScrollArea>
         </DialogContent>
