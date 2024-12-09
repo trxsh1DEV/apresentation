@@ -44,7 +44,7 @@ const Modal: FC = () => {
       <Dialog open={isOpen} onOpenChange={() => closeModal()}>
         <DialogContent
           aria-describedby="modal description"
-          className={`${sizeClasses[size]} max-h-[99vh] bg-gray-100 dark:bg-zinc-900 dark:text-white border-zinc-700 overflow-hidden p-4`}
+          className={`${sizeClasses[size]} max-h-[90vh] bg-gray-100 dark:bg-zinc-900 dark:text-white border-zinc-700 overflow-hidden p-4`}
         >
           <DialogHeader className="border-b border-zinc-700">
             <DialogTitle className="text-2xl font-bold border-none text-center text-slate-700 dark:text-white">
@@ -52,7 +52,7 @@ const Modal: FC = () => {
             </DialogTitle>
             {/* <DialogDescription></DialogDescription> */}
           </DialogHeader>
-          <ScrollArea className="flex-grow overflow-hidden">
+          <ScrollArea className="flex-grow overflow-hidden max-h-[75vh]">
             {content}
           </ScrollArea>
         </DialogContent>
