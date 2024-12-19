@@ -52,6 +52,8 @@ type InventoryTypeEspecified = {
   so: string;
   typeMachine: string;
   userLogged: string;
+  department: string;
+  lastUpdate: string;
   memoryTotal: number;
   diskTotal: number;
   createdAt: string;
@@ -138,14 +140,22 @@ const DataTableAgents: React.FC = () => {
       //       : cell.getValue(),
       // },
       {
-        accessorKey: "createdAt",
-        header: "Data de inclusão",
-        Cell: ({ cell }: any) => formatDateString(cell.getValue())
-      },
-      {
         accessorKey: "memoryTotal",
         header: "RAM",
         Cell: ({ cell }: any) => cell.getValue().toFixed(2) + " GB"
+      },
+      {
+        accessorKey: "department",
+        header: "Departamento"
+      },
+      {
+        accessorKey: "lastUpdate",
+        header: "Última atualização"
+      },
+      {
+        accessorKey: "createdAt",
+        header: "Data de inclusão",
+        Cell: ({ cell }: any) => formatDateString(cell.getValue())
       }
     ],
     []

@@ -72,7 +72,7 @@ const Shell = ({
   return (
     <div className="w-full h-full text-white bg-black bg-opacity-75 flex justify-center items-center z-10">
       <div className="rounded-lg border-4 p-4 relative bg-black overflow-auto w-[1000px] h-3/4 text-left">
-        <button onClick={closeModal} className="fixed right-28 text-white hover:text-gray-400 transition-colors">
+        <button onClick={closeModal} className="absolute top-2 right-2 cursor-pointer bg-transparent">
           <X size="32" className="hover:opacity-85" />
         </button>
 

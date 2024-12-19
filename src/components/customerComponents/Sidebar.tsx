@@ -16,11 +16,11 @@ import {
 } from "lucide-react";
 import { logout, userIsLogged } from "@/pages/Auth/token-methods";
 import { BarChart4 } from "lucide-react";
-import "./scroll.css"
+import "./scroll.css";
 
 const Sidebar = () => {
   return (
-    <nav className="fixed top-0 bottom-0 left-0 h-full w-[60px] sm:w-[70px] text-gray-800 bg-slate-400 dark:bg-slate-900 pt-5 mr-12 sm:mr-16 transition-all duration-300 ease-in-out overflow-x-hidden hover:w-44 sm:hover:w-52 z-20">
+    <nav className="fixed top-0 bottom-0 left-0 h-full w-[60px] sm:w-[70px] text-gray-800 bg-black bg-opacity-70 dark:bg-slate-900 pt-5 mr-12 sm:mr-16 transition-all duration-300 ease-in-out overflow-x-hidden hover:w-44 sm:hover:w-52 z-20">
       {/* <NavLink to="/" className="text-white block w-44 sm:w-52 px-2.5 py-2">
         <div className="flex items-center font-medium gap-2 sm:gap-2.5 px-2 sm:px-2.5 rounded transition-all duration-300 ease-in cursor-pointer hover:text-white hover:bg-green-400 dark:hover:bg-slate-600 dark:hover:text-indigo-400">
           <Home size={28} className="sm:size-[32px]" />

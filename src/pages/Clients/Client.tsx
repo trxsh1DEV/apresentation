@@ -10,7 +10,7 @@ import {
   SelectItem,
   SelectLabel,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import TableSoftwares from "../../components/Tables/Software";
@@ -119,10 +119,7 @@ const handleCopyContent = (inputId: string) => {
 
 export default function Client() {
   return (
-    <ErrorBoundary
-      FallbackComponent={ErrorFallback}
-      onReset={() => location.reload()}
-    >
+    <ErrorBoundary FallbackComponent={ErrorFallback} onReset={() => location.reload()}>
       <Suspense
         fallback={
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -150,13 +147,10 @@ function DataClient() {
         const response = await requestWithToken.get(`/clients/full/${id}`);
         return response.data;
       } catch (error: any) {
-        throw new UnexpectedError(
-          "Falha ao buscar os dados: " +
-            (error.response?.data?.message || error.message)
-        );
+        throw new UnexpectedError("Falha ao buscar os dados: " + (error.response?.data?.message || error.message));
       }
     },
-    retry: 1,
+    retry: 1
   });
 
   const { data: companieData } = useSuspenseQuery<CustomDataCompanie>({
@@ -166,13 +160,10 @@ function DataClient() {
         const response = await requestWithToken.get(`/company`);
         return response.data;
       } catch (error: any) {
-        throw new UnexpectedError(
-          "Falha ao buscar os dados: " +
-            (error.response?.data?.message || error.message)
-        );
+        throw new UnexpectedError("Falha ao buscar os dados: " + (error.response?.data?.message || error.message));
       }
     },
-    retry: 1,
+    retry: 1
   });
 
   const handleEdit = async () => {
@@ -183,41 +174,32 @@ function DataClient() {
       const form = formElement.current;
       if (!form) return;
 
-      const readOnlyElements = form.querySelectorAll(
-        "input:not([readonly]), [data-select-type='edit-field']"
-      );
+      const readOnlyElements = form.querySelectorAll("input:not([readonly]), [data-select-type='edit-field']");
 
       readOnlyElements.forEach((element) => {
-        const inputValue =
-          element instanceof HTMLInputElement
-            ? element.value
-            : element.textContent;
+        const inputValue = element instanceof HTMLInputElement ? element.value : element.textContent;
         if (inputValue) {
-          updatedCustom[element.id] = [
-            "Selecione um DP",
-            "Localizado no(a)",
-            "Pertence ao",
-          ].includes(inputValue)
+          updatedCustom[element.id] = ["Selecione um DP", "Localizado no(a)", "Pertence ao"].includes(inputValue)
             ? ""
             : inputValue;
         }
       });
 
       await requestWithToken.patch(`/inventory/custom/${id}`, {
-        custom: updatedCustom,
+        custom: updatedCustom
       });
       toast({
         title: "Sucesso",
         className: "bg-success border-zinc-100",
         variant: "destructive",
-        description: `Campo(s) atualizados com sucesso`,
+        description: `Campo(s) atualizados com sucesso`
       });
     } catch (err: any) {
       toast({
         title: "Erro",
         // className: "bg-success border-zinc-100",
         variant: "destructive",
-        description: `Ocorreu um problema para atualizar esse(s) campo(s). Erro ${err.message}`,
+        description: `Ocorreu um problema para atualizar esse(s) campo(s). Erro ${err.message}`
       });
     }
   };
@@ -239,14 +221,13 @@ function DataClient() {
           "Histórico de Ocorrências",
           "Monitoramento",
           "Processos",
-          "Detalhes",
+          "Detalhes"
         ].map((tab) => (
           <button
             key={tab}
             className={`px-4 bg py-2 rounded text-xl font-semibold transition-all duration-300 hover:opacity-80 ${
-              activeTab === tab
-                && "dark:bg-purple-700 bg-green-500 text-white"
-                // : ""
+              activeTab === tab && "dark:bg-purple-700 bg-green-500 text-white"
+              // : ""
             }`}
             onClick={() => handleTabClick(tab)}
           >
@@ -254,17 +235,11 @@ function DataClient() {
           </button>
         ))}
       </div>
-      <section
-        className="max-w-[1400px] w-[1400px] mx-auto rounded-lg"
-        id="FormContainer"
-        ref={formElement}
-      >
+      <section className="max-w-[1400px] w-[1400px] mx-auto rounded-lg" id="FormContainer" ref={formElement}>
         {/* Renderizar conteúdo conforme a aba ativa */}
         {activeTab === "Geral" && (
           <div className="grid grid-cols-[repeat(2,1fr)] gap-[15px_40px] items-center p-[15px]">
-            <div className="text-center col-span-full text-4xl font-bold mb-5">
-              Informações Gerais
-            </div>
+            <div className="text-center col-span-full text-4xl font-bold mb-5">Informações Gerais</div>
 
             <InputComponent
               label="SO"
@@ -325,29 +300,21 @@ function DataClient() {
             <InputComponent
               label="IP"
               id="net-ip"
-              value={
-                data.inventory.inventoryGeneral.network.principal_interface
-                  ?.ipv4 || ""
-              }
+              value={data.inventory.inventoryGeneral.network.principal_interface?.ipv4 || ""}
               readOnly
               onClick={() => handleCopyContent("net-ip")}
             />
             <InputComponent
               label="Mac"
               id="net-mac"
-              value={
-                data.inventory.inventoryGeneral.network.principal_interface
-                  ?.mac || ""
-              }
+              value={data.inventory.inventoryGeneral.network.principal_interface?.mac || ""}
               readOnly
               onClick={() => handleCopyContent("net-mac")}
             />
             <InputComponent
               label="Rede Conec."
               id="net-name"
-              value={
-                data.inventory.inventoryGeneral.network.principal_interface.name
-              }
+              value={data.inventory.inventoryGeneral.network.principal_interface.name}
               readOnly
               onClick={() => handleCopyContent("net-name")}
             />
@@ -410,10 +377,7 @@ function DataClient() {
             />
 
             <div className="flex justify-between items-center text-[1.4rem] relative">
-              <Label
-                htmlFor="department_ref"
-                className="text-2xl font-medium text-gray-700 dark:text-gray-300 "
-              >
+              <Label htmlFor="department_ref" className="text-2xl font-medium text-gray-700 dark:text-gray-300 ">
                 Departamento
               </Label>
 
@@ -423,11 +387,7 @@ function DataClient() {
                   // className="w-[270px] bg-slate-800 ring-1 ring-ring px-3 py-2 text-lg ring-offset-background placeholder:text-muted-foreground"
                   className="w-[256px] dark:bg-slate-800 px-3 py-2 text-xl ring-ring focus:outline-none focus:ring-4 focus:ring-ring focus:ring-offset-2"
                 >
-                  <SelectValue
-                    id="department"
-                    data-select-type="edit-field"
-                    placeholder="Selecione um DP"
-                  />
+                  <SelectValue id="department" data-select-type="edit-field" placeholder="Selecione um DP" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
@@ -449,10 +409,7 @@ function DataClient() {
             </div>
 
             <div className="flex justify-between items-center text-[1.4rem] relative">
-              <Label
-                htmlFor="local_ref"
-                className="text-2xl font-medium text-gray-700 dark:text-gray-300"
-              >
+              <Label htmlFor="local_ref" className="text-2xl font-medium text-gray-700 dark:text-gray-300">
                 Local
               </Label>
 
@@ -461,11 +418,7 @@ function DataClient() {
                   id="local_ref"
                   className="w-[256px] dark:bg-slate-800 px-3 py-2 text-xl ring-ring focus:outline-none focus:ring-4 focus:ring-ring focus:ring-offset-2"
                 >
-                  <SelectValue
-                    data-select-type="edit-field"
-                    id="local"
-                    placeholder="Localizado no(a)"
-                  />
+                  <SelectValue data-select-type="edit-field" id="local" placeholder="Localizado no(a)" />
                 </SelectTrigger>
                 <SelectContent>
                   {/* <SelectGroup>
@@ -484,10 +437,7 @@ function DataClient() {
             </div>
 
             <div className="flex justify-between items-center text-[1.4rem] relative">
-              <Label
-                htmlFor="bond_ref"
-                className="text-2xl font-medium text-gray-700 dark:text-gray-300"
-              >
+              <Label htmlFor="bond_ref" className="text-2xl font-medium text-gray-700 dark:text-gray-300">
                 Vinculo
               </Label>
 
@@ -496,11 +446,7 @@ function DataClient() {
                   id="bond_ref"
                   className="w-[256px] dark:bg-slate-800 px-3 py-2 text-xl ring-ring focus:outline-none focus:ring-4 focus:ring-ring focus:ring-offset-2"
                 >
-                  <SelectValue
-                    data-select-type="edit-field"
-                    id="bond"
-                    placeholder="Pertence ao"
-                  />
+                  <SelectValue data-select-type="edit-field" id="bond" placeholder="Pertence ao" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
@@ -514,7 +460,7 @@ function DataClient() {
             <div className="col-span-full flex justify-center mt-5">
               {" "}
               {/* Centralizando o botão "Salvar" */}
-              <Button className="w-60 text-xl" onClick={handleEdit}>
+              <Button className="w-60 text-xl text-white bg-green-500 hover:bg-green-600" onClick={handleEdit}>
                 Salvar
               </Button>
             </div>
@@ -534,13 +480,10 @@ function DataClient() {
         )}
         {activeTab === "Geolocalização" && (
           <div className="grid grid-cols-[repeat(2,1fr)] gap-[15px_40px] items-center  ">
-            <div className="text-center col-span-full text-5xl font-bold">
-              Geolocalização
-            </div>
+            <div className="text-center col-span-full text-5xl font-bold">Geolocalização</div>
             <div className="col-span-full text-3xl font-bold">
               <H1Custom className="text-left">
-                {data.inventory.inventoryGeneral.system.hostname},{" "}
-                {data.inventory.inventoryGeneral.system.last_update}
+                {data.inventory.inventoryGeneral.system.hostname}, {data.inventory.inventoryGeneral.system.last_update}
               </H1Custom>
             </div>
             <div className="col-span-full h-full w-full">
@@ -579,22 +522,25 @@ function DataClient() {
         {activeTab === "Monitoramento" && (
           <div className="grid grid-cols-[repeat(2,1fr)] gap-[15px_40px] items-center">
             <div className="text-center col-span-full text-4xl font-bold mb-6">
-              <span onClick={() => handleTabClick("Monitoramento")} className="mr-8 cursor-pointer dark:text-purple-400 text-green-500">Monitoramento</span>
-              <span onClick={() => handleTabClick("Produtividade")} className="cursor-pointer">Produtividade</span>
+              <span
+                onClick={() => handleTabClick("Monitoramento")}
+                className="mr-8 cursor-pointer dark:text-purple-400 text-green-500"
+              >
+                Monitoramento
+              </span>
+              <span onClick={() => handleTabClick("Produtividade")} className="cursor-pointer">
+                Produtividade
+              </span>
             </div>
             <WrapperCharts
               data={{
                 cpu_temp: data.inventory.inventoryGeneral.cpu.cpu_temp || 0,
                 cpu_usage: data.inventory.inventoryGeneral.cpu.cpu_usage,
-                free_disk_space:
-                  data.inventory.inventoryGeneral.storage[0].available,
+                free_disk_space: data.inventory.inventoryGeneral.storage[0].available,
                 ram_usage: data.inventory.inventoryGeneral.memory.used,
                 ram_total: data.inventory.inventoryGeneral.memory.total,
-                total_disk_space:
-                  data.inventory.inventoryGeneral.storage[0].total,
-                day: getDayOfWeek(
-                  data.inventory.inventoryGeneral.system.last_update
-                ),
+                total_disk_space: data.inventory.inventoryGeneral.storage[0].total,
+                day: getDayOfWeek(data.inventory.inventoryGeneral.system.last_update)
               }}
               id={data.uid}
             />
@@ -603,13 +549,21 @@ function DataClient() {
         {activeTab === "Produtividade" && (
           <div className="w-full">
             <div className="text-center col-span-full text-4xl font-bold mb-6">
-              <span onClick={() => handleTabClick("Monitoramento")} className="mr-8 cursor-pointer">Monitoramento</span>
-              <span onClick={() => handleTabClick("Produtividade")} className="cursor-pointer dark:text-purple-400 text-green-500">Produtividade</span>
+              <span onClick={() => handleTabClick("Monitoramento")} className="mr-8 cursor-pointer">
+                Monitoramento
+              </span>
+              <span
+                onClick={() => handleTabClick("Produtividade")}
+                className="cursor-pointer dark:text-purple-400 text-green-500"
+              >
+                Produtividade
+              </span>
             </div>
-          <ActivityMonitor id={data.uid}
-          hoursTotal={8}
-          // hoursTotal={data.inventory.inventoryGeneral.system.time_machine_on}
-          />
+            <ActivityMonitor
+              id={data.uid}
+              hoursTotal={8}
+              // hoursTotal={data.inventory.inventoryGeneral.system.time_machine_on}
+            />
           </div>
         )}
         {activeTab === "Detalhes" && (
