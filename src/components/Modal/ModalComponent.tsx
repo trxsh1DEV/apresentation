@@ -4,6 +4,7 @@ import { closeModalAtom, modalAtom } from "../../Context/ModalContext";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -50,7 +51,7 @@ const Modal: FC = () => {
             <DialogTitle className="text-2xl font-bold border-none text-center text-slate-700 dark:text-white">
               {title}
             </DialogTitle>
-            {/* <DialogDescription></DialogDescription> */}
+            <DialogDescription></DialogDescription>
           </DialogHeader>
           <ScrollArea className="flex-grow overflow-hidden max-h-[75vh]">
             {content}

@@ -322,7 +322,7 @@ const CombinedRowActions = ({ row }: any) => {
     const formData = new FormData();
     formData.append("clientId", clientId);
     formData.append("file", file);
-    formData.append('parameters', parameters);
+    formData.append("parameters", parameters);
 
     try {
       await requestWithToken.post("/sockets/send-file", formData, {
@@ -363,8 +363,9 @@ const CombinedRowActions = ({ row }: any) => {
         <div className="py-1 min-w-32 rounded-md shadow-lg">
           <label
             title="Permite arquivos .bat | .ps1 | .exe"
-            className={`w-full px-4 py-2 flex items-center gap-3 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer ${!row.original.online ? 'disabled opacity-50 cursor-not-allowed' : ''
-              }`}
+            className={`w-full px-4 py-2 flex items-center gap-3 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer ${
+              !row.original.online ? "disabled opacity-50 cursor-not-allowed" : ""
+            }`}
           >
             <input
               disabled={!row.original.online}

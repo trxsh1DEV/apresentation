@@ -107,7 +107,7 @@ const AlertTrigger: React.FC = () => {
   };
 
   return (
-    <div className="p-4 bg-gray-900 text-white mx-auto min-w-max max-w-5xl">
+    <div className="p-4 mx-auto min-w-max max-w-5xl">
       <H1Custom className="text-center mb-6">Configuração de Alertas</H1Custom>
       <div className="w-full overflow-x-auto">
         <Table>
@@ -138,7 +138,7 @@ const AlertTrigger: React.FC = () => {
                       )
                     )}
                     onBlur={(e) => updateParameter(alert.name, Number(e.target.value))}
-                    className="bg-gray-800 text-white p-2 rounded"
+                    className="p-2 rounded dark:bg-slate-700 disabled:opacity-50"
                   />
                   <span className="ml-2">%</span>
                    </TableCell>

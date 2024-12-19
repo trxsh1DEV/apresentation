@@ -15,6 +15,7 @@ type Client = {
   uid: string;
   hostname: string;
   userLogged: string;
+  online: boolean
 };
 
 
@@ -38,6 +39,8 @@ interface DistributionDevicesProps {
     },
     retry: 1
   });
+
+  const clientsOnline = data?.filter(client => client.online === true) || [];
 
   const handleSendToSelected = async () => {
     try {
@@ -70,7 +73,7 @@ interface DistributionDevicesProps {
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
       // Select all items
-      setSelectedIds(data?.map(client => client.uid) || []);
+      setSelectedIds(clientsOnline?.map(client => client.uid) || []);
     } else {
       // Deselect all items
       setSelectedIds([]);
@@ -104,16 +107,18 @@ interface DistributionDevicesProps {
             <TableRow>
                 <TableHead className="text-xl">
                     <Checkbox
-                        checked={data?.length === selectedIds.length && data?.length > 0}
+                        checked={clientsOnline?.length === selectedIds.length && clientsOnline?.length > 0}
                         onCheckedChange={handleSelectAll}
-                    />
+                        disabled={clientsOnline?.length <= 0}
+                        title={clientsOnline?.length <= 0 ? "Nenhum dispositivo online" : "Selecionar todos"}
+                      />
                 </TableHead>
               <TableHead className="text-xl">Hostname</TableHead>
               <TableHead className="text-xl">Usuário</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data?.map((client: Client) => (
+            {clientsOnline?.map((client: Client) => (
               <TableRow key={client.uid}>
                 <TableCell className="text-lg">
                   <Checkbox
